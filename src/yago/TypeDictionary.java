@@ -1,37 +1,24 @@
 package yago;
 
-import java.io.IOException;
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.text.ParseException;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Random;
 
-import db.JDBCConnection;
+import db.models.FactType;
 
 public class TypeDictionary {
 
 	private static TypeDictionary instance = null;
+	static private Random r = new Random();
 
 	private HashMap<String, Integer> typeMap;
 
 	protected TypeDictionary() {
+		
 		typeMap = new HashMap<String, Integer>();
-		Connection conn;
-		try {
-			conn = JDBCConnection.getConnection();
-			try (Statement statement = conn.createStatement();
-					ResultSet rs = statement.executeQuery("SELECT * FROM question_type");) {
-				while (rs.next() == true) {
-					typeMap.put(rs.getString("name"), rs.getInt("id"));
-				}
-			} catch (SQLException e) {
-				System.out.println("ERROR executeQuery - " + e.getMessage());
-			}
-
-		} catch (IOException | ParseException e1) {
-			e1.printStackTrace();
+		List<FactType> allTypes = FactType.fetchAll();
+		for (FactType fact : allTypes) {
+			typeMap.put(fact.getTypeName(), fact.getId());
 		}
 
 	} 
@@ -49,29 +36,22 @@ public class TypeDictionary {
 			return typeMap.get(typeName);
 		}
 		else {
-			try {
-				Connection conn = JDBCConnection.getConnection();
-				try (Statement statement = conn.createStatement()){
-
-					int result = statement.executeUpdate(String.format(""
-							+ "INSERT INTO question_type(name) "
-							+ "VALUES('%s')", typeName));
-
-					try (ResultSet genKeys = statement.getGeneratedKeys()) {
-						if (genKeys.next()) {
-							typeMap.put(typeName, (int) genKeys.getLong(1));
-						}
-					}
-
-				} catch (SQLException e) {
-					System.out.println("ERROR executeQuery - " + e.getMessage());
-				}
-			} catch (IOException | ParseException e1) {
-				e1.printStackTrace();
+			FactType fact = new FactType(-1, typeName);
+			int id = fact.save();
+			if (id != -1) {
+				typeMap.put(typeName, id);
 			}
-			return typeMap.get(typeName);
+			return id;
 		}
 
 	}
+	
+	public FactType getRandomFactType() {
+		
+		int index = r.nextInt(typeMap.size());
+		return (FactType) typeMap.values().toArray()[index];
+	}
+	
+
 }
 

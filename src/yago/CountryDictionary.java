@@ -1,14 +1,9 @@
 package yago;
 
-import java.io.IOException;
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.text.ParseException;
 import java.util.HashMap;
+import java.util.List;
 
-import db.JDBCConnection;
+import db.models.Country;
 
 public class CountryDictionary {
 
@@ -18,29 +13,20 @@ public class CountryDictionary {
 	
 	protected CountryDictionary() {
 		countryMap = new HashMap<String, Integer>();
-		Connection conn;
-		try {
-			conn = JDBCConnection.getConnection();
-			try (Statement statement = conn.createStatement();
-				ResultSet rs = statement.executeQuery("SELECT * FROM country");) {
-				while (rs.next() == true) {
-					countryMap.put(rs.getString("name"), rs.getInt("id"));
-				}
-			} catch (SQLException e) {
-				System.out.println("ERROR executeQuery - " + e.getMessage());
-			}
-			
-		} catch (IOException | ParseException e1) {
-			e1.printStackTrace();
+		List<Country> allCountries = Country.fetchAll();
+		for (Country country : allCountries) {
+			countryMap.put(country.getName(), country.getId());
 		}
-	
 	} 
 	
-	public static Integer getCountryId(String countryName) {
+	public static CountryDictionary getInstance() {
 		if (instance == null) {
 			instance = new CountryDictionary();
 		}
-		
+		return instance;
+	}
+	
+	public Integer getCountryId(String countryName) {
 		if (instance.countryMap.containsKey(countryName)) {
 			return instance.countryMap.get(countryName);
 		}

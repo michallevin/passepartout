@@ -1,7 +1,6 @@
 package db;
 
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -45,6 +44,7 @@ public class JDBCConnection {
 			conn = DriverManager.getConnection(
 					dbConfig.getConnectionURL(), dbConfig.getUserName(), dbConfig.getPassword()
 					);
+			
 		} catch (SQLException e) {
 			System.out.println("Unable to connect - " + e.getMessage());
 			conn = null;
