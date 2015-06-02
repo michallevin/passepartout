@@ -16,10 +16,12 @@ public class FactType {
 	private String typeName;
 	private String questionWording;
 	private int id;
+	private boolean isLiteral;
 
-	public FactType(int id, String typeName) {
+	public FactType(int id, String typeName, boolean isLiteral) {
 		this.setId(id);
 		this.setTypeName(typeName);
+		this.isLiteral = isLiteral;
 	}
 
 	public FactType(int id, String typeName, String questionWording) {
@@ -35,8 +37,8 @@ public class FactType {
 			conn = JDBCConnection.getConnection();
 			try (Statement statement = conn.createStatement()){
 				statement.executeUpdate(String.format(""
-						+ "INSERT INTO fact_type(name) "
-						+ "VALUES('%s')", getTypeName()), Statement.RETURN_GENERATED_KEYS);
+						+ "INSERT INTO fact_type(name, is_literal) "
+						+ "VALUES('%s', %d)", getTypeName(), isLiteral), Statement.RETURN_GENERATED_KEYS);
 
 				try (ResultSet genKeys = statement.getGeneratedKeys()) {
 					if (genKeys.next()) {
@@ -87,7 +89,7 @@ public class FactType {
 			try (Statement statement = conn.createStatement();
 					ResultSet rs = statement.executeQuery("SELECT * FROM fact_type");) {
 				while (rs.next() == true) {
-					result.add(new FactType(rs.getInt("id"), rs.getString("name")));
+					result.add(new FactType(rs.getInt("id"), rs.getString("name"), rs.getBoolean("is_literal")));
 				}
 			} catch (SQLException e) {
 				System.out.println("ERROR executeQuery - " + e.getMessage());

@@ -17,17 +17,20 @@ public class Fact {
 
 	String subject;
 	String infoType;
-
+	String yagoId;
+	
 	int countryId;
 	int factTypeId;
 	private String data;
+	private boolean isLiteral;
+	
 
+	public Fact(String yagoId, String subject, String infoType, String data, boolean isLiteral) {
 
-
-	public Fact(String subject, String infoType, String data) {
-
+		this.yagoId = yagoId;
 		this.subject = subject;
 		this.infoType = infoType;
+		this.isLiteral = isLiteral;
 		this.setData(data);
 	}
 
@@ -53,12 +56,12 @@ public class Fact {
 					answer = subject;
 				}
 
-				Integer typeId = TypeDictionary.getInstance().getId(infoType);
+				Integer typeId = TypeDictionary.getInstance().getId(infoType, isLiteral);
 
 
 				statement.executeUpdate(String.format(""
-						+ "INSERT INTO fact(country_id, data, type_id) "
-						+ "VALUES(%d, '%s', %d)", countryId, answer.replace("'", "''"), typeId));
+						+ "INSERT INTO fact(yago_id, country_id, data, type_id) "
+						+ "VALUES('%s', %d, '%s', %d)", yagoId, countryId, answer.replace("'", "''"), typeId));
 
 			} catch (SQLException e) {
 				System.out.println("ERROR executeQuery - " + e.getMessage());

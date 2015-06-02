@@ -30,13 +30,13 @@ public class TypeDictionary {
 		return instance;
 	}
 
-	public Integer getId(String typeName) {
+	public Integer getId(String typeName, boolean isLiteral) {
 
 		if (typeMap.containsKey(typeName)) {
 			return typeMap.get(typeName);
 		}
 		else {
-			FactType fact = new FactType(-1, typeName);
+			FactType fact = new FactType(-1, typeName, isLiteral);
 			int id = fact.save();
 			if (id != -1) {
 				typeMap.put(typeName, id);

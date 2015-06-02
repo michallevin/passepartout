@@ -6,8 +6,10 @@ import java.util.List;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import core.Question;
 import yago.YagoImport;
 import db.models.Country;
 import db.models.Highscore;
@@ -27,12 +29,15 @@ public class ApiController {
 		return questions;
 	}
 
+	
+	/* import */ 
+	
 	@RequestMapping(value="/import/start", method=RequestMethod.GET)
 	public void startImport() {
 		Thread t = new Thread() {
 			 public void run() {
 				 if (!YagoImport.isImporting())
-					 YagoImport.startImport(false, false, false, true, true);
+					 YagoImport.startImport(true, true, true, true, true);
 				 else {
 					 
 				 }
@@ -57,24 +62,32 @@ public class ApiController {
 	}
 
 	@RequestMapping(value="/rest/country", method=RequestMethod.POST)
-	public Country addCountry() {
-		return null;
+	public Country addCountry(@RequestParam("name") String name) {
+		Country country = new Country(-1, "", name);
+		country.save();
+		return country;
+		
 	}
 	
 	@RequestMapping(value="/rest/country/{id}", method=RequestMethod.GET)
 	public Country getCountry(@PathVariable Integer id) {
-		return null;
+		return Country.fetchById(id);
 	}
 	
 
 	@RequestMapping(value="/rest/country/{id}", method=RequestMethod.PUT)
-	public Country editCountry(@PathVariable Integer id) {
-		return null;
+	public Country editCountry(@PathVariable Integer id, @RequestParam("name") String name) {
+		Country country = Country.fetchById(id);
+		country.setName(name);
+		country.update();
+		return country;
 	}
 	
 	@RequestMapping(value="/rest/country/{id}", method=RequestMethod.DELETE)
 	public Country deleteCountry(@PathVariable Integer id) {
-		return null;
+		Country country = Country.fetchById(id);
+		country.delete();
+		return country;
 	}
 	
 	// highscore

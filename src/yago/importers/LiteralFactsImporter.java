@@ -20,7 +20,7 @@ public class LiteralFactsImporter extends BaseImporter {
 	@Override
 	public void handleRow(String id, String attr1, String attr2, String attr3,
 			String line) {
-		Fact yagoFact = new Fact(attr1, attr2, attr3);
+		Fact yagoFact = new Fact(id, attr1, attr2, attr3, true);
 		yagoFact.save();
 		
 	}

@@ -22,7 +22,7 @@ public class AttributesImporter extends BaseImporter {
 	@Override
 	public void handleRow(String id, String attr1, String attr2, String attr3,
 			String line) {
-		Fact fact = new Fact(attr1, attr2, attr3);
+		Fact fact = new Fact(id, attr1, attr2, attr3, true);
 		fact.save();
 		
 	}

@@ -9,19 +9,24 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 
+import db.InputHelper;
 import db.JDBCConnection;
 
 public class Country {
 
 	private String name;
 	private int id;
+	private String yagoId;
 
-	public Country(int id, String name) {
+	public Country(int id, String yagoId, String name) {
 
 		this.setId(id);
 		this.setName(name);
+		this.yagoId = yagoId;
 	}
 
+	
+	
 	public void save() {
 		Connection conn;
 		try {
@@ -29,8 +34,16 @@ public class Country {
 			try (Statement statement = conn.createStatement()){
 
 				statement.executeUpdate(String.format(""
-						+ "INSERT INTO country(name) "
-						+ "VALUES('%s')", getName().replace("'", "''")));
+						+ "INSERT INTO country(yago_id, name) "
+						+ "VALUES('%s', '%s')", yagoId, getName().replace("'", "''")), Statement.RETURN_GENERATED_KEYS);
+
+				try (ResultSet genKeys = statement.getGeneratedKeys()) {
+					if (genKeys.next()) {
+						int id = (int) genKeys.getLong(1);
+						this.setId(id);
+					}
+				}
+				
 
 			} catch (SQLException e) {
 				System.out.println("ERROR executeQuery - " + e.getMessage());
@@ -41,15 +54,34 @@ public class Country {
 
 	}
 	
+	public static Country fetchById(int id) {
+		Connection conn;
+		try {
+			conn = JDBCConnection.getConnection();
+			try (Statement statement = conn.createStatement();
+					ResultSet rs = statement.executeQuery(String.format("SELECT * FROM country WHERE deleted = 0 AND id = %d", id));) {
+				while (rs.next() == true) {
+					return new Country(rs.getInt("id"), rs.getString("yago_id"), rs.getString("name"));
+				}
+			} catch (SQLException e) {
+				System.out.println("ERROR executeQuery - " + e.getMessage());
+			}
+
+		} catch (IOException | ParseException e1) {
+			e1.printStackTrace();
+		}
+		return null;
+	}
+	
 	public static List<Country> fetchAll() {
 		List<Country> result = new ArrayList<Country>();
 		Connection conn;
 		try {
 			conn = JDBCConnection.getConnection();
 			try (Statement statement = conn.createStatement();
-					ResultSet rs = statement.executeQuery("SELECT * FROM country");) {
+					ResultSet rs = statement.executeQuery("SELECT * FROM country WHERE deleted = 0");) {
 				while (rs.next() == true) {
-					result.add(new Country(rs.getInt("id"), rs.getString("name")));
+					result.add(new Country(rs.getInt("id"), rs.getString("yago_id"), rs.getString("name")));
 				}
 			} catch (SQLException e) {
 				System.out.println("ERROR executeQuery - " + e.getMessage());
@@ -67,9 +99,9 @@ public class Country {
 		try {
 			conn = JDBCConnection.getConnection();
 			try (Statement statement = conn.createStatement();
-					ResultSet rs = statement.executeQuery("SELECT * FROM country WHERE route_order IS NOT NULL ORDER BY route_order");) {
+					ResultSet rs = statement.executeQuery("SELECT * FROM country WHERE route_order IS NOT NULL AND deleted = 0 ORDER BY route_order");) {
 				while (rs.next() == true) {
-					result.add(new Country(rs.getInt("id"), rs.getString("name")));
+					result.add(new Country(rs.getInt("id"), rs.getString("yago_id"), rs.getString("name")));
 				}
 			} catch (SQLException e) {
 				System.out.println("ERROR executeQuery - " + e.getMessage());
@@ -96,5 +128,46 @@ public class Country {
 	public void setId(int id) {
 		this.id = id;
 	}
+
+
+
+	public void update() {
+		Connection conn;
+		try {
+			conn = JDBCConnection.getConnection();
+			try (Statement statement = conn.createStatement()){
+
+				statement.executeUpdate(String.format(""
+						+ "UPDATE country SET name = '%s', updated = 1 WHERE id = %d", InputHelper.santize(name), id));
+
+				
+			} catch (SQLException e) {
+				System.out.println("ERROR executeQuery - " + e.getMessage());
+			}
+		} catch (IOException | ParseException e1) {
+			e1.printStackTrace();
+		}		
+	}
+
+
+
+	public void delete() {
+		Connection conn;
+		try {
+			conn = JDBCConnection.getConnection();
+			try (Statement statement = conn.createStatement()){
+
+				statement.executeUpdate(String.format(""
+						+ "UPDATE country SET deleted = 1, updated = 1 WHERE id = %d", InputHelper.santize(name), id));
+
+				
+			} catch (SQLException e) {
+				System.out.println("ERROR executeQuery - " + e.getMessage());
+			}
+		} catch (IOException | ParseException e1) {
+			e1.printStackTrace();
+		}				
+	}
+
 
 }
