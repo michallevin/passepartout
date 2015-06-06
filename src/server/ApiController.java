@@ -12,19 +12,27 @@ import org.springframework.web.bind.annotation.RestController;
 import core.Question;
 import yago.YagoImport;
 import db.models.Country;
+import db.models.CountryOrder;
+import db.models.FactType;
+import db.models.Fact;
 import db.models.Highscore;
+import db.models.User;
+import db.models.UserFactHistory;
 import db.models.FactTypeQuestionWording;
 
 @RestController
 public class ApiController {
 	
-	@RequestMapping(value="/rest/question/{id}", method=RequestMethod.GET)
-	public List<Question> getQuestions(@PathVariable Integer id) {
-		
+	@RequestMapping(value="/rest/question", method=RequestMethod.GET)
+	public List<Question> getQuestions(@RequestParam("userId") Integer userId) {
+			
 		List<Country> countries = Country.fetchByOrder();
 		List<Question> questions = new ArrayList<Question>();
-		for (Country country : countries)
-			questions.add(Question.generateQuestion(country));
+		int i = 0;
+		for (Country country : countries) {
+			questions.add(Question.generateQuestion(country, userId, i % 2 == 0));
+			i += 1;
+		}
 
 		return questions;
 	}
@@ -37,7 +45,7 @@ public class ApiController {
 		Thread t = new Thread() {
 			 public void run() {
 				 if (!YagoImport.isImporting())
-					 YagoImport.startImport(true, true, true, true, true);
+					 YagoImport.startImport(true, false, false, true, false);
 				 else {
 					 
 				 }
@@ -125,6 +133,167 @@ public class ApiController {
 		return highscore;
 	}
 	
+	//fact type
+	
+	@RequestMapping(value="/rest/fact_type", method=RequestMethod.GET)
+	public List<FactType> getFactTypes() {
+		List<FactType> countries = FactType.fetchAll();
+		return countries;
+	}
+
+	@RequestMapping(value="/rest/fact_type", method=RequestMethod.POST)
+	public FactType addFactType(@RequestParam("name") String name, @RequestParam("is_literal") Boolean isLiteral) {
+		FactType factType = new FactType(name, isLiteral);
+		factType.save();
+		return factType;
+		
+	}
+	
+	@RequestMapping(value="/rest/fact_type/{id}", method=RequestMethod.GET)
+	public FactType getFactType(@PathVariable Integer id) {
+		return FactType.fetchById(id);
+	}
+	
+
+	@RequestMapping(value="/rest/fact_type/{id}", method=RequestMethod.PUT)
+	public FactType editFactType(@PathVariable Integer id, @RequestParam("name") String name) {
+		FactType factType = FactType.fetchById(id);
+		factType.setTypeName(name);
+		factType.update();
+		return factType;
+	}
+	
+	@RequestMapping(value="/rest/fact_type/{id}", method=RequestMethod.DELETE)
+	public FactType deleteFactType(@PathVariable Integer id) {
+		FactType factType = FactType.fetchById(id);
+		factType.delete();
+		return factType;
+	}
+	
+	
+	
+	// user
+	
+	@RequestMapping(value="/rest/user", method=RequestMethod.GET)
+	public List<User> getUser() {
+		List<User> users = User.fetchAll();
+		return users;
+	}
+
+	@RequestMapping(value="/rest/user", method=RequestMethod.POST)
+	public User addUser(@RequestParam("name") String name) {
+		User user = new User(name);
+		user.save();
+		return user;
+		
+	}
+	
+	@RequestMapping(value="/rest/user/{id}", method=RequestMethod.GET)
+	public User getUser(@PathVariable Integer id) {
+		return User.fetchById(id);
+	}
+	
+
+	@RequestMapping(value="/rest/user/{id}", method=RequestMethod.PUT)
+	public User editUser(@PathVariable Integer id, @RequestParam("name") String name) {
+		User user = User.fetchById(id);
+		user.setName(name);
+		user.update();
+		return user;
+	}
+	
+	@RequestMapping(value="/rest/user/{id}", method=RequestMethod.DELETE)
+	public User deleteUser(@PathVariable Integer id) {
+		User user = User.fetchById(id);
+		user.delete();
+		return user;
+	}
+	
+	
+	
+	// user fact history
+	
+	@RequestMapping(value="/rest/user_fact_history", method=RequestMethod.GET)
+	public List<UserFactHistory> getUserFactHistory() {
+		List<UserFactHistory> userFactHistoryist = UserFactHistory.fetchAll();
+		return userFactHistoryist;
+	}
+
+	@RequestMapping(value="/rest/user_fact_history", method=RequestMethod.POST)
+	public UserFactHistory addUserFactHistory(@RequestParam("user_id") int userId,
+	                               @RequestParam("fact_id") int factId) {
+		UserFactHistory userFactHistory = new UserFactHistory(userId, factId);
+		userFactHistory.save();
+		return userFactHistory;
+		
+	}
+	
+	@RequestMapping(value="/rest/user_fact_history/{id}", method=RequestMethod.GET)
+	public UserFactHistory getUserFactHistory(@PathVariable Integer id) {
+		return UserFactHistory.fetchById(id);
+	}
+	
+
+	@RequestMapping(value="/rest/user_fact_history/{id}", method=RequestMethod.PUT)
+	public UserFactHistory editUserFactHistory(@PathVariable Integer id,
+	                                           @RequestParam("user_id") int userId,
+	                                           @RequestParam("fact_id") int factId) {
+		UserFactHistory userFactHistory = UserFactHistory.fetchById(id);
+		userFactHistory.setUserId(userId);
+		userFactHistory.setFactId(factId);
+		userFactHistory.update();
+		return userFactHistory;
+	}
+	
+	@RequestMapping(value="/rest/user_fact_history/{id}", method=RequestMethod.DELETE)
+	public UserFactHistory deleteUserFactHistory(@PathVariable Integer id) {
+		UserFactHistory userFactHistory = UserFactHistory.fetchById(id);
+		userFactHistory.delete();
+		return userFactHistory;
+	}
+	
+	// country route
+	
+	@RequestMapping(value="/rest/country_order", method=RequestMethod.GET)
+	public List<CountryOrder> getCountryOrders() {
+		List<CountryOrder> countryOrders = CountryOrder.fetchAll();
+		return countryOrders;
+	}
+
+	@RequestMapping(value="/rest/country_order", method=RequestMethod.POST)
+	public CountryOrder addCountryOrder(@RequestParam("country_id") int countryId,
+	                                    @RequestParam("route_order") int routeOrder) {
+		CountryOrder countryOrder = new CountryOrder(countryId, routeOrder);
+		countryOrder.save();
+		return countryOrder;
+		
+	}
+	
+	@RequestMapping(value="/rest/country_order/{id}", method=RequestMethod.GET)
+	public CountryOrder getCountryOrder(@PathVariable Integer id) {
+		return CountryOrder.fetchById(id);
+	}
+	
+
+	@RequestMapping(value="/rest/country_order/{id}", method=RequestMethod.PUT)
+	public CountryOrder editCountryOrder(@PathVariable Integer id,
+	                                     @RequestParam("country_id") int countryId,
+	                                     @RequestParam("route_order") int routeOrder) {
+		CountryOrder countryOrder = CountryOrder.fetchById(id);
+		countryOrder.setCountryId(countryId);
+		countryOrder.setRouteOrder(routeOrder);
+		countryOrder.update();
+		return countryOrder;
+	}
+	
+	@RequestMapping(value="/rest/country_order/{id}", method=RequestMethod.DELETE)
+	public CountryOrder deleteCountryOrder(@PathVariable Integer id) {
+		CountryOrder countryOrder = CountryOrder.fetchById(id);
+		countryOrder.delete();
+		return countryOrder;
+	}
+	
+	
 	// fact_type_question_wording
 
 	@RequestMapping(value="/rest/fact_type_question_wording", method=RequestMethod.GET)
@@ -161,4 +330,46 @@ public class ApiController {
 		factTypeQuestionWording.delete();
 		return factTypeQuestionWording;
 	}
+	
+	
+	// fact
+	
+	@RequestMapping(value="/rest/fact", method=RequestMethod.GET)
+	public List<Fact> getFacts() {
+		List<Fact> facts = Fact.fetchAll();
+		return facts;
+	}
+
+	@RequestMapping(value="/rest/fact", method=RequestMethod.POST)
+	public Fact addFact(@RequestParam("yagoId") String yagoId, @RequestParam("countryId") int countryId, @RequestParam("data") String data, @RequestParam("factTypeId") int factTypeId, @RequestParam("rank") int rank) {
+		Fact fact = new Fact("",countryId,data,factTypeId,rank);
+		fact.save();
+		return fact;
+	}
+	
+	@RequestMapping(value="/rest/fact/{id}", method=RequestMethod.GET)
+	public Fact getFact(@PathVariable Integer id) {
+		return Fact.fetchById(id);
+	}
+	
+
+	@RequestMapping(value="/rest/fact/{id}", method=RequestMethod.PUT)
+	public Fact editFact(@PathVariable Integer id, @RequestParam("countryId") int countryId, @RequestParam("data") String data, @RequestParam("factTypeId") int factTypeId, @RequestParam("rank") int rank) {
+		Fact fact = Fact.fetchById(id);
+		fact.setCountryId(countryId);
+		fact.setData(data);
+		fact.setFactTypeId(factTypeId);
+		fact.setRank(rank);
+		fact.update();
+		return fact;
+	}
+	
+	@RequestMapping(value="/rest/fact/{id}", method=RequestMethod.DELETE)
+	public Country deleteFact(@PathVariable Integer id) {
+		Country fact = Country.fetchById(id);
+		fact.delete();
+		return fact;
+	}
+	
+
 }

@@ -12,31 +12,23 @@ import java.util.List;
 import db.InputHelper;
 import db.JDBCConnection;
 
-public class Country {
+public class User {
 
 	private String name;
 	private int id;
-	private String yagoId;
 
-	public Country(int id, String yagoId, String name) {
-
-		this.setId(id);
-		this.setName(name);
-		this.yagoId = yagoId;
-	}
-
-	public Country(String yagoId, String name) {
+	public User(int id, String name) {
 
 		this.setId(id);
-		this.setName(name);
-		this.yagoId = yagoId;
+		this.name = name;
 	}
 
+	public User(String name) {
 
-	public Country(String name) {
-		this.setName(name);
-		this.yagoId = "";
+		this.name = name;
 	}
+
+	
 	
 	public void save() {
 		Connection conn;
@@ -45,8 +37,8 @@ public class Country {
 			try (Statement statement = conn.createStatement()){
 
 				statement.executeUpdate(String.format(""
-						+ "INSERT INTO country(yago_id, name) "
-						+ "VALUES('%s', '%s')", yagoId, getName().replace("'", "''")), Statement.RETURN_GENERATED_KEYS);
+						+ "INSERT INTO user(name) "
+						+ "VALUES('%s')", getName().replace("'", "''")), Statement.RETURN_GENERATED_KEYS);
 
 				try (ResultSet genKeys = statement.getGeneratedKeys()) {
 					if (genKeys.next()) {
@@ -65,14 +57,14 @@ public class Country {
 
 	}
 	
-	public static Country fetchById(int id) {
+	public static User fetchById(int id) {
 		Connection conn;
 		try {
 			conn = JDBCConnection.getConnection();
 			try (Statement statement = conn.createStatement();
-					ResultSet rs = statement.executeQuery(String.format("SELECT * FROM country WHERE deleted = 0 AND id = %d", id));) {
+					ResultSet rs = statement.executeQuery(String.format("SELECT * FROM user WHERE deleted = 0 AND id = %d", id));) {
 				while (rs.next() == true) {
-					return new Country(rs.getInt("id"), rs.getString("yago_id"), rs.getString("name"));
+					return new User(rs.getInt("id"), rs.getString("name"));
 				}
 			} catch (SQLException e) {
 				System.out.println("ERROR executeQuery - " + e.getMessage());
@@ -84,35 +76,15 @@ public class Country {
 		return null;
 	}
 	
-	public static List<Country> fetchAll() {
-		List<Country> result = new ArrayList<Country>();
+	public static List<User> fetchAll() {
+		List<User> result = new ArrayList<User>();
 		Connection conn;
 		try {
 			conn = JDBCConnection.getConnection();
 			try (Statement statement = conn.createStatement();
-					ResultSet rs = statement.executeQuery("SELECT * FROM country WHERE deleted = 0");) {
+					ResultSet rs = statement.executeQuery("SELECT * FROM user WHERE deleted = 0");) {
 				while (rs.next() == true) {
-					result.add(new Country(rs.getInt("id"), rs.getString("yago_id"), rs.getString("name")));
-				}
-			} catch (SQLException e) {
-				System.out.println("ERROR executeQuery - " + e.getMessage());
-			}
-
-		} catch (IOException | ParseException e1) {
-			e1.printStackTrace();
-		}
-		return result;
-	}
-
-	public static List<Country> fetchByOrder() {
-		List<Country> result = new ArrayList<Country>();
-		Connection conn;
-		try {
-			conn = JDBCConnection.getConnection();
-			try (Statement statement = conn.createStatement();
-					ResultSet rs = statement.executeQuery("SELECT * FROM country JOIN country_order ON country_order.country_id = country.id WHERE route_order IS NOT NULL AND deleted = 0 ORDER BY route_order");) {
-				while (rs.next() == true) {
-					result.add(new Country(rs.getInt("id"), rs.getString("yago_id"), rs.getString("name")));
+					result.add(new User(rs.getInt("id"), rs.getString("name")));
 				}
 			} catch (SQLException e) {
 				System.out.println("ERROR executeQuery - " + e.getMessage());
@@ -149,7 +121,7 @@ public class Country {
 			try (Statement statement = conn.createStatement()){
 
 				statement.executeUpdate(String.format(""
-						+ "UPDATE country SET name = '%s', updated = 1 WHERE id = %d", InputHelper.santize(name), id));
+						+ "UPDATE user SET name = '%s', updated = 1 WHERE id = %d", InputHelper.santize(name), id));
 
 				
 			} catch (SQLException e) {
@@ -157,7 +129,7 @@ public class Country {
 			}
 		} catch (IOException | ParseException e1) {
 			e1.printStackTrace();
-		}		
+		}
 	}
 
 
@@ -169,7 +141,7 @@ public class Country {
 			try (Statement statement = conn.createStatement()){
 
 				statement.executeUpdate(String.format(""
-						+ "UPDATE country SET deleted = 1, updated = 1 WHERE id = %d", InputHelper.santize(name), id));
+						+ "UPDATE user SET deleted = 1, updated = 1 WHERE id = %d", id));
 
 				
 			} catch (SQLException e) {
@@ -177,7 +149,7 @@ public class Country {
 			}
 		} catch (IOException | ParseException e1) {
 			e1.printStackTrace();
-		}				
+		}
 	}
 
 

@@ -17,11 +17,7 @@ public class YagoImport {
 		isImporting = true;
 				
 		try {
-			if (links) {
-				LinksImporter linksImporter = new LinksImporter();
-				linksImporter.importData();
-			}
-			
+	
 			if (countries) {
 				CountriesImporter countriesImporter = new CountriesImporter();
 				countriesImporter.importData();
@@ -41,6 +37,12 @@ public class YagoImport {
 				LiteralFactsImporter literalFactsImporter = new LiteralFactsImporter();
 				literalFactsImporter.importData();
 			}
+			
+			if (links) {
+				LinksImporter linksImporter = new LinksImporter();
+				linksImporter.importData();
+			}
+			
 		
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
