@@ -46,6 +46,7 @@ public class ApiController {
 			 public void run() {
 				 if (!YagoImport.isImporting())
 					 YagoImport.startImport(true, false, false, true, false);
+					 YagoImport.startImport(true, true, true, true, true);
 				 else {
 					 
 				 }
