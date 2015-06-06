@@ -14,7 +14,7 @@ angular.module('passepartoutApp')
   	$scope.lives = 3;
 
     $scope.init = function() {
-    	//$http(...)
+    	//$http(localhost:8080/rest/question)
     	$scope.questions = [
     		{
     			questionText: "What is the capital of Belgium",

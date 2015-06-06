@@ -18,8 +18,8 @@ import db.models.FactTypeQuestionWording;
 @RestController
 public class ApiController {
 	
-	@RequestMapping(value="/rest/question", method=RequestMethod.GET)
-	public List<Question> getQuestions() {
+	@RequestMapping(value="/rest/question/{id}", method=RequestMethod.GET)
+	public List<Question> getQuestions(@PathVariable Integer id) {
 		
 		List<Country> countries = Country.fetchByOrder();
 		List<Question> questions = new ArrayList<Question>();
