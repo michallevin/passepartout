@@ -14,10 +14,11 @@ import yago.YagoImport;
 import db.models.Country;
 import db.models.CountryOrder;
 import db.models.FactType;
+import db.models.Fact;
 import db.models.Highscore;
 import db.models.User;
 import db.models.UserFactHistory;
-
+import db.models.FactTypeQuestionWording;
 
 @RestController
 public class ApiController {
@@ -101,27 +102,35 @@ public class ApiController {
 
 	@RequestMapping(value="/rest/highscore", method=RequestMethod.GET)
 	public List<Highscore> getHighScores() {
-		return null;
+		return Highscore.fetchAll();
 	}
 	
-	@RequestMapping(value="/rest/highscore", method=RequestMethod.POST)
-	public Highscore addHighScore() {
-		return null;
+	@RequestMapping(value="/rest/highscore}", method=RequestMethod.POST)
+	public Highscore addHighScore(@RequestParam("user_id") Integer user_id, @RequestParam("score") Integer score) {
+		Highscore highscore = new Highscore(user_id, score);
+		highscore.save();
+		return highscore;
 	}
 	
 	@RequestMapping(value="/rest/highscore/{id}", method=RequestMethod.GET)
 	public Highscore getHighscore(@PathVariable Integer id) {
-		return null;
+		return Highscore.fetchById(id);
 	}
 	
 	@RequestMapping(value="/rest/highscore/{id}", method=RequestMethod.PUT)
-	public Highscore editHighscore(@PathVariable Integer id) {
-		return null;
+	public Highscore editHighscore(@PathVariable Integer id,@RequestParam("user_id") Integer user_id,@RequestParam("user_id") Integer score) {
+		Highscore highscore = Highscore.fetchById(id);
+		highscore.setScore(score);
+		highscore.setUser_id(user_id);
+		highscore.update();
+		return highscore;
 	}
 	
 	@RequestMapping(value="/rest/highscore/{id}", method=RequestMethod.DELETE)
 	public Highscore deleteHighscore(@PathVariable Integer id) {
-		return null;
+		Highscore highscore = Highscore.fetchById(id);
+		highscore.delete();
+		return highscore;
 	}
 	
 	//fact type
@@ -284,4 +293,83 @@ public class ApiController {
 		return countryOrder;
 	}
 	
+	
+	// fact_type_question_wording
+
+	@RequestMapping(value="/rest/fact_type_question_wording", method=RequestMethod.GET)
+	public List<FactTypeQuestionWording> getFactTypeQuestionWordings() {
+		return FactTypeQuestionWording.fetchAll();
+	}
+	
+	@RequestMapping(value="/rest/fact_type_question_wording}", method=RequestMethod.POST)
+	public FactTypeQuestionWording addFactTypeQuestionWording(
+			@RequestParam("question_id") Integer question_id,
+			@RequestParam("question_wording") String question_wording) {
+		FactTypeQuestionWording factTypeQuestionWording = new FactTypeQuestionWording(question_id,question_wording);
+		factTypeQuestionWording.save();
+		return factTypeQuestionWording;
+	}
+	
+	@RequestMapping(value="/rest/fact_type_question_wording/{id}", method=RequestMethod.GET)
+	public FactTypeQuestionWording getFactTypeQuestionWording(@PathVariable Integer id) {
+		return FactTypeQuestionWording.fetchById(id);
+	}
+	
+	@RequestMapping(value="/rest/fact_type_question_wording/{id}", method=RequestMethod.PUT)
+	public FactTypeQuestionWording editFactTypeQuestionWording(@PathVariable Integer id,@RequestParam("question_id") Integer question_id,@RequestParam("question_wording") String question_wording) {
+		FactTypeQuestionWording factTypeQuestionWording = FactTypeQuestionWording.fetchById(id);
+		factTypeQuestionWording.setQuestion_id(question_id);
+		factTypeQuestionWording.setQuestion_wording(question_wording);
+		factTypeQuestionWording.update();
+		return factTypeQuestionWording;
+	}
+	
+	@RequestMapping(value="/rest/fact_type_question_wording/{id}", method=RequestMethod.DELETE)
+	public FactTypeQuestionWording deleteFactTypeQuestionWording(@PathVariable Integer id) {
+		FactTypeQuestionWording factTypeQuestionWording = FactTypeQuestionWording.fetchById(id);
+		factTypeQuestionWording.delete();
+		return factTypeQuestionWording;
+	}
+	
+	
+	// fact
+	
+	@RequestMapping(value="/rest/fact", method=RequestMethod.GET)
+	public List<Fact> getFacts() {
+		List<Fact> facts = Fact.fetchAll();
+		return facts;
+	}
+
+	@RequestMapping(value="/rest/fact", method=RequestMethod.POST)
+	public Fact addFact(@RequestParam("yagoId") String yagoId, @RequestParam("countryId") int countryId, @RequestParam("data") String data, @RequestParam("factTypeId") int factTypeId, @RequestParam("rank") int rank) {
+		Fact fact = new Fact("",countryId,data,factTypeId,rank);
+		fact.save();
+		return fact;
+	}
+	
+	@RequestMapping(value="/rest/fact/{id}", method=RequestMethod.GET)
+	public Fact getFact(@PathVariable Integer id) {
+		return Fact.fetchById(id);
+	}
+	
+
+	@RequestMapping(value="/rest/fact/{id}", method=RequestMethod.PUT)
+	public Fact editFact(@PathVariable Integer id, @RequestParam("countryId") int countryId, @RequestParam("data") String data, @RequestParam("factTypeId") int factTypeId, @RequestParam("rank") int rank) {
+		Fact fact = Fact.fetchById(id);
+		fact.setCountryId(countryId);
+		fact.setData(data);
+		fact.setFactTypeId(factTypeId);
+		fact.setRank(rank);
+		fact.update();
+		return fact;
+	}
+	
+	@RequestMapping(value="/rest/fact/{id}", method=RequestMethod.DELETE)
+	public Country deleteFact(@PathVariable Integer id) {
+		Country fact = Country.fetchById(id);
+		fact.delete();
+		return fact;
+	}
+	
+
 }
