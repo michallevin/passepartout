@@ -1,9 +1,0 @@
-
-<div ng-repeat="question in questions" ng-show="$index == currentQuestion">
-		<h1>{{question.questionText}}</h1>
-		<div>
-			<div ng-repeat="answer in question.options">
-				<h4 ng-click="guessAnswer($index)">{{answer}}</h4>
-			</div>
-		</div>
-</div>

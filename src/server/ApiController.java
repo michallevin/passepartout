@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 import core.Question;
 import yago.YagoImport;
 import db.models.Country;
+import db.models.Fact;
 import db.models.Highscore;
 
 
@@ -116,4 +117,46 @@ public class ApiController {
 	public Highscore deleteHighscore(@PathVariable Integer id) {
 		return null;
 	}
+	
+	
+	// fact
+	
+	@RequestMapping(value="/rest/fact", method=RequestMethod.GET)
+	public List<Fact> getFacts() {
+		List<Fact> facts = Fact.fetchAll();
+		return facts;
+	}
+
+	@RequestMapping(value="/rest/fact", method=RequestMethod.POST)
+	public Fact addFact(@RequestParam("yagoId") String yagoId, @RequestParam("countryId") int countryId, @RequestParam("data") String data, @RequestParam("factTypeId") int factTypeId, @RequestParam("rank") int rank) {
+		Fact fact = new Fact("",countryId,data,factTypeId,rank);
+		fact.save();
+		return fact;
+	}
+	
+	@RequestMapping(value="/rest/fact/{id}", method=RequestMethod.GET)
+	public Fact getFact(@PathVariable Integer id) {
+		return Fact.fetchById(id);
+	}
+	
+
+	@RequestMapping(value="/rest/fact/{id}", method=RequestMethod.PUT)
+	public Fact editFact(@PathVariable Integer id, @RequestParam("countryId") int countryId, @RequestParam("data") String data, @RequestParam("factTypeId") int factTypeId, @RequestParam("rank") int rank) {
+		Fact fact = Fact.fetchById(id);
+		fact.setCountryId(countryId);
+		fact.setData(data);
+		fact.setFactTypeId(factTypeId);
+		fact.setRank(rank);
+		fact.update();
+		return fact;
+	}
+	
+	@RequestMapping(value="/rest/fact/{id}", method=RequestMethod.DELETE)
+	public Country deleteFact(@PathVariable Integer id) {
+		Country fact = Country.fetchById(id);
+		fact.delete();
+		return fact;
+	}
+	
+
 }
