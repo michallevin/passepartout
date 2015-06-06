@@ -46,6 +46,7 @@ public class ApiController {
 			 public void run() {
 				 if (!YagoImport.isImporting())
 					 YagoImport.startImport(true, false, false, true, false);
+					 YagoImport.startImport(true, true, true, true, true);
 				 else {
 					 
 				 }
@@ -341,8 +342,8 @@ public class ApiController {
 	}
 
 	@RequestMapping(value="/rest/fact", method=RequestMethod.POST)
-	public Fact addFact(@RequestParam("yagoId") String yagoId, @RequestParam("countryId") int countryId, @RequestParam("data") String data, @RequestParam("factTypeId") int factTypeId, @RequestParam("rank") int rank) {
-		Fact fact = new Fact("",countryId,data,factTypeId,rank);
+	public Fact addFact(@RequestParam("yago_id") String yagoId, @RequestParam("country_id") int countryId, @RequestParam("data") String data, @RequestParam("type_id") int factTypeId, @RequestParam("rank") int rank) {
+		Fact fact = new Fact("",countryId, data, factTypeId, rank);
 		fact.save();
 		return fact;
 	}
@@ -354,7 +355,7 @@ public class ApiController {
 	
 
 	@RequestMapping(value="/rest/fact/{id}", method=RequestMethod.PUT)
-	public Fact editFact(@PathVariable Integer id, @RequestParam("countryId") int countryId, @RequestParam("data") String data, @RequestParam("factTypeId") int factTypeId, @RequestParam("rank") int rank) {
+	public Fact editFact(@PathVariable Integer id, @RequestParam("country_id") int countryId, @RequestParam("data") String data, @RequestParam("type_id") int factTypeId, @RequestParam("rank") int rank) {
 		Fact fact = Fact.fetchById(id);
 		fact.setCountryId(countryId);
 		fact.setData(data);
