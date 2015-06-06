@@ -5,5 +5,22 @@
     <img src="images/yeoman.png" alt="I'm Yeoman"><br>
     Around the world in 80 days 
   </p>
-  <p><a class="btn btn-lg btn-success" ng-href="#/game">Start game!</a></p>
+  
+<form name="myForm">
+  <label>Username:
+    <input type="text" name="input" ng-model="username.name"
+           ng-pattern="username.word" required ng-trim="false">
+  </label>
+    <span class="error" ng-show="myForm.input.$error.required">
+      Required!</span>
+    <span class="error" ng-show="myForm.input.$error.pattern">
+      Single word only!</span>
+  </div>
+<p><a class="btn btn-lg btn-success" ng-click="startGame()">Start game!</a></p>
+ </form>
+  
+  
+  
+  
+  
 </div>
