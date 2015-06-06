@@ -94,12 +94,14 @@ public class ApiController {
 
 	@RequestMapping(value="/rest/highscore", method=RequestMethod.GET)
 	public List<Highscore> getHighScores() {
-		return null;
+		return Highscore.fetchAll();
 	}
 	
-	@RequestMapping(value="/rest/highscore", method=RequestMethod.POST)
-	public Highscore addHighScore() {
-		return null;
+	@RequestMapping(value="/rest/highscore}", method=RequestMethod.POST)
+	public Highscore addHighScore(@RequestParam("name") String name, @RequestParam("score") Integer score) {
+		Highscore highscore = new Highscore(name, score);
+		highscore.save();
+		return highscore;
 	}
 	
 	@RequestMapping(value="/rest/highscore/{id}", method=RequestMethod.GET)
