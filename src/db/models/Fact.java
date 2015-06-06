@@ -29,6 +29,17 @@ public class Fact {
 	
 
 
+	public Fact(String yagoId, String subject, String infoType, String data, boolean isLiteral) {
+
+		this.yagoId = yagoId;
+		this.subject = subject;
+		this.infoType = infoType;
+		this.isLiteral = isLiteral;
+		this.setData(data);
+	}
+
+
+
 	public Fact(int id, String yagoId, int countryId, String data, int factTypeId, int rank) {
 			this.setId(id);
 			this.setYagoId(yagoId);
@@ -65,7 +76,7 @@ public class Fact {
 
 				if (countryId == null) {
 					countryId = CountryDictionary.getInstance().getCountryId(getData());
-					if (countryId == null) 
+					if (countryId == null)
 						return;
 					answer = getSubject();
 				}
@@ -116,25 +127,43 @@ public class Fact {
 	
 
 
-	public static Fact getFact(int countryId, int factTypeId) {
+	public static Fact getFact(int countryId, int factTypeId, int userId) {
 
 		Connection conn;
+		Fact fact = null;
 		try {
 			conn = JDBCConnection.getConnection();
+			// Get the least viewed by user random fact
 			try (Statement statement = conn.createStatement();
-					ResultSet rs = statement.executeQuery(String.format("SELECT * from fact where country_id = %d "
-							+ "and type_id = %d LIMIT 1", countryId, factTypeId))) {
+					ResultSet rs = statement.executeQuery(String.format("SELECT *, count(1) as appearance_count " +
+					                                                    "FROM fact " +
+					                                                    "JOIN user_fact_history ON fact.id = user_fact_history.fact_id " +
+					                                                    "WHERE country_id = %d and type_id = %d and deleted = 0 and user_id = %d" +
+					                                                    "GROUP BY fact.id " +
+					                                                    "ORDER BY appearance_count, RAND() ASC" +
+					                                                    "LIMIT 1",
+					                                                    countryId, factTypeId, userId))) {
 				while (rs.next() == true) {
-					return new Fact(rs.getInt("country_id"), rs.getInt("type_id"), rs.getString("data"));
+					 fact = new Fact(rs.getInt("country_id"), rs.getInt("type_id"), rs.getString("data"));;
 				}
+				
 			} catch (SQLException e) {
 				System.out.println("ERROR executeQuery - " + e.getMessage());
 			}
+			// Mark the returned fact as viewed by the user
+			try (Statement statement = conn.createStatement();){
+				statement.executeUpdate(String.format("INSERT INTO user_fact_history(user_id, fact_id) " +
+                        "VALUES(%d, %d)", userId, fact.getId()), Statement.RETURN_GENERATED_KEYS);
+
+			} catch (SQLException e) {
+				System.out.println("ERROR executeQuery - " + e.getMessage());
+			}
+			
 
 		} catch (IOException | ParseException e1) {
 			e1.printStackTrace();
 		}
-		return null;
+		return fact;
 	}
 
 	public static List<Fact> getWrongAnswers(int factTypeId, String correctAnswer) {
@@ -144,10 +173,12 @@ public class Fact {
 		try {
 			conn = JDBCConnection.getConnection();
 			try (Statement statement = conn.createStatement();
-					ResultSet rs = statement.executeQuery(String.format("SELECT * from fact where type_id = %d and "
-							+ " data <> '%s' "
-							+ " ORDER BY RAND() " 
-							+ " LIMIT 0,3 ", factTypeId, correctAnswer))) {
+					ResultSet rs = statement.executeQuery(String.format("SELECT * " +
+					                                                    "FROM fact " +
+					                                                    "WHERE type_id = %d and data <> '%s' " +
+					                                                    "ORDER BY RAND() " +
+					                                                    "LIMIT 0,3 ",
+					                                                    factTypeId, correctAnswer))) {
 				while (rs.next() == true) {
 					result.add(new Fact(rs.getInt("country_id"), rs.getInt("type_id"), rs.getString("data")));
 				}
@@ -226,7 +257,7 @@ public class Fact {
 			}
 		} catch (IOException | ParseException e1) {
 			e1.printStackTrace();
-		}		
+		}
 	}
 
 	public int getCountryId() {
@@ -278,6 +309,23 @@ public class Fact {
 	}
 
 
+		public static void updateFactByData(String factData, Integer rank) {
+		Connection conn;
+		try {
+			conn = JDBCConnection.getConnection();
+			try (Statement statement = conn.createStatement()){
+
+				statement.executeUpdate(String.format(""
+						+ "UPDATE fact SET rank = %d WHERE data = '%s'", rank, InputHelper.santize(factData)));
+
+				
+			} catch (SQLException e) {
+				System.out.println("ERROR executeQuery - " + e.getMessage());
+			}
+		} catch (IOException | ParseException e1) {
+			e1.printStackTrace();
+		}			
+	}
 	
 	
 	

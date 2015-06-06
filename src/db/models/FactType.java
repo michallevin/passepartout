@@ -9,6 +9,7 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 
+import db.InputHelper;
 import db.JDBCConnection;
 
 public class FactType {
@@ -24,12 +25,18 @@ public class FactType {
 		this.isLiteral = isLiteral;
 	}
 
-	public FactType(int id, String typeName, String questionWording) {
+	public FactType(int id, String typeName, boolean isLiteral, String questionWording) {
 		this.setId(id);
 		this.setTypeName(typeName);
 		this.setQuestionWording(questionWording);
+		this.isLiteral = isLiteral;
+
 	}
 
+	public FactType(String typeName, boolean isLiteral) {
+		this.setTypeName(typeName);
+		this.isLiteral = isLiteral;
+	}
 	
 	public int save() {
 		Connection conn;
@@ -38,7 +45,7 @@ public class FactType {
 			try (Statement statement = conn.createStatement()){
 				statement.executeUpdate(String.format(""
 						+ "INSERT INTO fact_type(name, is_literal) "
-						+ "VALUES('%s', %d)", getTypeName(), isLiteral), Statement.RETURN_GENERATED_KEYS);
+						+ "VALUES('%s', %b)", getTypeName(), isLiteral), Statement.RETURN_GENERATED_KEYS);
 
 				try (ResultSet genKeys = statement.getGeneratedKeys()) {
 					if (genKeys.next()) {
@@ -59,15 +66,60 @@ public class FactType {
 	}
 	
 
-	public static FactType getRandom() {
+	public void update() {
+		Connection conn;
+		try {
+			conn = JDBCConnection.getConnection();
+			try (Statement statement = conn.createStatement()){
+
+				statement.executeUpdate(String.format(""
+						+ "UPDATE fact_type SET name = '%s', updated = 1 WHERE id = %d", InputHelper.santize(typeName), id));
+
+				
+			} catch (SQLException e) {
+				System.out.println("ERROR executeQuery - " + e.getMessage());
+			}
+		} catch (IOException | ParseException e1) {
+			e1.printStackTrace();
+		}		
+	}
+
+
+
+	public void delete() {
+		Connection conn;
+		try {
+			conn = JDBCConnection.getConnection();
+			try (Statement statement = conn.createStatement()){
+
+				statement.executeUpdate(String.format(""
+						+ "UPDATE fact_type SET deleted = 1, updated = 1 WHERE id = %d", id));
+
+				
+			} catch (SQLException e) {
+				System.out.println("ERROR executeQuery - " + e.getMessage());
+			}
+		} catch (IOException | ParseException e1) {
+			e1.printStackTrace();
+		}				
+	}
+	
+	
+	
+	public static FactType getRandom(boolean isLiteral) {
 		Connection conn;
 		try {
 			conn = JDBCConnection.getConnection();
 			try (Statement statement = conn.createStatement();
-					ResultSet rs = statement.executeQuery("SELECT * FROM fact_type WHERE question_wording IS NOT NULL ORDER BY RAND() LIMIT 0,1");) {
+					ResultSet rs = statement.executeQuery(String.format("SELECT * FROM fact_type "
+							+ " JOIN fact_type_question_wording on fact_type_question_wording.fact_id = fact_type.id"
+							+ " WHERE question_wording IS NOT NULL"
+							+ " and is_literal = %d"
+							+ " ORDER BY RAND() LIMIT 0,1", isLiteral ? 1 : 0));) {
 				while (rs.next() == true) {
 					return new FactType(rs.getInt("id"),
 							rs.getString("name"),
+							rs.getBoolean("is_literal"),
 							rs.getString("question_wording"));
 				}
 			} catch (SQLException e) {
@@ -87,9 +139,9 @@ public class FactType {
 		try {
 			conn = JDBCConnection.getConnection();
 			try (Statement statement = conn.createStatement();
-					ResultSet rs = statement.executeQuery("SELECT * FROM fact_type");) {
+					ResultSet rs = statement.executeQuery("SELECT * FROM fact_type JOIN fact_type_question_wording on fact_type_question_wording.fact_id = fact_type.id");) {
 				while (rs.next() == true) {
-					result.add(new FactType(rs.getInt("id"), rs.getString("name"), rs.getBoolean("is_literal")));
+					result.add(new FactType(rs.getInt("id"), rs.getString("name"), rs.getBoolean("is_literal"), rs.getString("question_wording")));
 				}
 			} catch (SQLException e) {
 				System.out.println("ERROR executeQuery - " + e.getMessage());
@@ -124,5 +176,11 @@ public class FactType {
 	public void setQuestionWording(String questionWording) {
 		this.questionWording = questionWording;
 	}
+
+	public static FactType fetchById(Integer id2) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 	
 }

@@ -28,6 +28,7 @@ public abstract class BaseImporter {
 			int i = 0;
 			String str;
 			while ((str = reader.readLine()) != null) {
+				//if (i == 10000) break;
 				String[] attributes = str.split("\\t");
 				if (attributes.length >= 4) {
 					handleRow(attributes[0], attributes[1], attributes[2], attributes[3], str);
@@ -40,8 +41,13 @@ public abstract class BaseImporter {
 			}
 
 			System.out.println("Commiting last records");
+
+			this.finished();
+
 			JDBCConnection.getConnection().commit();
 			JDBCConnection.getConnection().setAutoCommit(true);
+			
+			
 
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
@@ -56,4 +62,10 @@ public abstract class BaseImporter {
 
 	public abstract void handleRow(String id, String attr1, String attr2,
 			String attr3, String line);
+	
+	
+	public void finished() {
+		System.out.println("importing finished");
+		
+	}
 }

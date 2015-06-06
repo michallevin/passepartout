@@ -17,13 +17,13 @@ public class Question {
 	private static Random r = new Random();
 	
 	
-	public static Question generateQuestion(Country country) {
+	public static Question generateQuestion(Country country, int userId, boolean isLiteral) {
 
-		FactType factType = FactType.getRandom();
-		Fact answer = Fact.getFact(country.getId(), factType.getId());
+		FactType factType = FactType.getRandom(isLiteral);
+		Fact answer = Fact.getFact(country.getId(), factType.getId(), userId);
 		while (answer == null) {
-			factType = FactType.getRandom();
-			answer = Fact.getFact(country.getId(), factType.getId());
+			factType = FactType.getRandom(isLiteral);
+			answer = Fact.getFact(country.getId(), factType.getId(), userId);
 		}
 		List<Fact> otherOptions = Fact.getWrongAnswers(factType.getId(), answer.getData());
 		
@@ -39,9 +39,8 @@ public class Question {
 			question.getOptions().add(option.getData());
 			i += 1;
 		}
-		return question;	
+		return question;
 	}
-
 
 	public String getQuestionText() {
 		return questionText;
