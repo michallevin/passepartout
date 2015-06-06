@@ -2,7 +2,8 @@ package yago.importers;
 
 import java.io.FileNotFoundException;
 
-import db.models.Link;
+import yago.FactDictionary;
+import db.models.Fact;
 
 public class LinksImporter extends BaseImporter {
 
@@ -22,10 +23,18 @@ public class LinksImporter extends BaseImporter {
 	public void handleRow(String id, String attr1, String attr2, String attr3,
 			String line) {
 		if (attr2.equals(LINKS_TO)) {
-			Link link = new Link(attr1, attr3);
-			link.save();
+			FactDictionary.getInstance().addLink(attr3);
 		}
 		
+	}
+	
+	@Override
+	public void finished() {
+		for (String factData : FactDictionary.getInstance().getFactMap().keySet()) {
+			Fact.updateFactByData(factData, FactDictionary.getInstance().getFactMap().get(factData));
+		}
+		super.finished();
+
 	}
 }
 
