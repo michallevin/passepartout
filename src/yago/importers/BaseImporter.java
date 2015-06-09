@@ -34,8 +34,8 @@ public abstract class BaseImporter {
 					handleRow(attributes[0], attributes[1], attributes[2], attributes[3], str);
 					++i;
 				}
-				if (i % 10000 == 0) {
-					if (i % 100000 == 0)
+				if (i >0 && i % 10000 == 0) {
+					if (i % 1000000 == 0)
 						System.out.println("");
 					System.out.print(".");
 					JDBCConnection.getConnection().commit();

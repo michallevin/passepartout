@@ -1,7 +1,7 @@
 package db;
 
 public class Configuration {
-	private static final String location = "local";
+	private static final String location = "remote";
 	
 	public String hostName;
 	public String port;
