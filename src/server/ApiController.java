@@ -44,7 +44,7 @@ public class ApiController {
 		Thread t = new Thread() {
 			public void run() {
 				if (!YagoImport.isImporting())
-					YagoImport.startImport(true, false, false, false, false);
+					YagoImport.startImport(true, false, true, true, true, true);
 				else {
 
 				}
@@ -69,8 +69,8 @@ public class ApiController {
 	}
 
 	@RequestMapping(value="/rest/country", method=RequestMethod.POST)
-	public Country addCountry(@RequestParam("name") String name) {
-		Country country = new Country(-1, "", name);
+	public Country addCountry(@RequestParam("name") String name, @RequestParam("label") String label) {
+		Country country = new Country(-1, "", name, label);
 		country.save();
 		return country;
 
@@ -83,9 +83,10 @@ public class ApiController {
 
 
 	@RequestMapping(value="/rest/country/{id}", method=RequestMethod.PUT)
-	public Country editCountry(@PathVariable Integer id, @RequestParam("name") String name) {
+	public Country editCountry(@PathVariable Integer id, @RequestParam("name") String name,  @RequestParam("label") String label) {
 		Country country = Country.fetchById(id);
 		country.setName(name);
+		country.setLabel(label);
 		country.update();
 		return country;
 	}
