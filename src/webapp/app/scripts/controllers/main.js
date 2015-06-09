@@ -10,9 +10,16 @@
 angular.module('passepartoutApp')
   .controller('MainCtrl', function ($scope, $location) {
 
+	 $scope.username = {
+		name: 'guest',
+	    word: /^\s*\w*\s*$/
+	 };
 
      $scope.startGame = function() {
+    	console.log($scope.username.name);
      	$location.path('/game');
      };
+
+
 
   });
