@@ -29,7 +29,7 @@ public class ApiController {
 		List<Question> questions = new ArrayList<Question>();
 		int i = 0;
 		for (Country country : countries) {
-			questions.add(Question.generateQuestion(country, userId,false));
+			questions.add(Question.generateQuestion(country, userId,true));
 			i += 1;
 		}
 
@@ -212,7 +212,10 @@ public class ApiController {
 	public User login(@RequestParam("name") String name) {
 		// Fetch user by name, or create user if it doesn't exist
 		User user = User.fetchByName(name);
-		return user != null ? user : new User(name);	
+		if (user != null) return user;
+		user = new User(name);	
+		user.save();
+		return user;
 	}
 
 

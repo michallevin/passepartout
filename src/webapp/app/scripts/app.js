@@ -10,6 +10,9 @@
  */
 angular
   .module('passepartoutApp', [
+    'passepartoutApp.questions',
+    'passepartoutApp.user',
+    'passepartoutApp.highscores',
     'ngAnimate',
     'ngCookies',
     'ngResource',

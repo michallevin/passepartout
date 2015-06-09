@@ -1,4 +1,3 @@
-/core/
-/db/
 /server/
-/yago/
+/db/
+/core/

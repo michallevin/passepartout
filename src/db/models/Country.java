@@ -110,7 +110,7 @@ public class Country {
 		try {
 			conn = JDBCConnection.getConnection();
 			try (Statement statement = conn.createStatement();
-					ResultSet rs = statement.executeQuery("SELECT * FROM country JOIN country_order ON country_order.country_id = country.id WHERE route_order IS NOT NULL AND deleted = 0 ORDER BY route_order");) {
+					ResultSet rs = statement.executeQuery("SELECT * FROM country JOIN country_order ON country_order.country_id = country.id WHERE route_order IS NOT NULL AND country.deleted = 0 ORDER BY route_order");) {
 				while (rs.next() == true) {
 					result.add(new Country(rs.getInt("id"), rs.getString("yago_id"), rs.getString("name")));
 				}

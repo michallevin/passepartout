@@ -1,26 +1,25 @@
-<br/>
-<div class="jumbotron">
-  <h1>Passepartout</h1>
-  <p class="lead">
-    <img src="images/yeoman.png" alt="I'm Yeoman"><br>
-    Around the world in 80 days 
-  </p>
-  
-<form name="myForm">
-  <label>Username:
-    <input type="text" name="input" ng-model="username.name"
-           ng-pattern="username.word" required ng-trim="false">
-  </label>
-    <span class="error" ng-show="myForm.input.$error.required">
-      Required!</span>
-    <span class="error" ng-show="myForm.input.$error.pattern">
-      Single word only!</span>
-  </div>
-<p><a class="btn btn-lg btn-success" ng-click="startGame()">Start game!</a></p>
- </form>
-  
-  
-  
-  
-  
+<br />
+<div class="jumbotron" ng-show="!loading">
+	<h1>Passepartout</h1>
+	<p class="lead">
+		<img src="images/yeoman.png" alt="I'm Yeoman"><br> Around
+		the world in 80 days
+	</p>
+
+	<form name="myForm" ng-show="!loading">
+		<label>Username: <input type="text" name="input"
+			ng-model="username.name" ng-pattern="username.word" required
+			ng-trim="false">
+		</label> <span class="error" ng-show="myForm.input.$error.required">
+			Required!</span> <span class="error" ng-show="myForm.input.$error.pattern">
+			Single word only!</span>
+		<p>
+			<a class="btn btn-lg btn-success" ng-click="startGame()">Start
+				game!</a>
+		</p>
+	</form>
+
 </div>
+
+
+	<div ng-show="loading">Loading...</div>
