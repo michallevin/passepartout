@@ -20,10 +20,12 @@ public class Fact {
 	private String subject;
 	String infoType;
 	private String yagoId;
+	
 
 	private int countryId;
 	private int factTypeId;
 	private String data;
+	private String label;
 	private boolean isLiteral;
 	private int id;
 	private int rank;
@@ -38,35 +40,34 @@ public class Fact {
 		this.subject = subject;
 		this.infoType = infoType;
 		this.isLiteral = isLiteral;
-		this.setData(data);
+		this.data = data;
 	}
 
 
 
 	public Fact(int id, String yagoId, int countryId, String data, int factTypeId, int rank) {
-		this.setId(id);
-		this.setYagoId(yagoId);
+		this.id = id;
+		this.yagoId = yagoId;
 		this.countryId=countryId;
 		this.data=data;
 		this.factTypeId=factTypeId;
-		this.setRank(rank);
+		this.rank = rank;
 
 	}
 
 	public Fact(String yagoId, int countryId, String data, int factTypeId, int rank) {
-		this.setYagoId(yagoId);
+		this.yagoId = yagoId;
 		this.countryId=countryId;
 		this.data=data;
 		this.factTypeId=factTypeId;
-		this.setRank(rank);
+		this.rank = rank;
 
 	}
 
 	public Fact(int countryId, int factTypeId, String data) {
-
-		this.setCountryId(countryId);
-		this.setFactTypeId(factTypeId);
-		this.setData(data);
+		this.countryId=countryId;
+		this.data=data;
+		this.factTypeId=factTypeId;
 	}
 
 	public void saveFromImport() {
@@ -97,7 +98,7 @@ public class Fact {
 		} catch (IOException | ParseException e1) {
 			e1.printStackTrace();
 		}
-
+		this.dirty = false;
 	}
 
 
@@ -268,6 +269,8 @@ public class Fact {
 		} catch (IOException | ParseException e1) {
 			e1.printStackTrace();
 		}
+		this.dirty = false;
+
 	}
 	
 	
@@ -289,6 +292,8 @@ public class Fact {
 		} catch (IOException | ParseException e1) {
 			e1.printStackTrace();
 		}
+		this.dirty = false;
+
 	}
 
 
@@ -344,6 +349,18 @@ public class Fact {
 	public void setId(int id) {
 		dirty = true;
 		this.id = id;
+	}
+
+
+
+	public String getLabel() {
+		return label;
+	}
+
+
+
+	public void setLabel(String label) {
+		this.label = label;
 	}
 
 

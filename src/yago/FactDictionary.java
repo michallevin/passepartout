@@ -41,4 +41,12 @@ public class FactDictionary {
 		return factMap;
 	}
 
+	public void setLabel(String data, String label) {
+		if (factMap.containsKey(data)) {
+			List<Fact> factList = factMap.get(data);
+			for (Fact fact : factList)
+				fact.setLabel(label);
+		}		
+	}
+
 }

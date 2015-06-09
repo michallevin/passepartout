@@ -26,7 +26,7 @@ public class CountriesImporter extends BaseImporter{
 		
 		if (attr3.equals(WIKICAT_MEMBER_STATES_OF_THE_UNITED_NATIONS)) {
 			if (CountryDictionary.getInstance().getCountryId(countryName) == null) {
-				Country country = new Country(-1, id, countryName);
+				Country country = new Country(-1, id, countryName, "");
 				country.save();
 			}
 		}
