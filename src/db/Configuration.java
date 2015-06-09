@@ -20,7 +20,7 @@ public class Configuration {
 			config.setUserName("DbMysql08");
 			config.setPassword("DbMysql08");
 		}
-		else if (location.equals("local")) {
+		else if (location.equals("remote")) {
 			config.hostName = "127.0.0.1";
 			config.port = "3306";
 			config.dbName = "passepartout";
