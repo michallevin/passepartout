@@ -28,8 +28,8 @@ public class User {
 		this.name = name;
 	}
 
-	
-	
+
+
 	public void save() {
 		Connection conn;
 		try {
@@ -46,7 +46,7 @@ public class User {
 						this.setId(id);
 					}
 				}
-				
+
 
 			} catch (SQLException e) {
 				System.out.println("ERROR executeQuery - " + e.getMessage());
@@ -56,7 +56,7 @@ public class User {
 		}
 
 	}
-	
+
 	public static User fetchById(int id) {
 		Connection conn;
 		try {
@@ -75,7 +75,28 @@ public class User {
 		}
 		return null;
 	}
-	
+
+	public static User fetchByName(String name) {
+		Connection conn;
+		try {
+			conn = JDBCConnection.getConnection();
+			try (Statement statement = conn.createStatement();
+					ResultSet rs = statement.executeQuery(String.format("SELECT * " +
+							"FROM user " +
+							"WHERE deleted = 0 AND name = '%s'", InputHelper.santize(name)));) {
+				while (rs.next() == true) {
+					return new User(rs.getInt("id"), rs.getString("name"));
+				}
+			} catch (SQLException e) {
+				System.out.println("ERROR executeQuery - " + e.getMessage());
+			}
+
+		} catch (IOException | ParseException e1) {
+			e1.printStackTrace();
+		}
+		return null;
+	}
+
 	public static List<User> fetchAll() {
 		List<User> result = new ArrayList<User>();
 		Connection conn;
@@ -95,7 +116,7 @@ public class User {
 		}
 		return result;
 	}
-	
+
 	public String getName() {
 		return name;
 	}
@@ -123,7 +144,7 @@ public class User {
 				statement.executeUpdate(String.format(""
 						+ "UPDATE user SET name = '%s', updated = 1 WHERE id = %d", InputHelper.santize(name), id));
 
-				
+
 			} catch (SQLException e) {
 				System.out.println("ERROR executeQuery - " + e.getMessage());
 			}
@@ -143,7 +164,7 @@ public class User {
 				statement.executeUpdate(String.format(""
 						+ "UPDATE user SET deleted = 1, updated = 1 WHERE id = %d", id));
 
-				
+
 			} catch (SQLException e) {
 				System.out.println("ERROR executeQuery - " + e.getMessage());
 			}

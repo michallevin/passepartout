@@ -114,8 +114,8 @@ public class FactType {
 					ResultSet rs = statement.executeQuery(String.format("SELECT * FROM fact_type "
 							+ " JOIN fact_type_question_wording on fact_type_question_wording.fact_id = fact_type.id"
 							+ " WHERE question_wording IS NOT NULL"
-							+ " and is_literal = %d"
-							+ " ORDER BY RAND() LIMIT 0,1", isLiteral ? 1 : 0));) {
+							+ " and is_literal = %s"
+							+ " ORDER BY RAND() LIMIT 0,1", isLiteral ? "true" : "false"));) {
 				while (rs.next() == true) {
 					return new FactType(rs.getInt("id"),
 							rs.getString("name"),

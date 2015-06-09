@@ -1,6 +1,7 @@
 package yago.importers;
 
 import java.io.FileNotFoundException;
+import java.util.List;
 
 import yago.FactDictionary;
 import db.models.Fact;
@@ -31,7 +32,10 @@ public class LinksImporter extends BaseImporter {
 	@Override
 	public void finished() {
 		for (String factData : FactDictionary.getInstance().getFactMap().keySet()) {
-			Fact.updateFactByData(factData, FactDictionary.getInstance().getFactMap().get(factData));
+			
+			List<Fact> factList = FactDictionary.getInstance().getFactMap().get(factData);
+			for (Fact fact : factList)
+				fact.updateFromImport();
 		}
 		super.finished();
 

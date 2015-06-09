@@ -1,5 +1,6 @@
 package yago;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -9,13 +10,15 @@ public class FactDictionary {
 
 	private static FactDictionary instance = null;
 	
-	private HashMap<String, Integer> factMap;
+	private HashMap<String, List<Fact>> factMap;
 	
 	protected FactDictionary() {
-		factMap = new HashMap<String, Integer>();
+		factMap = new HashMap<String, List<Fact>>();
 		List<Fact> allFacts = Fact.fetchAll();
 		for (Fact fact : allFacts) {
-			factMap.put(fact.getData(), 0);
+			if (!factMap.containsKey(fact.getData()))
+				factMap.put(fact.getData(), new ArrayList<Fact>());
+			factMap.get(fact.getData()).add(fact);
 		}
 	} 
 	
@@ -26,19 +29,15 @@ public class FactDictionary {
 		return instance;
 	}
 	
-	public void addFact(String data) {
-		if (!factMap.containsKey(data)) {
-			factMap.put(data, 0);
-		}
-	}
-	
 	public void addLink(String data) {
 		if (factMap.containsKey(data)) {
-			factMap.put(data, 1 + instance.factMap.get(data));
+			List<Fact> factList = factMap.get(data);
+			for (Fact fact : factList)
+				fact.setRank(fact.getRank() + 1);
 		}
 	}
 
-	public HashMap<String, Integer> getFactMap() {
+	public HashMap<String, List<Fact>> getFactMap() {
 		return factMap;
 	}
 
