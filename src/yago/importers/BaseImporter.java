@@ -35,11 +35,13 @@ public abstract class BaseImporter {
 					++i;
 				}
 				if (i % 10000 == 0) {
-					System.out.println("Commiting 10000 records");
+					if (i % 100000 == 0)
+						System.out.println("");
+					System.out.print(".");
 					JDBCConnection.getConnection().commit();
 				}
 			}
-
+			System.out.println("");
 			System.out.println("Commiting last records");
 
 			this.finished();

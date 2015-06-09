@@ -1,5 +1,6 @@
 package db.models;
 
+
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -19,7 +20,7 @@ public class Fact {
 	private String subject;
 	String infoType;
 	private String yagoId;
-	
+
 	private int countryId;
 	private int factTypeId;
 	private String data;
@@ -27,6 +28,8 @@ public class Fact {
 	private int id;
 	private int rank;
 	
+	private boolean dirty = false;
+
 
 
 	public Fact(String yagoId, String subject, String infoType, String data, boolean isLiteral) {
@@ -41,15 +44,15 @@ public class Fact {
 
 
 	public Fact(int id, String yagoId, int countryId, String data, int factTypeId, int rank) {
-			this.setId(id);
-			this.setYagoId(yagoId);
-			this.countryId=countryId;
-			this.data=data;
-			this.factTypeId=factTypeId;
-			this.setRank(rank);
+		this.setId(id);
+		this.setYagoId(yagoId);
+		this.countryId=countryId;
+		this.data=data;
+		this.factTypeId=factTypeId;
+		this.setRank(rank);
 
 	}
-	
+
 	public Fact(String yagoId, int countryId, String data, int factTypeId, int rank) {
 		this.setYagoId(yagoId);
 		this.countryId=countryId;
@@ -57,7 +60,7 @@ public class Fact {
 		this.factTypeId=factTypeId;
 		this.setRank(rank);
 
-}
+	}
 
 	public Fact(int countryId, int factTypeId, String data) {
 
@@ -86,7 +89,7 @@ public class Fact {
 
 				statement.executeUpdate(String.format(""
 						+ "INSERT INTO fact(yago_id, country_id, data, type_id) "
-						+ "VALUES('%s', %d, '%s', %d)", getYagoId(), countryId, answer.replace("'", "''"), typeId));
+						+ "VALUES('%s', %d, '%s', %d)", getYagoId(), countryId, InputHelper.santize(answer), typeId));
 
 			} catch (SQLException e) {
 				System.out.println("ERROR executeQuery - " + e.getMessage());
@@ -96,7 +99,7 @@ public class Fact {
 		}
 
 	}
-	
+
 
 	public void save() {
 		Connection conn;
@@ -114,7 +117,7 @@ public class Fact {
 						this.setId(id);
 					}
 				}
-				
+
 
 			} catch (SQLException e) {
 				System.out.println("ERROR executeQuery - " + e.getMessage());
@@ -122,9 +125,10 @@ public class Fact {
 		} catch (IOException | ParseException e1) {
 			e1.printStackTrace();
 		}
+		dirty = false;
 
 	}
-	
+
 
 
 	public static Fact getFact(int countryId, int factTypeId, int userId) {
@@ -136,29 +140,34 @@ public class Fact {
 			// Get the least viewed by user random fact
 			try (Statement statement = conn.createStatement();
 					ResultSet rs = statement.executeQuery(String.format("SELECT *, count(1) as appearance_count " +
-					                                                    "FROM fact " +
-					                                                    "JOIN user_fact_history ON fact.id = user_fact_history.fact_id " +
-					                                                    "WHERE country_id = %d and type_id = %d and deleted = 0 and user_id = %d" +
-					                                                    "GROUP BY fact.id " +
-					                                                    "ORDER BY appearance_count, RAND() ASC" +
-					                                                    "LIMIT 1",
-					                                                    countryId, factTypeId, userId))) {
+							"FROM fact " +
+							"LEFT JOIN  user_fact_history ON fact.id = user_fact_history.fact_id AND " +
+							"user_fact_history.user_id = %d AND user_fact_history.deleted = 0 " +
+							"WHERE country_id = %d and type_id = %d and fact.deleted = 0 " +
+							"GROUP BY fact.id " +
+							"ORDER BY appearance_count ASC, RAND() " +
+							"LIMIT 1",
+							userId, countryId, factTypeId))) {
 				while (rs.next() == true) {
-					 fact = new Fact(rs.getInt("country_id"), rs.getInt("type_id"), rs.getString("data"));;
+					fact = new Fact(rs.getInt("id"), rs.getString("yago_id"), rs.getInt("country_id"), 
+							rs.getString("data"), rs.getInt("type_id"),  rs.getInt("rank"));
 				}
-				
-			} catch (SQLException e) {
-				System.out.println("ERROR executeQuery - " + e.getMessage());
-			}
-			// Mark the returned fact as viewed by the user
-			try (Statement statement = conn.createStatement();){
-				statement.executeUpdate(String.format("INSERT INTO user_fact_history(user_id, fact_id) " +
-                        "VALUES(%d, %d)", userId, fact.getId()), Statement.RETURN_GENERATED_KEYS);
 
 			} catch (SQLException e) {
 				System.out.println("ERROR executeQuery - " + e.getMessage());
 			}
 			
+			if (fact == null) 
+				return null;
+			// Mark the returned fact as viewed by the user
+			try (Statement statement = conn.createStatement();){
+				statement.executeUpdate(String.format("INSERT INTO user_fact_history(user_id, fact_id) " +
+						"VALUES(%d, %d)", userId, fact.getId()));
+
+			} catch (SQLException e) {
+				System.out.println("ERROR executeQuery - " + e.getMessage());
+			}
+
 
 		} catch (IOException | ParseException e1) {
 			e1.printStackTrace();
@@ -174,11 +183,11 @@ public class Fact {
 			conn = JDBCConnection.getConnection();
 			try (Statement statement = conn.createStatement();
 					ResultSet rs = statement.executeQuery(String.format("SELECT * " +
-					                                                    "FROM fact " +
-					                                                    "WHERE type_id = %d and data <> '%s' " +
-					                                                    "ORDER BY RAND() " +
-					                                                    "LIMIT 0,3 ",
-					                                                    factTypeId, correctAnswer))) {
+							"FROM fact " +
+							"WHERE type_id = %d and data <> '%s' " +
+							"ORDER BY RAND() " +
+							"LIMIT 3 ",
+							factTypeId, correctAnswer))) {
 				while (rs.next() == true) {
 					result.add(new Fact(rs.getInt("country_id"), rs.getInt("type_id"), rs.getString("data")));
 				}
@@ -201,7 +210,7 @@ public class Fact {
 	public void setData(String data) {
 		this.data = data;
 	}
-	
+
 	public static List<Fact> fetchAll() {
 		List<Fact> result = new ArrayList<Fact>();
 		Connection conn;
@@ -210,7 +219,7 @@ public class Fact {
 			try (Statement statement = conn.createStatement();
 					ResultSet rs = statement.executeQuery("SELECT * FROM fact WHERE deleted = 0");) {
 				while (rs.next() == true) {
-					result.add(new Fact(rs.getInt("id"), rs.getString("yagoId"), rs.getInt("countryId"), rs.getString("data"), rs.getInt("factTypeId"),rs.getInt("rank")));
+					result.add(new Fact(rs.getInt("id"), rs.getString("yago_id"), rs.getInt("country_id"), rs.getString("data"), rs.getInt("type_id"),rs.getInt("rank")));
 				}
 			} catch (SQLException e) {
 				System.out.println("ERROR executeQuery - " + e.getMessage());
@@ -221,7 +230,7 @@ public class Fact {
 		}
 		return result;
 	}
-	
+
 	public static Fact fetchById(int id) {
 		Connection conn;
 		try {
@@ -229,7 +238,7 @@ public class Fact {
 			try (Statement statement = conn.createStatement();
 					ResultSet rs = statement.executeQuery(String.format("SELECT * FROM fact WHERE deleted = 0 AND id = %d", id));) {
 				while (rs.next() == true) {
-					return new Fact(rs.getInt("id"), rs.getString("yagoId"), rs.getInt("countryId"), rs.getString("data"), rs.getInt("factTypeId"),rs.getInt("rank"));
+					return new Fact(rs.getInt("id"), rs.getString("yago_id"), rs.getInt("country_id"), rs.getString("data"), rs.getInt("type_id"),rs.getInt("rank"));
 				}
 			} catch (SQLException e) {
 				System.out.println("ERROR executeQuery - " + e.getMessage());
@@ -240,18 +249,40 @@ public class Fact {
 		}
 		return null;
 	}
-	
-	
+
+
 	public void update() {
+		if (!dirty) return;
 		Connection conn;
 		try {
 			conn = JDBCConnection.getConnection();
 			try (Statement statement = conn.createStatement()){
 
 				statement.executeUpdate(String.format(""
-						+ "UPDATE fact SET CountryId = %d, data ='%s', factTypeId=%d, rank=%d, updated = 1 WHERE id = %d",
-						countryId, data, factTypeId, rank, getId()));
-			
+						+ "UPDATE fact SET country_id = %d, data = '%s', type_id = %d, rank = %d, updated = 1 WHERE id = %d",
+						countryId, InputHelper.santize(data), factTypeId, rank, getId()));
+
+			} catch (SQLException e) {
+				System.out.println("ERROR executeQuery - " + e.getMessage());
+			}
+		} catch (IOException | ParseException e1) {
+			e1.printStackTrace();
+		}
+	}
+	
+	
+
+	public void updateFromImport() {
+		if (!dirty) return;
+		Connection conn;
+		try {
+			conn = JDBCConnection.getConnection();
+			try (Statement statement = conn.createStatement()){
+
+				statement.executeUpdate(String.format(""
+						+ "UPDATE fact SET country_id = %d, data = '%s', type_id = %d, rank = %d WHERE id = %d and updated = 0",
+						countryId, InputHelper.santize(data), factTypeId, rank, getId()));
+
 			} catch (SQLException e) {
 				System.out.println("ERROR executeQuery - " + e.getMessage());
 			}
@@ -260,11 +291,13 @@ public class Fact {
 		}
 	}
 
+
 	public int getCountryId() {
 		return countryId;
 	}
 
 	public void setCountryId(int countryId) {
+		dirty = true;
 		this.countryId = countryId;
 	}
 
@@ -273,6 +306,7 @@ public class Fact {
 	}
 
 	public void setFactTypeId(int factTypeId) {
+		dirty = true;
 		this.factTypeId = factTypeId;
 	}
 
@@ -281,6 +315,7 @@ public class Fact {
 	}
 
 	public void setRank(int rank) {
+		dirty = true;
 		this.rank = rank;
 	}
 
@@ -289,6 +324,7 @@ public class Fact {
 	}
 
 	public void setYagoId(String yagoId) {
+		dirty = true;
 		this.yagoId = yagoId;
 	}
 
@@ -297,6 +333,7 @@ public class Fact {
 	}
 
 	public void setSubject(String subject) {
+		dirty = true;
 		this.subject = subject;
 	}
 
@@ -305,28 +342,29 @@ public class Fact {
 	}
 
 	public void setId(int id) {
+		dirty = true;
 		this.id = id;
 	}
 
 
-		public static void updateFactByData(String factData, Integer rank) {
-		Connection conn;
-		try {
-			conn = JDBCConnection.getConnection();
-			try (Statement statement = conn.createStatement()){
+//	public static void updateFactByData(String factData, Integer rank) {
+//		Connection conn;
+//		try {
+//			conn = JDBCConnection.getConnection();
+//			try (Statement statement = conn.createStatement()){
+//
+//				statement.executeUpdate(String.format(""
+//						+ "UPDATE fact SET rank = %d WHERE data = '%s'", rank, InputHelper.santize(factData)));
+//
+//
+//			} catch (SQLException e) {
+//				System.out.println("ERROR executeQuery - " + e.getMessage());
+//			}
+//		} catch (IOException | ParseException e1) {
+//			e1.printStackTrace();
+//		}			
+//	}
 
-				statement.executeUpdate(String.format(""
-						+ "UPDATE fact SET rank = %d WHERE data = '%s'", rank, InputHelper.santize(factData)));
 
-				
-			} catch (SQLException e) {
-				System.out.println("ERROR executeQuery - " + e.getMessage());
-			}
-		} catch (IOException | ParseException e1) {
-			e1.printStackTrace();
-		}			
-	}
-	
-	
-	
+
 }

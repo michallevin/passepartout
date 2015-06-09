@@ -9,13 +9,13 @@ import java.text.ParseException;
 import java.util.List;
 import java.util.ArrayList;
 
-import db.InputHelper;
 import db.JDBCConnection;
 
 public class Highscore {
 	private Integer id;
 	private Integer user_id;
 	private Integer score;
+	private String name;
 
 	public Highscore(Integer user_id, Integer score) {
 		this.setUser_id(user_id);
