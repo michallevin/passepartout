@@ -12,7 +12,7 @@ public class Question {
 
 	private String questionText;
 	private List<String> options;
-	private int answerIndex;
+	private Integer answerIndex;
 	private int score;
 	private String posterImage;
 	private String label;
@@ -33,11 +33,11 @@ public class Question {
 		Question question = new Question();
 		question.setQuestionText(factType.getQuestionWording().replace("$countryName", country.getName()));
 		
-		question.answerIndex = r.nextInt(4);
+		question.setAnswerIndex(r.nextInt(4));
 		question.setOptions(new ArrayList<String>());
 		int i = 0;
 		for (Fact option : otherOptions) {
-			if (i == question.answerIndex)
+			if (i == question.getAnswerIndex())
 				question.getOptions().add(answer.getData());
 			question.getOptions().add(option.getData());
 			i += 1;
@@ -86,6 +86,14 @@ public class Question {
 
 	public void setLabel(String label) {
 		this.label = label;
+	}
+
+	public Integer getAnswerIndex() {
+		return answerIndex;
+	}
+
+	public void setAnswerIndex(Integer answerIndex) {
+		this.answerIndex = answerIndex;
 	}
 	
 }

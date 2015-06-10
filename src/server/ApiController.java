@@ -227,7 +227,10 @@ public class ApiController {
 	public User login(@RequestParam("name") String name) {
 		// Fetch user by name, or create user if it doesn't exist
 		User user = User.fetchByName(name);
-		return user != null ? user : new User(name);	
+		if (user != null) return user;
+		user = new User(name);	
+		user.save();
+		return user;
 	}
 
 

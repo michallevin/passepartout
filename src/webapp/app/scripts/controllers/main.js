@@ -8,18 +8,25 @@
  * Controller of the passepartoutApp
  */
 angular.module('passepartoutApp')
-  .controller('MainCtrl', function ($scope, $location) {
+.controller('MainCtrl', function ($scope, $location, $User) {
 
-	 $scope.username = {
-		name: 'guest',
-	    word: /^\s*\w*\s*$/
-	 };
+	$scope.username = {
+			name: 'guest',
+			word: /^\s*\w*\s*$/
+	};
 
-     $scope.startGame = function() {
-    	console.log($scope.username.name);
-     	$location.path('/game');
-     };
+	$scope.startGame = function() {
+		console.log($scope.username.name);
+		$User.name=$scope.username.name;
+		$scope.loading = true;
+		$User.getUserId(function() {
+			console.log("loaded questions");
+			$scope.loading = false;
+			$location.path('/game');
+		});
+
+	};
 
 
 
-  });
+});
