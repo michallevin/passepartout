@@ -6,12 +6,12 @@ import db.models.Fact;
 
 public class AttributesImporter extends BaseImporter {
 
+	private static final String EN = "@en";
 	private static final String FILENAME = "res//yagoInfoboxAttributes_en.tsv";
 
 	public AttributesImporter() throws FileNotFoundException {
 		super();
 	}
-	
 	
 
 	@Override
@@ -19,12 +19,19 @@ public class AttributesImporter extends BaseImporter {
 		return FILENAME;
 	}
 
+	private String replaceEntityMarker(String input) {
+		if (input.startsWith("[[") && input.endsWith("]]"))
+			return input.replace("[[", "<").replace("]]", ">").replace(" ", "_");
+		return input;
+	}
+	
 	@Override
 	public void handleRow(String id, String attr1, String attr2, String attr3,
 			String line) {
-		Fact fact = new Fact(id, attr1, attr2, attr3, true);
-		fact.saveFromImport();
-		
+		if (attr3.endsWith(EN)) {
+			Fact fact = new Fact(id, attr1, attr2, replaceEntityMarker(cleanInput(attr3, EN)), true);
+			fact.saveFromImport();
+		}
 	}
 }
 

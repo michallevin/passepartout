@@ -2,6 +2,8 @@ package yago;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 
 import yago.importers.AttributesImporter;
 import yago.importers.CountriesImporter;
@@ -15,49 +17,49 @@ public class YagoImport {
 
 	private static boolean isImporting = false;
 
-	public static void startImport(boolean links, boolean countries, boolean attributes,
-			boolean facts, boolean literalFacts, boolean labels) {
+	public static void startImport(String[] imports) {
 		
 		isImporting = true;
-				
+		List<String> importsList = Arrays.asList(imports);
+
 		try {
 	
-			if (countries) {
+			if (importsList.contains("countries")) {
 				CountriesImporter countriesImporter = new CountriesImporter();
 				countriesImporter.importData();
 			}
 			
-			if (attributes) {
+			if (importsList.contains("attributes")) {
 				AttributesImporter attributesImporter = new AttributesImporter();
 				attributesImporter.importData();
 			}
 			
-			if (facts) {
+			if (importsList.contains("facts")) {
 				FactsImporter factsImporter = new FactsImporter();
 				factsImporter.importData();
 			}
 			
-			if (literalFacts) {
+			if (importsList.contains("literalFacts")) {
 				LiteralFactsImporter literalFactsImporter = new LiteralFactsImporter();
 				literalFactsImporter.importData();
 			}
 			
-			if (links) {
+			if (importsList.contains("links")) {
 				LinksImporter linksImporter = new LinksImporter();
 				linksImporter.importData();
 			}
 			
-			if (labels) {
+			if (importsList.contains("labels")) {
 				LabelsImporter labelsImporter = new LabelsImporter();
 				labelsImporter.importData();
 			}
 			
 
-			if (labels) {
+			if (importsList.contains("labels")) {
 				DictionaryUpdater.updateFactDictionary();
 				DictionaryUpdater.updateCountryDictionary();
 			}
-			else if (links) {
+			else if (importsList.contains("links")) {
 				DictionaryUpdater.updateFactDictionary();
 			}
 		

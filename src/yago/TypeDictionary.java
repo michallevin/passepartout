@@ -2,23 +2,20 @@ package yago;
 
 import java.util.HashMap;
 import java.util.List;
-import java.util.Random;
-
 import db.models.FactType;
 
 public class TypeDictionary {
 
 	private static TypeDictionary instance = null;
-	static private Random r = new Random();
 
-	private HashMap<String, Integer> typeMap;
+	private HashMap<String, FactType> typeMap;
 
 	protected TypeDictionary() {
 		
-		typeMap = new HashMap<String, Integer>();
+		typeMap = new HashMap<String, FactType>();
 		List<FactType> allTypes = FactType.fetchAll();
-		for (FactType fact : allTypes) {
-			typeMap.put(fact.getTypeName(), fact.getId());
+		for (FactType type : allTypes) {
+			typeMap.put(type.getTypeName(), type);
 		}
 
 	} 
@@ -33,23 +30,17 @@ public class TypeDictionary {
 	public Integer getId(String typeName, boolean isLiteral) {
 
 		if (typeMap.containsKey(typeName)) {
-			return typeMap.get(typeName);
+			return typeMap.get(typeName).getId();
 		}
 		else {
 			FactType fact = new FactType(-1, typeName, isLiteral);
 			int id = fact.save();
 			if (id != -1) {
-				typeMap.put(typeName, id);
+				typeMap.put(typeName, fact);
 			}
 			return id;
 		}
 
-	}
-	
-	public FactType getRandomFactType() {
-		
-		int index = r.nextInt(typeMap.size());
-		return (FactType) typeMap.values().toArray()[index];
 	}
 	
 

@@ -13,6 +13,9 @@ public class Question {
 	private String questionText;
 	private List<String> options;
 	private int answerIndex;
+	private int score;
+	private String posterImage;
+	private String label;
 	
 	private static Random r = new Random();
 	
@@ -59,6 +62,30 @@ public class Question {
 
 	public void setOptions(List<String> options) {
 		this.options = options;
+	}
+
+	public int getScore() {
+		return score;
+	}
+
+	public void setScore(int score) {
+		this.score = score;
+	}
+
+	public String getPosterImage() {
+		return posterImage;
+	}
+
+	public void setPosterImage(String posterImage) {
+		this.posterImage = posterImage;
+	}
+
+	public String getLabel() {
+		return label;
+	}
+
+	public void setLabel(String label) {
+		this.label = label;
 	}
 	
 }

@@ -22,7 +22,6 @@ public class LiteralFactsImporter extends BaseImporter {
 			String line) {
 		Fact yagoFact = new Fact(id, attr1, attr2, attr3, true);
 		yagoFact.saveFromImport();
-		
 	}
 }
 

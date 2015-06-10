@@ -13,18 +13,18 @@ import db.JDBCConnection;
 
 public class Highscore {
 	private Integer id;
-	private Integer user_id;
+	private Integer userId;
 	private Integer score;
 	private String name;
 
-	public Highscore(Integer user_id, Integer score) {
-		this.setUser_id(user_id);
+	public Highscore(Integer userId, Integer score) {
+		this.setUserId(userId);
 		this.setScore(score);
 	}
-	
-	public Highscore(Integer id, Integer user_id, Integer score) {
+
+	public Highscore(Integer id, Integer userId, Integer score) {
 		this.setId(id);
-		this.setUser_id(user_id);
+		this.setUserId(userId);
 		this.setScore(score);
 	}
 
@@ -36,7 +36,7 @@ public class Highscore {
 
 				statement.executeUpdate(String.format(""
 						+ "INSERT INTO highscore(user_id, score) "
-						+ "VALUES(%d, %d)", user_id, score),
+						+ "VALUES(%d, %d)", userId, score),
 						Statement.RETURN_GENERATED_KEYS);
 
 				try (ResultSet genKeys = statement.getGeneratedKeys()) {
@@ -62,10 +62,12 @@ public class Highscore {
 			try (Statement statement = conn.createStatement();
 					ResultSet rs = statement
 							.executeQuery(String
-									.format("SELECT * FROM highscore WHERE deleted = 0 AND id = %d",
+									.format("SELECT * FROM highscore JOIN user ON user.id = highscore.user_id WHERE deleted = 0 AND id = %d",
 											id));) {
 				while (rs.next() == true) {
-					return new Highscore(rs.getInt("user_id"), rs.getInt("score"));
+					Highscore highscore = new Highscore(rs.getInt("user_id"), rs.getInt("score"));
+					highscore.setName(rs.getString("name"));
+					return highscore;
 				}
 			} catch (SQLException e) {
 				System.out.println("ERROR executeQuery - " + e.getMessage());
@@ -100,11 +102,11 @@ public class Highscore {
 	}
 
 	public Integer getUser_id() {
-		return user_id;
+		return userId;
 	}
 
-	public void setUser_id(Integer user_id) {
-		this.user_id = user_id;
+	public void setUserId(Integer user_id) {
+		this.userId = user_id;
 	}
 
 	public Integer getScore() {
@@ -129,9 +131,9 @@ public class Highscore {
 			try (Statement statement = conn.createStatement()){
 
 				statement.executeUpdate(String.format(""
-						+ "UPDATE highscore SET user_id = %d,score = %d updated = 1 WHERE id = %d", user_id, score, id));
+						+ "UPDATE highscore SET user_id = %d,score = %d updated = 1 WHERE id = %d", userId, score, id));
 
-				
+
 			} catch (SQLException e) {
 				System.out.println("ERROR executeQuery - " + e.getMessage());
 			}
@@ -151,13 +153,21 @@ public class Highscore {
 				statement.executeUpdate(String.format(""
 						+ "UPDATE highscore SET deleted = 1, updated = 1 WHERE id = %d", id));
 
-				
+
 			} catch (SQLException e) {
 				System.out.println("ERROR executeQuery - " + e.getMessage());
 			}
 		} catch (IOException | ParseException e1) {
 			e1.printStackTrace();
 		}				
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
 	}
 
 }

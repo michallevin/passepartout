@@ -19,6 +19,7 @@ public class Country {
 	private String yagoId;
 	private String label;
 	private boolean dirty = false;
+	private String posterImage;
 
 	public Country(int id, String yagoId, String name, String label) {
 
@@ -114,9 +115,11 @@ public class Country {
 		try {
 			conn = JDBCConnection.getConnection();
 			try (Statement statement = conn.createStatement();
-					ResultSet rs = statement.executeQuery("SELECT * FROM country JOIN country_order ON country_order.country_id = country.id WHERE route_order IS NOT NULL AND deleted = 0 ORDER BY route_order");) {
+					ResultSet rs = statement.executeQuery("SELECT * FROM country JOIN country_order ON country_order.country_id = country.id WHERE route_order IS NOT NULL AND country.deleted = 0 AND country_order.deleted = 0 ORDER BY route_order");) {
 				while (rs.next() == true) {
-					result.add(new Country(rs.getInt("id"), rs.getString("yago_id"), rs.getString("name"), rs.getString("label")));
+					Country country = new Country(rs.getInt("id"), rs.getString("yago_id"), rs.getString("name"), rs.getString("label"));
+					country.setPosterImage(rs.getString("poster_label"));
+					result.add(country);
 				}
 			} catch (SQLException e) {
 				System.out.println("ERROR executeQuery - " + e.getMessage());
@@ -220,6 +223,14 @@ public class Country {
 	public void setLabel(String label) {
 		dirty = true;
 		this.label = label;
+	}
+
+	public String getPosterImage() {
+		return posterImage;
+	}
+
+	public void setPosterImage(String posterImage) {
+		this.posterImage = posterImage;
 	}
 
 

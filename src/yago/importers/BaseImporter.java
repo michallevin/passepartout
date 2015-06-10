@@ -12,11 +12,22 @@ import db.JDBCConnection;
 public abstract class BaseImporter {
 
 	private BufferedReader reader;
+	protected static final String ENG = "@eng";
 
 	public abstract String getFileName();
 
 	public BaseImporter() throws FileNotFoundException {
 		reader = new BufferedReader(new FileReader(getFileName()));
+	}
+	
+	
+	String cleanInput(String input, String postfix) {
+		return input.substring(1, input.length() - postfix.length() - 1);
+
+	}	
+	 
+	String cleanInput(String input) {
+		return cleanInput(input, ENG);
 	}
 
 	public void importData() throws IOException {

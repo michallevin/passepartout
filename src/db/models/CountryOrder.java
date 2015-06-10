@@ -16,18 +16,22 @@ public class CountryOrder {
 	private int id;
 	private int countryId;
 	private int routeOrder;
+	private String posterImage;
 
-	public CountryOrder(int id, int countryId, int routeOrder) {
+	public CountryOrder(int id, int countryId, int routeOrder, String posterImage) {
 
 		this.setId(id);
 		this.countryId = countryId;
 		this.routeOrder = routeOrder;
+		this.setPosterImage(posterImage);
 	}
 	
-	public CountryOrder(int countryId, int routeOrder) {
+	public CountryOrder(int countryId, int routeOrder, String posterImage) {
 
 		this.countryId = countryId;
 		this.routeOrder = routeOrder;
+		this.setPosterImage(posterImage);
+
 	}
 
 	
@@ -66,7 +70,7 @@ public class CountryOrder {
 			try (Statement statement = conn.createStatement();
 					ResultSet rs = statement.executeQuery(String.format("SELECT * FROM country_order WHERE deleted = 0 AND id = %d", id));) {
 				while (rs.next() == true) {
-					return new CountryOrder(rs.getInt("id"), rs.getInt("country_id"), rs.getInt("route_order"));
+					return new CountryOrder(rs.getInt("id"), rs.getInt("country_id"), rs.getInt("route_order"),  rs.getString("poster_image"));
 				}
 			} catch (SQLException e) {
 				System.out.println("ERROR executeQuery - " + e.getMessage());
@@ -86,7 +90,7 @@ public class CountryOrder {
 			try (Statement statement = conn.createStatement();
 					ResultSet rs = statement.executeQuery("SELECT * FROM country_order WHERE deleted = 0");) {
 				while (rs.next() == true) {
-					result.add(new CountryOrder(rs.getInt("id"), rs.getInt("country_id"), rs.getInt("route_order")));
+					result.add(new CountryOrder(rs.getInt("id"), rs.getInt("country_id"), rs.getInt("route_order"),  rs.getString("poster_image")));
 				}
 			} catch (SQLException e) {
 				System.out.println("ERROR executeQuery - " + e.getMessage());
@@ -161,6 +165,14 @@ public class CountryOrder {
 		} catch (IOException | ParseException e1) {
 			e1.printStackTrace();
 		}
+	}
+
+	public String getPosterImage() {
+		return posterImage;
+	}
+
+	public void setPosterImage(String posterImage) {
+		this.posterImage = posterImage;
 	}
 
 
