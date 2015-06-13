@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import core.GameConfigInit;
 import core.Question;
 import yago.YagoImport;
 import db.models.Country;
@@ -49,18 +50,22 @@ public class ApiController {
 	public void startImport() {
 		Thread t = new Thread() {
 			public void run() {
-				if (!YagoImport.isImporting())
-					YagoImport.startImport(
-							new String[] {
-									"links", 
-									//"countries", 
-									"attributes", 
-									"facts", 
-									"literalFacts", 
-									"labels"
-							});
-				else {
-
+				if (!YagoImport.isImporting()) {
+//					YagoImport.startImport(
+//							new String[] {
+//									//"links", 
+//									//"countries", 
+//									//"attributes", 
+//									//"facts", 
+//									//"literalFacts", 
+//									//"labels"
+//							});
+				
+					if (true) {
+						GameConfigInit.setCountryOrder();
+						GameConfigInit.setQuestionWordings();
+					}
+				
 				}
 			}
 		};
@@ -343,9 +348,9 @@ public class ApiController {
 	}
 
 	@RequestMapping(value="/rest/fact_type_question_wording/{id}", method=RequestMethod.PUT)
-	public FactTypeQuestionWording editFactTypeQuestionWording(@PathVariable Integer id,@RequestParam("question_id") Integer question_id,@RequestParam("question_wording") String question_wording) {
+	public FactTypeQuestionWording editFactTypeQuestionWording(@PathVariable Integer id,@RequestParam("factId") Integer factId, @RequestParam("question_wording") String question_wording) {
 		FactTypeQuestionWording factTypeQuestionWording = FactTypeQuestionWording.fetchById(id);
-		factTypeQuestionWording.setQuestionId(question_id);
+		factTypeQuestionWording.setFactId(factId);
 		factTypeQuestionWording.setQuestionWording(question_wording);
 		factTypeQuestionWording.update();
 		return factTypeQuestionWording;

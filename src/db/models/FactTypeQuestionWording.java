@@ -2,6 +2,7 @@ package db.models;
 
 import java.io.IOException;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -9,28 +10,27 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 
-import db.InputHelper;
 import db.JDBCConnection;
 
 public class FactTypeQuestionWording {
 
 	private static final String DELETE = "UPDATE fact_type_question_wording SET deleted = 1, updated = 1 WHERE id = ?";
-	private static final String UPDATE_BY_ID = "UPDATE fact_type_question_wording SET question_wording = ?, question_id = ? updated = 1 WHERE id = ?";
+	private static final String UPDATE_BY_ID = "UPDATE fact_type_question_wording SET question_wording = ?, fact_id = ? updated = 1 WHERE id = ?";
 	private static final String SELECT_ALL = "SELECT * FROM fact_type_question_wording WHERE deleted = 0";
 	private static final String SELECT_BY_ID = "SELECT * FROM fact_type_question_wording WHERE deleted = 0 AND id = ?";
-	private static final String INSERT = "INSERT INTO fact_type_question_wording(question_id, question_wording) VALUES(?, ?)";
+	private static final String INSERT = "INSERT INTO fact_type_question_wording(fact_id, question_wording) VALUES(?, ?)";
 	private int id;
-	private int questionId;
+	private int factId;
 	private String questionWording;
 
-	public FactTypeQuestionWording(int questionId, String questionWording) {
-		this.setQuestionId(questionId);
+	public FactTypeQuestionWording(int factId, String questionWording) {
+		this.setFactId(factId);
 		this.setQuestionWording(questionWording);
 	}
 
-	public FactTypeQuestionWording(int id, int questionId, String questionWording) {
+	public FactTypeQuestionWording(int id, int factId, String questionWording) {
 		this.setId(id);
-		this.setQuestionId(questionId);
+		this.setFactId(factId);
 		this.setQuestionWording(questionWording);
 	}
 
@@ -38,8 +38,8 @@ public class FactTypeQuestionWording {
 		Connection conn;
 		try {
 			conn = JDBCConnection.getConnection();
-			try (PreparedStatement statement = conn.prepareStatement(INSERT_QUERY, Statement.RETURN_GENERATED_KEYS)){
-				statement.setInt(1, questionId);
+			try (PreparedStatement statement = conn.prepareStatement(INSERT, Statement.RETURN_GENERATED_KEYS)){
+				statement.setInt(1, factId);
 				statement.setString(2, getQuestion_wording());
 				statement.executeUpdate();
 		
@@ -68,7 +68,7 @@ public class FactTypeQuestionWording {
 				try (ResultSet rs = statement.executeQuery()) {
 					while (rs.next() == true) {
 						return new FactTypeQuestionWording(rs.getInt("id"),
-								rs.getInt("question_id"),
+								rs.getInt("fact_id"),
 								rs.getString("question_wording"));
 					}
 				}
@@ -91,7 +91,7 @@ public class FactTypeQuestionWording {
 				try (ResultSet rs = statement.executeQuery()) {
 					while (rs.next() == true) {
 						result.add(new FactTypeQuestionWording(rs.getInt("id"), rs
-								.getInt("question_id"), rs
+								.getInt("fact_id"), rs
 								.getString("question_wording")));
 					}
 				}
@@ -111,7 +111,7 @@ public class FactTypeQuestionWording {
 			conn = JDBCConnection.getConnection();
 			try (PreparedStatement statement = conn.prepareStatement(UPDATE_BY_ID)){
 				statement.setString(1, questionWording);
-				statement.setInt(2, questionId);
+				statement.setInt(2, factId);
 				statement.setInt(3, id);
 				statement.executeUpdate();
 			} catch (SQLException e) {
@@ -125,7 +125,7 @@ public class FactTypeQuestionWording {
 		Connection conn;
 		try {
 			conn = JDBCConnection.getConnection();
-			try (PreparedStatement statement = conn.prepareStatement(DELETE_BY_ID)){
+			try (PreparedStatement statement = conn.prepareStatement(DELETE)){
 				statement.setInt(1, id);
 				statement.executeUpdate();
 
@@ -154,16 +154,15 @@ public class FactTypeQuestionWording {
 		this.id = id;
 	}
 
-	public int getQuestionId() {
-		return questionId;
+	public int getFactId() {
+		return factId;
 	}
 
-	public void setQuestionId(int questionId) {
-		this.questionId = questionId;
+	public void setFactId(int factId) {
+		this.factId = factId;
 	}
 
 	public void replace() {
-		// TODO Auto-generated method stub
 		
 	}
 

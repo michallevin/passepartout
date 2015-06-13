@@ -18,7 +18,7 @@ public class CountryOrder {
 	private static final String UPDATE_BY_ID = "UPDATE country_order SET country_id = ?, route_order = ?, updated = 1 WHERE id = ?";
 	private static final String SELECT_ALL = "SELECT * FROM country_order WHERE deleted = 0";
 	private static final String SELECT_BY_ID = "SELECT * FROM country_order WHERE deleted = 0 AND id = ?";
-	private static final String INSERT = "INSERT INTO country_order(country_id, route_order) VALUES(?, ?)";
+	private static final String INSERT = "INSERT INTO country_order(country_id, route_order, poster_image) VALUES(?, ?, ?)";
 	private int id;
 	private int countryId;
 	private int routeOrder;
@@ -50,6 +50,7 @@ public class CountryOrder {
 
 				statement.setInt(1, countryId);
 				statement.setInt(2, routeOrder);
+				statement.setString(3, posterImage);
 				statement.executeUpdate();
 
 				try (ResultSet genKeys = statement.getGeneratedKeys()) {

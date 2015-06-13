@@ -2,6 +2,7 @@ package db.models;
 
 import java.io.IOException;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -9,21 +10,21 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 
-import db.InputHelper;
 import db.JDBCConnection;
 
 public class FactType {
 
 	private static final String SELECT_BY_ID = "SELECT * FROM fact WHERE deleted = 0 AND id = ?";
-	private static final String SELECT_ALL = "SELECT * FROM fact_type LEFT JOIN fact_type_question_wording on fact_type_question_wording.fact_id = fact_type.id";
+	private static final String SELECT_ALL = "SELECT * FROM fact_type LEFT JOIN fact_type_question_wording ON fact_type_question_wording.fact_id = fact_type.id";
 	private static final String SELECT_RANDOM = "SELECT * FROM fact_type "
 			+ " JOIN fact_type_question_wording on fact_type_question_wording.fact_id = fact_type.id"
 			+ " WHERE question_wording IS NOT NULL"
 			+ " and is_literal = ?"
 			+ " ORDER BY RAND() LIMIT 0,1";
-	private static final String DELETE = "UPDATE fact_type SET deleted = 1, updated = 1 WHERE id = ?";
+	private static final String DELETE_BY_ID = "UPDATE fact_type SET deleted = 1, updated = 1 WHERE id = ?";
 	private static final String UPDATE_BY_ID = "UPDATE fact_type SET name = ?, updated = 1 WHERE id = ?";
-	private static final String INSERT = "INSERT INTO fact_type(name, is_literal) VALUES(?, ?)";
+	private static final String INSERT = "INSERT INTO fact_type (name, is_literal) VALUES(?, ?)";
+	
 	private String typeName;
 	private String questionWording;
 	private int id;
@@ -115,7 +116,7 @@ public class FactType {
 		Connection conn;
 		try {
 			conn = JDBCConnection.getConnection();
-			try (PreparedStatement statement = conn.prepareStatement(SElECT_RANDOM)) {
+			try (PreparedStatement statement = conn.prepareStatement(SELECT_RANDOM)) {
 				statement.setBoolean(1, isLiteral);
 			
 				try (ResultSet rs = statement.executeQuery()) {

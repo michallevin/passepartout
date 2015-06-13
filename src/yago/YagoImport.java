@@ -88,12 +88,7 @@ public class YagoImport {
 			DictionaryUpdater.updateCountryDictionary();
 			
 			
-			if (importsList.contains("init")) {
-				GameConfigInit.setCountryOrder();
-				GameConfigInit.setQuestionWordings();
-
-			}
-			
+		
 			System.out.println("import process finished");
 
 			
