@@ -33,7 +33,7 @@ public class AttributesImporter extends BaseImporter {
 		if (!attr3.endsWith(EN) || attr3.length() > 255) return;
 		Fact fact = Fact.parseFact(id, attr1, attr2, replaceEntityMarker(cleanInput(attr3, EN)));
 		if (fact == null) return;
-		Fact existing = FactDictionary.getInstance().getFact(fact);
+		Fact existing = FactDictionary.getInstance().getFactByYagoId(id);
 		if (existing == null)  {
 			//fact.save();
 			FactDictionary.getInstance().addFact(fact);

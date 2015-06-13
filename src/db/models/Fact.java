@@ -28,17 +28,32 @@ public class Fact {
 	private static final String DELETE_BY_ID = "UPDATE fact SET deleted = 1, updated = 1 WHERE id = ?";
 
 	private static final String SELECT_WRONG_ANSWERS = "SELECT * FROM fact "
-			+ "WHERE type_id = ? AND and country_id <> ? AND "
-			+ "data not in (SELECT data FROM fact WHERE type_id = ? AND country_id = ?) "
+			+ "WHERE type_id = ? AND country_id <> ? "
+			//+ "AND data NOT IN (SELECT data FROM fact WHERE type_id = ? AND country_id = ?) "
 			+ "ORDER BY RAND() "
 			+ "LIMIT 3";
 
-	private static final String SElECT_RANDOM_FACT = "SELECT *, count(1) as appearance_count FROM fact "
+	private static final String SElECT_RANDOM_LITERAL_FACT = "SELECT *, count(1) as appearance_count FROM fact "
 			+ "LEFT JOIN user_fact_history "
 			+ "ON fact.id = user_fact_history.fact_id AND user_fact_history.user_id = ? AND user_fact_history.deleted = 0 "
 			+ "WHERE country_id = ? AND type_id = ? AND fact.deleted = 0 "
 			+ "GROUP BY fact.id "
 			+ "ORDER BY appearance_count ASC, RAND() LIMIT 1";
+
+	private static final String SElECT_RANDOM_FACT_BY_DIFFICULTY = "SELECT *, count(1) as appearance_count FROM fact "
+			+ "LEFT JOIN user_fact_history "
+			+ "ON fact.id = user_fact_history.fact_id AND user_fact_history.user_id = ? AND user_fact_history.deleted = 0 "
+			+ "WHERE country_id = ? AND type_id = ? AND fact.deleted = 0 AND fact.rank = ?"
+			+ "GROUP BY fact.id "
+			+ "ORDER BY appearance_count ASC, RAND() LIMIT 1";
+			
+	private static final String SElECT_FACT_BY_RANK = "SELECT rank FROM fact "
+			+ "WHERE deleted = 0 "
+			+ "ORDER BY rank ASC LIMIT ?, 1";
+
+	private static final String UPDATE_RANK = "UPDATE fact SET rank = ?" +
+						   "WHERE rank > ? AND rank < ?";
+
 
 	private String yagoId;
 	private int countryId;
@@ -70,6 +85,7 @@ public class Fact {
 		Integer typeId = TypeDictionary.getInstance().getId(type, isLiteral);
 		return new Fact(-1, yagoId, country.getId(), data, typeId, null, 0, false);
 	}
+
 
 	public Fact(int id, String yagoId, int countryId, String data, int factTypeId, String label, int rank, boolean updated) {
 		this.id = id;
@@ -112,17 +128,21 @@ public class Fact {
 
 	}
 
-	public static Fact getFact(int countryId, int factTypeId, int userId) {
+	public static Fact getFact(int countryId, int factTypeId, int userId, boolean isLiteral, int difficulty) {
 
 		Connection conn;
 		Fact fact = null;
 		try {
 			conn = JDBCConnection.getConnection();
 			// Get the least viewed by user random fact
-			try (PreparedStatement statement = conn.prepareStatement(SElECT_RANDOM_FACT)) {
+			String query = isLiteral ? SElECT_RANDOM_LITERAL_FACT : SElECT_RANDOM_FACT_BY_DIFFICULTY;
+			try (PreparedStatement statement = conn.prepareStatement(query)) {
 				statement.setInt(1, userId);
 				statement.setInt(2, countryId);
 				statement.setInt(3, factTypeId);
+				if (isLiteral){
+					statement.setInt(4, difficulty);
+				}
 				try (ResultSet rs = statement.executeQuery()) {
 					while (rs.next() == true) {
 						fact = new Fact(
@@ -157,8 +177,8 @@ public class Fact {
 			try (PreparedStatement statement = conn.prepareStatement(SELECT_WRONG_ANSWERS)) {
 				statement.setInt(1, factTypeId);
 				statement.setInt(2, countryId);
-				statement.setInt(3, factTypeId);
-				statement.setInt(4, countryId);
+				//statement.setInt(3, factTypeId);
+				//statement.setInt(4, countryId);
 				try (ResultSet rs = statement.executeQuery()) {
 					while (rs.next() == true) {
 						result.add(new Fact(
@@ -290,6 +310,40 @@ public class Fact {
 			e1.printStackTrace();
 		}
 		this.dirty = false;
+	}
+	
+	public static void updateFactRanks(int factsCount) {
+		Connection conn;
+		List<Integer> linksByRank = new ArrayList<Integer>();
+		try {
+			conn = JDBCConnection.getConnection();
+			for (int i = 1; i <= 9; ++i) {
+				try (PreparedStatement statement = conn.prepareStatement(SElECT_FACT_BY_RANK)){
+					statement.setInt(1, i*factsCount/9);
+					try (ResultSet rs = statement.executeQuery()) {
+						while (rs.next() == true) {
+							linksByRank.add(rs.getInt("rank"));
+						}
+					}
+				} catch (SQLException e) {
+					System.out.println("ERROR executeQuery - " + e.getMessage());
+				}
+			}
+			for (int i = 0; i < linksByRank.size() ; i++){
+				try (PreparedStatement statement = conn.prepareStatement(UPDATE_RANK)){
+					statement.setInt(1, 9-i);
+					statement.setInt(2, i == 0 ? 0 : linksByRank.get(i));
+					statement.setInt(3, i == linksByRank.size() -1 ? Integer.MAX_VALUE : linksByRank.get(i+1));
+					statement.executeUpdate();
+
+				} catch (SQLException e) {
+					System.out.println("ERROR executeQuery - " + e.getMessage());
+				}	
+			}
+
+		} catch (IOException | ParseException e1) {
+			e1.printStackTrace();
+		}
 	}
 
 	public void delete() {

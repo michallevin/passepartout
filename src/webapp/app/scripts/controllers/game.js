@@ -11,8 +11,8 @@ angular.module('passepartoutApp')
 .controller('GameCtrl', function ($scope, $http, $Questions, $User, $location) {
 
 	$scope.currentQuestion = 0;
-	$scope.lives = 0;
-	$scope.score=0;
+	$scope.lives = 3;
+	$scope.score = 0;
 
 
 //	$scope.init = function() {
@@ -47,13 +47,15 @@ angular.module('passepartoutApp')
 	
 	$scope.startOver= function() {
 		$scope.loading = true;
-		$User.getUserId(function() {
+		$Questions.getQuestions($User.id, function() {
 			console.log("loaded questions");
 			$scope.loading = false;
 			$scope.questions=$Questions.questions;
 			$scope.currentQuestion = 0;
 			$scope.lives = 3;
+			$scope.score = 0;
 		});
+
 	}
 	
 	$scope.endGame = function() {

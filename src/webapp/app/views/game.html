@@ -5,9 +5,9 @@
 	rel='stylesheet' type='text/css'>
 
 <div class="jumbotron"
-	style="background: url(images/world_map.jpg) top center">
+	style="background: url(images/world_map.jpg) top center" >
 	
-		<div >
+	<div  ng-show="lives > 0">
 		<h4 style="font-family: 'Cinzel', serif;" >
 			<b>Score : {{score}} </b>
 		</h4>
@@ -15,43 +15,45 @@
 			<b>Lives: {{lives}} </b>
 		</h4>
 		
-	</div>
-	
-	
-	
-	
-	
-	<div ng-repeat="question in questions"
-		ng-show="$index == currentQuestion" style="">
-		<h1 style="font-family: 'Cinzel', serif;" ng-hide="$index % 1== 1">
-			<b>Welcome to {{question.questionText.split(" ")[5]}}!</b>
-		</h1>
-		<p class="lead">
-			<img src="images/belguim1.jpg"
-				/*{{question.photo}}*/  alt="Passepartout" width="30%" height="30%"
-				ng-hide="$index % 1== 1">
-		</p>
-		<div
-			style="background: url(http://www.texturepalace.com/wp-content/uploads/vintage-paper-texture-for-photoshop-3.jpg) top center; border-style: solid; border-width: 5px;">
-			<h3 style="font-family: 'Cinzel', serif;">
-				<b>{{question.questionText}}?</b>
-			</h3>
-			<div ng-repeat="answer in question.options">
-				<h4 style="font-family: 'Cinzel', serif;"
-					ng-click="guessAnswer($index)">
-					<b>{{answer}}</b>
-				</h4>
+
+		<div ng-repeat="question in questions"
+			ng-show="$index == currentQuestion" style="">
+			<h1 style="font-family: 'Cinzel', serif;" ng-hide="$index % 1== 1">
+				<b>Welcome to {{question.questionText.split(" ")[5]}}!</b>
+			</h1>
+			<p class="lead">
+				<img src="images/belguim1.jpg"
+					/*{{question.photo}}*/  alt="Passepartout" width="30%" height="30%"
+					ng-hide="$index % 1== 1">
+			</p>
+			<div
+				style="background: url(http://www.texturepalace.com/wp-content/uploads/vintage-paper-texture-for-photoshop-3.jpg) top center; border-style: solid; border-width: 5px;">
+				<h3 style="font-family: 'Cinzel', serif;">
+					<b>{{question.questionText}}?</b>
+				</h3>
+				<div ng-repeat="answer in question.options">
+					<h4 style="font-family: 'Cinzel', serif;"
+						ng-click="guessAnswer($index)">
+						<b>{{answer}}</b>
+					</h4>
+				</div>
+
+
+
+
 			</div>
-
-
-
-
 		</div>
-	</div>
 
-	
+	</div>
 
 	<div ng-show="lives==0">
+		<h1 style="font-family: 'Cinzel', serif;" ng-hide="$index % 1== 1">
+			<b>Game over!</b>
+		</h1>
+		<h2>
+			Your score is {{score}}
+		</h2>
+		<br/>
 		<h4 style="font-family: 'Cinzel', serif;" ng-click="submitScore()">
 			<b>Submit highscore</b>
 		</h4>

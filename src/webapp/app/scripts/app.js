@@ -1,4 +1,3 @@
-'use strict';
 
 /**
  * @ngdoc overview
@@ -13,6 +12,7 @@ angular
     'passepartoutApp.questions',
     'passepartoutApp.user',
     'passepartoutApp.highscores',
+    //'passepartoutApp.admin',
     'ngAnimate',
     'ngCookies',
     'ngResource',
@@ -34,10 +34,10 @@ angular
           templateUrl: 'views/highscores.html',
           controller: 'ScoresCtrl'
         })
-      .when('/admin', {
-        templateUrl: 'views/admin.html',
-        controller: 'AdminCtrl'
-      })
+      // .when('/admin', {
+      //   templateUrl: 'views/admin.html',
+      //   controller: 'AdminCtrl'
+      // }) 
       .otherwise({
         redirectTo: '/'
       });

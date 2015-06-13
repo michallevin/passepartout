@@ -10,15 +10,6 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 
-
-
-
-
-
-
-
-
-import db.InputHelper;
 import db.JDBCConnection;
 
 public class Country {
@@ -128,7 +119,7 @@ public class Country {
 				try (ResultSet rs = statement.executeQuery()) {
 					while (rs.next() == true) {
 						Country country = new Country(rs.getInt("id"), rs.getString("yago_id"), rs.getString("name"), rs.getString("label"), rs.getBoolean("updated"));
-						country.posterImage = rs.getString("poster_label");
+						country.posterImage = rs.getString("poster_image");
 						result.add(country);
 					}
 				}
