@@ -17,7 +17,7 @@ public class Highscore {
 	private static final String UPDATE_BY_ID = "UPDATE highscore SET user_id = ?, score = ? updated = 1 WHERE id = ?";
 	private static final String SELECT_ALL = "SELECT user_id, score FROM highscore WHERE deleted = 0";
 	private static final String SELECT_TOP = "SELECT user_id, score FROM highscore WHERE deleted = 0 ORDER BY score DESC LIMIT ?";
-	private static final String SELECT_BY_ID = "SELECT * FROM highscore JOIN user ON user.id = highscore.user_id WHERE deleted = 0 AND id = ?";
+	private static final String SELECT_BY_ID = "SELECT user_id, score, user.name FROM highscore JOIN user ON user.id = highscore.user_id WHERE deleted = 0 AND id = ?";
 	private static final String INSERT = "INSERT INTO highscore (user_id, score) VALUES (?, ?)";
 
 	private Integer id;
@@ -69,7 +69,8 @@ public class Highscore {
 				statement.setInt(1, id);
 				try (ResultSet rs = statement.executeQuery()) {
 					while (rs.next() == true) {
-						Highscore highscore = new Highscore(rs.getInt("user_id"), rs.getInt("score"));
+						Highscore highscore = new Highscore(rs.getInt("user_id"),
+										    rs.getInt("score"));
 						highscore.setName(rs.getString("name"));
 						return highscore;
 					}
