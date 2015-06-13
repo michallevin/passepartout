@@ -28,6 +28,7 @@ public class Country {
 	private boolean dirty = false;
 	private String posterImage;
 	private boolean updated;
+	private String routeLabel;
 
 	public Country(int id, String yagoId, String name, String label, boolean updated) {
 
@@ -120,6 +121,7 @@ public class Country {
 					while (rs.next() == true) {
 						Country country = new Country(rs.getInt("id"), rs.getString("yago_id"), rs.getString("name"), rs.getString("label"), rs.getBoolean("updated"));
 						country.posterImage = rs.getString("poster_image");
+						country.setRouteLabel(rs.getString("route_name"));
 						result.add(country);
 					}
 				}
@@ -237,6 +239,14 @@ public class Country {
 
 	public void setUpdated(boolean updated) {
 		this.updated = updated;
+	}
+
+	public String getRouteLabel() {
+		return routeLabel;
+	}
+
+	public void setRouteLabel(String routeLabel) {
+		this.routeLabel = routeLabel;
 	}
 
 

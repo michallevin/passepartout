@@ -18,7 +18,7 @@ public class FactTypeQuestionWording {
 	private static final String UPDATE_BY_ID = "UPDATE fact_type_question_wording SET question_wording = ?, fact_id = ? updated = 1 WHERE id = ?";
 	private static final String SELECT_ALL = "SELECT * FROM fact_type_question_wording WHERE deleted = 0";
 	private static final String SELECT_BY_ID = "SELECT * FROM fact_type_question_wording WHERE deleted = 0 AND id = ?";
-	private static final String INSERT = "INSERT INTO fact_type_question_wording(fact_id, question_wording) VALUES(?, ?)";
+	private static final String INSERT = "INSERT INTO fact_type_question_wording (fact_id, question_wording) VALUES(?, ?)";
 	private int id;
 	private int factId;
 	private String questionWording;

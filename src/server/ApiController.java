@@ -2,6 +2,7 @@ package server;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -11,7 +12,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import core.GameConfigInit;
 import core.Question;
-import yago.FactDictionary;
 import yago.YagoImport;
 import db.models.Country;
 import db.models.CountryOrder;
@@ -29,14 +29,15 @@ public class ApiController {
 	@RequestMapping(value="/rest/question", method=RequestMethod.GET)
 	public List<Question> getQuestions(@RequestParam("userId") Integer userId) {
 
+		int literalRandomStart = new Random().nextInt(2);
 		List<Country> countries = Country.fetchByOrder();
 		List<Question> questions = new ArrayList<Question>();
 		int i = 0;
 		for (Country country : countries) {
-			Question question = Question.generateQuestion(country, userId, i % 2 == 0, i + 1 );
+			Question question = Question.generateQuestion(country, userId, i % 2 == literalRandomStart, i + 1 );
 			question.setScore((int) ((Math.floor(i/3)+1)*100));
 			question.setPosterImage(country.getPosterImage());
-			question.setLabel(country.getLabel());
+			question.setLabel(country.getRouteLabel());
 			questions.add(question);
 			i += 1;
 		}
@@ -66,7 +67,7 @@ public class ApiController {
 						GameConfigInit.setCountryOrder();
 						GameConfigInit.setQuestionWordings();
 					}
-					Fact.updateFactRanks(FactDictionary.getInstance().getCount());
+					//Fact.updateFactRanks(FactDictionary.getInstance().getCount());
 				}
 			}
 		};
@@ -300,8 +301,8 @@ public class ApiController {
 
 	@RequestMapping(value="/rest/country_order", method=RequestMethod.POST)
 	public CountryOrder addCountryOrder(@RequestParam("country_id") int countryId,
-			@RequestParam("route_order") int routeOrder, @RequestParam("poster_image") String posterImage) {
-		CountryOrder countryOrder = new CountryOrder(countryId, routeOrder, posterImage);
+			@RequestParam("route_order") int routeOrder, @RequestParam("poster_image") String posterImage, String name) {
+		CountryOrder countryOrder = new CountryOrder(countryId, routeOrder, posterImage, name);
 		countryOrder.save();
 		return countryOrder;
 

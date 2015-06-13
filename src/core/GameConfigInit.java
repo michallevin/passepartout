@@ -11,30 +11,30 @@ public class GameConfigInit {
 
 	public static void setCountryOrder() {
 		String[][] countries = {
-				{"<Belgium>", "belgium2.jpg"}, 
-				{"<France>", "paris1.jpg"},
-				{"<Germany>", "germany1.jpg"},
-				{"<Liechtenstein>", "lichtenstien1.jpg"},
-				{"<Italy>", "italy1.jpg"},
-				{"<Greece>", "greece1.jpg"},
-				{"<Turkey>", "turkey4.jpg"},
-				{"<Egypt>", "egypt3.jpg"},
-				{"<Yemen>", "yemen1.jpg"},
-				{"<India>", "india1.jpg"},
-				{"<India>", "india3.jpg"},
-				{"<Thailand>", "thailand3.jpg"},
-				{"<China>", "china2.jpg"},
-				{"<Japan>", "japan1.jpg"},
-				{"<United_States>", "san_fransisco1.jpg"},
-				{"<United_States>", "new_york4.jpg"},
-				{"<Republic_of_Ireland>", "ireland2.jpg"},
-				{"<United_Kingdom>", "london3.jpg"}
+				{"<Belgium>", "belgium2.jpg", "Belgium"}, 
+				{"<France>", "paris1.jpg", "France"},
+				{"<Germany>", "germany1.jpg", "Germany"},
+				{"<Liechtenstein>", "lichtenstien1.jpg", "Liechtenstein"},
+				{"<Italy>", "italy1.jpg", "Italy"},
+				{"<Greece>", "greece1.jpg", "Greece"},
+				{"<Turkey>", "turkey4.jpg", "Turkey"},
+				{"<Egypt>", "egypt3.jpg", "Egypt"},
+				{"<Yemen>", "yemen1.jpg", "Yemen"},
+				{"<India>", "india1.jpg", "Mumbai, India"},
+				{"<India>", "india3.jpg", "Kolkata, India"},
+				{"<Thailand>", "thailand3.jpg", "Thailand"},
+				{"<China>", "china2.jpg", "China"},
+				{"<Japan>", "japan1.jpg", "Japan"},
+				{"<United_States>", "san_fransisco1.jpg", "San Francisco, USA"},
+				{"<United_States>", "new_york4.jpg", "New York, USA"},
+				{"<Republic_of_Ireland>", "ireland2.jpg", "Ireland"},
+				{"<United_Kingdom>", "london3.jpg", "United Kingdom"}
 		};
 		
 		
 		for (int i = 0; i < countries.length; ++i) {
 			Country country = CountryDictionary.getInstance().getCountry(countries[i][0]);
-			CountryOrder countryOrder = new CountryOrder(country.getId(), i, countries[i][1]);
+			CountryOrder countryOrder = new CountryOrder(country.getId(), i, countries[i][1], countries[i][2]);
 			countryOrder.save();
 		}
 	}
@@ -61,9 +61,8 @@ public class GameConfigInit {
 				{"<hasMotto>", "Which of these is the motto of $countryName?"}, 
 				{"<infobox/en/imageflag>", "Which of these is the flag of $countryName?"}, 
 				{"<infobox/en/areakm>", "What is the area of $countryName?"}, 
-				{"<infobox/en/cctld>", "What is the TLD of $countryName?"}, 
+				//{"<infobox/en/cctld>", "What is the TLD of $countryName?"}, 
 				{"<infobox/en/capital>", "What is the capital of $countryName?"}, 
-				{"<infobox/en/currencycode>", "What is the currency code of $countryName?"}, 
 				{"<infobox/en/currencycode>", "What is the currency code of $countryName?"}, 
 				{"<hasCapital>", "What is the capital of $countryName?"}, 
 	
