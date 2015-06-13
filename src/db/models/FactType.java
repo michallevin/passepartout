@@ -22,20 +22,20 @@ public class FactType {
 	public FactType(int id, String typeName, boolean isLiteral) {
 		this.setId(id);
 		this.setTypeName(typeName);
-		this.isLiteral = isLiteral;
+		this.setLiteral(isLiteral);
 	}
 
 	public FactType(int id, String typeName, boolean isLiteral, String questionWording) {
 		this.setId(id);
 		this.setTypeName(typeName);
 		this.setQuestionWording(questionWording);
-		this.isLiteral = isLiteral;
+		this.setLiteral(isLiteral);
 
 	}
 
 	public FactType(String typeName, boolean isLiteral) {
 		this.setTypeName(typeName);
-		this.isLiteral = isLiteral;
+		this.setLiteral(isLiteral);
 	}
 	
 	public int save() {
@@ -45,7 +45,7 @@ public class FactType {
 			try (Statement statement = conn.createStatement()){
 				statement.executeUpdate(String.format(""
 						+ "INSERT INTO fact_type(name, is_literal) "
-						+ "VALUES('%s', %b)", getTypeName(), isLiteral), Statement.RETURN_GENERATED_KEYS);
+						+ "VALUES('%s', %b)", getTypeName(), isLiteral()), Statement.RETURN_GENERATED_KEYS);
 
 				try (ResultSet genKeys = statement.getGeneratedKeys()) {
 					if (genKeys.next()) {
@@ -139,7 +139,7 @@ public class FactType {
 		try {
 			conn = JDBCConnection.getConnection();
 			try (Statement statement = conn.createStatement();
-					ResultSet rs = statement.executeQuery("SELECT * FROM fact_type JOIN fact_type_question_wording on fact_type_question_wording.fact_id = fact_type.id");) {
+					ResultSet rs = statement.executeQuery("SELECT * FROM fact_type LEFT JOIN fact_type_question_wording on fact_type_question_wording.fact_id = fact_type.id");) {
 				while (rs.next() == true) {
 					result.add(new FactType(rs.getInt("id"), rs.getString("name"), rs.getBoolean("is_literal"), rs.getString("question_wording")));
 				}
@@ -177,9 +177,33 @@ public class FactType {
 		this.questionWording = questionWording;
 	}
 
-	public static FactType fetchById(Integer id2) {
+	public static FactType fetchById(Integer id) {
 		// TODO Auto-generated method stub
-		return null;
+			Connection conn;
+			try {
+				conn = JDBCConnection.getConnection();
+				try (Statement statement = conn.createStatement();
+						ResultSet rs = statement.executeQuery(String.format("SELECT * FROM fact WHERE deleted = 0 AND id = %d", id));) {
+					while (rs.next() == true) {
+						return new FactType(rs.getInt("id"), rs.getString("name"), rs.getBoolean("is_literal"), rs.getString("question_wording"));
+					}
+				} catch (SQLException e) {
+					System.out.println("ERROR executeQuery - " + e.getMessage());
+				}
+
+			} catch (IOException | ParseException e1) {
+				e1.printStackTrace();
+			}
+			return null;
+		
+	}
+
+	public boolean isLiteral() {
+		return isLiteral;
+	}
+
+	public void setLiteral(boolean isLiteral) {
+		this.isLiteral = isLiteral;
 	}
 
 	

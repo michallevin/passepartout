@@ -54,24 +54,34 @@
 
         var country = nga.entity('country');
         var fact = nga.entity('fact'); // the API endpoint for posts will be http://localhost:3000/posts/:id
-        var fact_type = nga.entity('fact_type');
+        var factType = nga.entity('fact_type');
+        var highScore = nga.entity('highscore');
+        var user = nga.entity('user');
+        var userFactHistory = nga.entity('user_fact_history');
+        var countryOrder = nga.entity('country_order');
 
         // set the application entities
         admin
-            .addEntity(country);
+            .addEntity(country)
             .addEntity(fact)
-            .addEntity(fact_type);
+            .addEntity(factType)
+            .addEntity(highScore)
+            .addEntity(user)
+            .addEntity(userFactHistory)
+            .addEntity(countryOrder);
 
         // customize entities and views
+        
+        //Country
 
         country.dashboardView() // customize the dashboard panel for this entity
-            .title('Countries')
+            .title('countries')
             .order(1) // display the post panel first in the dashboard
             .perPage(5) // limit the panel to the 5 latest posts
             .fields([nga.field('name').isDetailLink(true).map(truncate)]); // fields() called with arguments add fields to the view
 
         country.listView()
-            .title('All Countries') // default title is "[Entity_name] list"
+            .title('All countries') // default title is "[Entity_name] list"
             .description('List of countries') // description appears under the title
             .infinitePagination(true) // load pages as the user scrolls
             .fields([
@@ -92,7 +102,7 @@
             ]);
 
         country.editionView()
-            .title('Edit post "{{ entry.values.title }}"') // title() accepts a template string, which has access to the entry
+            .title('Edit country {{ entry.values.name }}') // title() accepts a template string, which has access to the entry
             .actions(['list', 'show', 'delete']) // choose which buttons appear in the top action bar. Show is disabled by default
             .fields([
                 country.creationView().fields() // fields() without arguments returns the list of fields. That way you can reuse fields from another view to avoid repetition
@@ -103,124 +113,260 @@
                 nga.field('id'),
                 country.editionView().fields() // reuse fields from another view in another order
             ]);
-/*
-        comment.dashboardView()
-            .title('Last comments')
-            .order(2) // display the comment panel second in the dashboard
-            .perPage(5)
+            
+        // High score
+
+        highScore.dashboardView() // customize the dashboard panel for this entity
+            .title('high scores')
+            .order(1) // display the post panel first in the dashboard
+            .perPage(5) // limit the panel to the 5 latest posts
+            .fields([nga.field('user_id').isDetailLink(true).map(truncate)]); // fields() called with arguments add fields to the view
+
+        highScore.listView()
+            .title('All high scores') // default title is "[Entity_name] list"
+            .description('List of users high scores') // description appears under the title
+            .infinitePagination(true) // load pages as the user scrolls
+            .fields([
+                nga.field('id').label('ID'), // The default displayed name is the camelCase field name. label() overrides id
+                nga.field('user_id', 'number'), // the default list field type is "string", and displays as a string
+                nga.field('score', 'number'), // Date field type allows date formatting
+                nga.field('deleted', 'number'),
+                nga.field('updated', 'number')
+            ])
+            .listActions(['show', 'edit', 'delete']);
+
+        highScore.creationView()
+            .fields([
+                nga.field('user_id', 'number'), // the default list field type is "string", and displays as a string
+                nga.field('score', 'number'), // Date field type allows date formatting
+            ]);
+
+        highScore.editionView()
+            .title('Edit highscore for user with id {{ entry.values.user_id }}') // title() accepts a template string, which has access to the entry
+            .actions(['list', 'show', 'delete']) // choose which buttons appear in the top action bar. Show is disabled by default
+            .fields([
+                highScore.creationView().fields() // fields() without arguments returns the list of fields. That way you can reuse fields from another view to avoid repetition
+            ]);
+
+        highScore.showView() // a showView displays one entry in full page - allows to display more data than in a a list
             .fields([
                 nga.field('id'),
-                nga.field('body', 'wysiwyg')
-                    .label('Comment')
-                    .stripTags(true)
-                    .map(truncate),
-                nga.field(null, 'template') // template fields don't need a name in dashboard view
-                    .label('')
-                    .template('<post-link entry="entry"></post-link>') // you can use custom directives, too
+                highScore.editionView().fields() // reuse fields from another view in another order
             ]);
+            
+        // Fact type
+        
+        factType.dashboardView() // customize the dashboard panel for this entity
+            .title('fact types')
+            .order(1) // display the post panel first in the dashboard
+            .perPage(5) // limit the panel to the 5 latest posts
+            .fields([nga.field('name').isDetailLink(true).map(truncate)]); // fields() called with arguments add fields to the view
 
-        comment.listView()
-            .title('Comments')
-            .perPage(10) // limit the number of elements displayed per page. Default is 30.
+        factType.listView()
+            .title('All fact types') // default title is "[Entity_name] list"
+            .description('List of fact types that define te question types') // description appears under the title
+            .infinitePagination(true) // load pages as the user scrolls
             .fields([
-                nga.field('created_at', 'date')
-                    .label('Posted')
-                    .order(1),
-                nga.field('body', 'wysiwyg')
-                    .stripTags(true)
-                    .map(truncate)
-                    .order(3),
-                nga.field('post_id', 'reference')
-                    .label('Post')
-                    .map(truncate)
-                    .targetEntity(post)
-                    .targetField(nga.field('title').map(truncate))
-                    .order(4),
-                nga.field('author').order(2)
+                nga.field('id').label('ID'), // The default displayed name is the camelCase field name. label() overrides id
+                nga.field('typeName'), // the default list field type is "string", and displays as a string
+                nga.field('is_literal', 'number'), // Date field type allows date formatting
+                nga.field('questionWording')
             ])
-            .filters([
-                nga.field('q', 'string').label('').attributes({'placeholder': 'Global Search'}),
-                nga.field('created_at', 'date')
-                    .label('Posted')
-                    .attributes({'placeholder': 'Filter by date'}),
-                nga.field('today', 'boolean').map(function() {
-                    var now = new Date(),
-                        year = now.getFullYear(),
-                        month = now.getMonth() + 1,
-                        day = now.getDate();
-                    month = month < 10 ? '0' + month : month;
-                    day = day < 10 ? '0' + day : day;
-                    return {
-                        created_at: [year, month, day].join('-') // ?created_at=... will be appended to the API call
-                    };                    
-                }),
-                nga.field('post_id', 'reference')
-                    .label('Post')
-                    .targetEntity(post)
-                    .targetField(nga.field('title'))
-            ])
-            .listActions(['edit', 'delete']);
+            .listActions(['show', 'edit', 'delete']);
 
-        comment.creationView()
+        factType.creationView()
             .fields([
-                nga.field('created_at', 'date')
-                    .label('Posted')
-                    .defaultValue(new Date()), // preset fields in creation view with defaultValue
-                nga.field('author'),
-                nga.field('body', 'wysiwyg'),
-                nga.field('post_id', 'reference')
-                    .label('Post')
-                    .map(truncate)
-                    .targetEntity(post)
-                    .targetField(nga.field('title')),
+                nga.field('typeName'), // the default edit field type is "string", and displays as a text input
+                nga.field('is_literal', 'number') // Date field type allows date formatting
             ]);
 
-        comment.editionView()
-            .fields(comment.creationView().fields())
-            .fields([nga.field(null, 'template')
-                .label('')
-                .template('<post-link entry="entry"></post-link>') // template() can take a function or a string
+        factType.editionView()
+            .title('Edit fact type {{ entry.values.typeName }}') // title() accepts a template string, which has access to the entry
+            .actions(['list', 'show', 'delete']) // choose which buttons appear in the top action bar. Show is disabled by default
+            .fields([
+                factType.creationView().fields() // fields() without arguments returns the list of fields. That way you can reuse fields from another view to avoid repetition
             ]);
 
-        comment.deletionView()
-            .title('Deletion confirmation'); // customize the deletion confirmation message
-
-        tag.dashboardView()
-            .title('Recent tags')
-            .order(3)
-            .perPage(10)
+        factType.showView() // a showView displays one entry in full page - allows to display more data than in a a list
             .fields([
                 nga.field('id'),
-                nga.field('name'),
-                nga.field('published', 'boolean').label('Is published ?')
+                factType.editionView().fields() // reuse fields from another view in another order
+            ]);
+            
+        // User
+        
+        user.dashboardView() // customize the dashboard panel for this entity
+            .title('user')
+            .order(1) // display the post panel first in the dashboard
+            .perPage(5) // limit the panel to the 5 latest posts
+            .fields([nga.field('name').isDetailLink(true).map(truncate)]); // fields() called with arguments add fields to the view
+
+        user.listView()
+            .title('All users') // default title is "[Entity_name] list"
+            .description('List of all game registered users') // description appears under the title
+            .infinitePagination(true) // load pages as the user scrolls
+            .fields([
+                nga.field('id').label('ID'), // The default displayed name is the camelCase field name. label() overrides id
+                nga.field('name'), // the default list field type is "string", and displays as a string
+            ])
+            .listActions(['show', 'edit', 'delete']);
+
+        user.creationView()
+            .fields([
+                nga.field('name') // the default edit field type is "string", and displays as a text input
             ]);
 
-        tag.listView()
-            .infinitePagination(false) // by default, the list view uses infinite pagination. Set to false to use regulat pagination
+        user.editionView()
+            .title('Edit user {{ entry.values.name }}') // title() accepts a template string, which has access to the entry
+            .actions(['list', 'show', 'delete']) // choose which buttons appear in the top action bar. Show is disabled by default
             .fields([
-                nga.field('id').label('ID'),
-                nga.field('name'),
-                nga.field('published', 'boolean').cssClasses(function(entry) { // add custom CSS classes to inputs and columns
-                    if (entry.values.published) {
-                        return 'bg-success text-center';
-                    }
-                    return 'bg-warning text-center';
-                }),
-                nga.field('custom', 'template')
-                    .label('Upper name')
-                    .template('{{ entry.values.name.toUpperCase() }}')
+                user.creationView().fields() // fields() without arguments returns the list of fields. That way you can reuse fields from another view to avoid repetition
+            ]);
+
+        user.showView() // a showView displays one entry in full page - allows to display more data than in a a list
+            .fields([
+                nga.field('id'),
+                user.editionView().fields() // reuse fields from another view in another order
+            ]);
+            
+        // User fact history
+        
+        userFactHistory.dashboardView() // customize the dashboard panel for this entity
+            .title('User fact history')
+            .order(1) // display the post panel first in the dashboard
+            .perPage(5) // limit the panel to the 5 latest posts
+            .fields([nga.field('user_id').isDetailLink(true).map(truncate)]); // fields() called with arguments add fields to the view
+
+        userFactHistory.listView()
+            .title('All viewed facts by users') // default title is "[Entity_name] list"
+            .description('Each entry states that the user has viewed the fact') // description appears under the title
+            .infinitePagination(true) // load pages as the user scrolls
+            .fields([
+                nga.field('id').label('ID'), // The default displayed name is the camelCase field name. label() overrides id
+                nga.field('user_id', 'number'), // the default list field type is "string", and displays as a string
+                nga.field('fact_id', 'number'), // the default list field type is "string", and displays as a string
+                nga.field('deleted', 'number'),
+                nga.field('updated', 'number')
             ])
-            .batchActions([]) // disable checkbox column and batch delete
-            .listActions(['show']);
+            .listActions(['show', 'edit', 'delete']);
 
-        tag.showView()
+        userFactHistory.creationView()
             .fields([
-                nga.field('name'),
-                nga.field('published', 'boolean')
-            ]);*/
+                nga.field('user_id', 'number'), // the default edit field type is "string", and displays as a text input
+                nga.field('fact_id', 'number')
+            ]);
 
+        userFactHistory.editionView()
+            .title('Edit fact history for user with id "{{ entry.values.user_id }}"') // title() accepts a template string, which has access to the entry
+            .actions(['list', 'show', 'delete']) // choose which buttons appear in the top action bar. Show is disabled by default
+            .fields([
+                userFactHistory.creationView().fields() // fields() without arguments returns the list of fields. That way you can reuse fields from another view to avoid repetition
+            ]);
+
+        userFactHistory.showView() // a showView displays one entry in full page - allows to display more data than in a a list
+            .fields([
+                nga.field('id'),
+                userFactHistory.editionView().fields() // reuse fields from another view in another order
+            ]);
+ 
+         // Fact
+        
+        fact.dashboardView() // customize the dashboard panel for this entity
+            .title('fact')
+            .order(1) // display the post panel first in the dashboard
+            .perPage(5) // limit the panel to the 5 latest posts
+            .fields([nga.field('data').isDetailLink(true).map(truncate)]); // fields() called with arguments add fields to the view
+
+        fact.listView()
+            .title('All facts') // default title is "[Entity_name] list"
+            .description('List of all facts used to generate questions') // description appears under the title
+            .infinitePagination(true) // load pages as the user scrolls
+            .fields([
+                nga.field('id').label('ID'), // The default displayed name is the camelCase field name. label() overrides id
+                nga.field('yago_id'),
+                nga.field('country_id', 'number'), // Date field type allows date formatting
+                nga.field('data'), // the default list field type is "string", and displays as a string
+                nga.field('type_id', 'number'),
+                nga.field('label'),
+                nga.field('rank', 'number'),
+                nga.field('deleted', 'number'),
+                nga.field('updated', 'number')
+            ])
+            .listActions(['show', 'edit', 'delete']);
+
+        fact.creationView()
+            .fields([
+                nga.field('data'), // the default edit field type is "string", and displays as a text input
+                nga.field('country_id', 'number'), // Date field type allows date formatting
+                nga.field('yago_id'),
+                nga.field('type_id', 'number'),
+                nga.field('label'), // text field type translates to a textarea
+                nga.field('rank', 'number')
+            ]);
+
+        fact.editionView()
+            .title('Edit fact {{ entry.values.data }}') // title() accepts a template string, which has access to the entry
+            .actions(['list', 'show', 'delete']) // choose which buttons appear in the top action bar. Show is disabled by default
+            .fields([
+                fact.creationView().fields() // fields() without arguments returns the list of fields. That way you can reuse fields from another view to avoid repetition
+            ]);
+
+        fact.showView() // a showView displays one entry in full page - allows to display more data than in a a list
+            .fields([
+                nga.field('id'),
+                fact.editionView().fields() // reuse fields from another view in another order
+            ]);
+            
+            
+        //Country order
+
+        countryOrder.dashboardView() // customize the dashboard panel for this entity
+            .title('Country order')
+            .order(1) // display the post panel first in the dashboard
+            .perPage(5) // limit the panel to the 5 latest posts
+            .fields([nga.field('country_id').isDetailLink(true).map(truncate)]); // fields() called with arguments add fields to the view
+
+        countryOrder.listView()
+            .title('Countries by game order') // default title is "[Entity_name] list"
+            .description('List of countries and their order in the game') // description appears under the title
+            .infinitePagination(true) // load pages as the user scrolls
+            .fields([
+                nga.field('id').label('ID'), // The default displayed name is the camelCase field name. label() overrides id
+                nga.field('country_id', 'number'), // the default list field type is "string", and displays as a string
+                nga.field('route_order', 'number'), // Date field type allows date formatting
+                nga.field('deleted', 'number'),
+                nga.field('updated', 'number')
+            ])
+            .listActions(['show', 'edit', 'delete']);
+
+        countryOrder.creationView()
+            .fields([
+                nga.field('country_id', 'number'), // the default edit field type is "string", and displays as a text input
+                nga.field('route_order', 'number') // text field type translates to a textarea
+            ]);
+
+        countryOrder.editionView()
+            .title('Edit country order for country id {{ entry.values.country_id }}') // title() accepts a template string, which has access to the entry
+            .actions(['list', 'show', 'delete']) // choose which buttons appear in the top action bar. Show is disabled by default
+            .fields([
+                countryOrder.creationView().fields() // fields() without arguments returns the list of fields. That way you can reuse fields from another view to avoid repetition
+            ]);
+
+        countryOrder.showView() // a showView displays one entry in full page - allows to display more data than in a a list
+            .fields([
+                nga.field('id'),
+                countryOrder.editionView().fields() // reuse fields from another view in another order
+            ]);
+    
         admin.menu(nga.menu()
             .addChild(nga.menu(country).icon('<span class="glyphicon glyphicon-file"></span>')) // customize the entity menu icon
+            .addChild(nga.menu(fact).icon('<span class="glyphicon glyphicon-file"></span>')) // customize the entity menu icon
+            .addChild(nga.menu(factType).icon('<span class="glyphicon glyphicon-file"></span>')) // customize the entity menu icon
+            .addChild(nga.menu(user).icon('<span class="glyphicon glyphicon-file"></span>')) // customize the entity menu icon
+            .addChild(nga.menu(userFactHistory).icon('<span class="glyphicon glyphicon-file"></span>')) // customize the entity menu icon
+            .addChild(nga.menu(highScore).icon('<span class="glyphicon glyphicon-file"></span>')) // customize the entity menu icon
+            .addChild(nga.menu(countryOrder).icon('<span class="glyphicon glyphicon-file"></span>')) // customize the entity menu icon
+
             //.addChild(nga.menu(comment).icon('<strong style="font-size:1.3em;line-height:1em">✉</strong>')) // you can even use utf-8 symbols!
             //.addChild(nga.menu(tag).icon('<span class="glyphicon glyphicon-tags"></span>'))
 

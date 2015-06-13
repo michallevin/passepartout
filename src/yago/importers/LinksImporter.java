@@ -1,10 +1,10 @@
 package yago.importers;
 
 import java.io.FileNotFoundException;
-import java.util.List;
+
+import org.apache.commons.lang3.StringEscapeUtils;
 
 import yago.FactDictionary;
-import db.models.Fact;
 
 public class LinksImporter extends BaseImporter {
 
@@ -24,22 +24,11 @@ public class LinksImporter extends BaseImporter {
 	public void handleRow(String id, String attr1, String attr2, String attr3,
 			String line) {
 		if (attr2.equals(LINKS_TO)) {
-			FactDictionary.getInstance().addLink(attr3);
+			FactDictionary.getInstance().addLink(StringEscapeUtils.escapeJava(attr3));
 		}
 		
 	}
 	
-	@Override
-	public void finished() {
-		for (String factData : FactDictionary.getInstance().getFactMap().keySet()) {
-			
-			List<Fact> factList = FactDictionary.getInstance().getFactMap().get(factData);
-			for (Fact fact : factList)
-				fact.updateFromImport();
-		}
-		super.finished();
-
-	}
 }
 
 

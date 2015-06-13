@@ -13,19 +13,27 @@ public class Question {
 	private String questionText;
 	private List<String> options;
 	private Integer answerIndex;
+	private int score;
+	private String posterImage;
+	private String label;
 	
 	private static Random r = new Random();
 	
 	
 	public static Question generateQuestion(Country country, int userId, boolean isLiteral) {
 
-		FactType factType = FactType.getRandom(isLiteral);
-		Fact answer = Fact.getFact(country.getId(), factType.getId(), userId);
-		while (answer == null) {
+		List<Fact> otherOptions = new ArrayList<Fact>();
+		FactType factType = null;
+		Fact answer = null;
+		
+		while (otherOptions.size() < 3) {
 			factType = FactType.getRandom(isLiteral);
 			answer = Fact.getFact(country.getId(), factType.getId(), userId);
+			if (answer == null) continue;
+			factType = FactType.getRandom(isLiteral);
+			answer = Fact.getFact(country.getId(), factType.getId(), userId);
+			otherOptions = Fact.getWrongAnswers(factType.getId(), country.getId());
 		}
-		List<Fact> otherOptions = Fact.getWrongAnswers(factType.getId(), answer.getData());
 		
 		Question question = new Question();
 		question.setQuestionText(factType.getQuestionWording().replace("$countryName", country.getName()));
@@ -39,6 +47,9 @@ public class Question {
 			question.getOptions().add(option.getData());
 			i += 1;
 		}
+		if (question.getAnswerIndex() == 3)
+			question.getOptions().add(answer.getData());
+
 		return question;
 	}
 
@@ -59,6 +70,30 @@ public class Question {
 
 	public void setOptions(List<String> options) {
 		this.options = options;
+	}
+
+	public int getScore() {
+		return score;
+	}
+
+	public void setScore(int score) {
+		this.score = score;
+	}
+
+	public String getPosterImage() {
+		return posterImage;
+	}
+
+	public void setPosterImage(String posterImage) {
+		this.posterImage = posterImage;
+	}
+
+	public String getLabel() {
+		return label;
+	}
+
+	public void setLabel(String label) {
+		this.label = label;
 	}
 
 	public Integer getAnswerIndex() {

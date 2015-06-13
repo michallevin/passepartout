@@ -7,20 +7,36 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.text.ParseException;
 
+import yago.YagoImport;
 import db.JDBCConnection;
 
 public abstract class BaseImporter {
 
 	private BufferedReader reader;
+	protected static final String ENG = "@eng";
 
 	public abstract String getFileName();
 
 	public BaseImporter() throws FileNotFoundException {
 		reader = new BufferedReader(new FileReader(getFileName()));
 	}
+	
+	
+	String cleanInput(String input, String postfix) {
+		return input.substring(1, input.length() - postfix.length() - 1);
+
+	}	
+	 
+	String cleanInput(String input) {
+		return cleanInput(input, ENG);
+	}
 
 	public void importData() throws IOException {
-		System.out.println(String.format("Starting import from file: '%s'", getFileName()));
+		if (YagoImport.shouldCancel()) {
+			return;
+		}
+		
+		System.out.println(String.format("file: '%s'", getFileName()));
 
 		try {
 			JDBCConnection.getConnection().setAutoCommit(false);
@@ -28,14 +44,17 @@ public abstract class BaseImporter {
 			int i = 0;
 			String str;
 			while ((str = reader.readLine()) != null) {
-				//if (i == 10000) break;
+				if (YagoImport.shouldCancel()) {
+					break;
+				}
+				
 				String[] attributes = str.split("\\t");
 				if (attributes.length >= 4) {
 					handleRow(attributes[0], attributes[1], attributes[2], attributes[3], str);
 					++i;
 				}
-				if (i >0 && i % 10000 == 0) {
-					if (i % 1000000 == 0)
+				if (i > 0 && i % 50000 == 0) {
+					if (i % 5000000 == 0)
 						System.out.println("");
 					System.out.print(".");
 					JDBCConnection.getConnection().commit();

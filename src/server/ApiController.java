@@ -15,6 +15,8 @@ import db.models.Country;
 import db.models.CountryOrder;
 import db.models.FactType;
 import db.models.Fact;
+import db.models.FactTypeQuestionWording;
+import db.models.Highscore;
 import db.models.User;
 import db.models.UserFactHistory;
 
@@ -29,7 +31,11 @@ public class ApiController {
 		List<Question> questions = new ArrayList<Question>();
 		int i = 0;
 		for (Country country : countries) {
-			questions.add(Question.generateQuestion(country, userId,true));
+			Question question = Question.generateQuestion(country, userId, false);
+			question.setScore((int) ((Math.floor(i/3)+1)*100));
+			question.setPosterImage(country.getPosterImage());
+			question.setLabel(country.getLabel());
+			questions.add(question);
 			i += 1;
 		}
 
@@ -44,13 +50,25 @@ public class ApiController {
 		Thread t = new Thread() {
 			public void run() {
 				if (!YagoImport.isImporting())
-					YagoImport.startImport(true, false, true, true, true, true);
+					YagoImport.startImport(
+							new String[] {
+									"links", 
+									//"countries", 
+									"attributes", 
+									"facts", 
+									"literalFacts", 
+									"labels"
+							});
 				else {
 
 				}
 			}
 		};
 		t.start();
+	}
+	@RequestMapping(value="/import/cancel", method=RequestMethod.GET)
+	public void cancelImport() {
+		YagoImport.cancelImport();
 	}
 
 	@RequestMapping(value="/import/status", method=RequestMethod.GET)
@@ -70,7 +88,7 @@ public class ApiController {
 
 	@RequestMapping(value="/rest/country", method=RequestMethod.POST)
 	public Country addCountry(@RequestParam("name") String name, @RequestParam("label") String label) {
-		Country country = new Country(-1, "", name, label);
+		Country country = new Country(-1, "", name, label, false);
 		country.save();
 		return country;
 
@@ -99,7 +117,7 @@ public class ApiController {
 	}
 
 	// highscore
-	/*
+
 	@RequestMapping(value="/rest/highscore", method=RequestMethod.GET)
 	public List<Highscore> getHighScores() {
 		return Highscore.fetchAll();
@@ -121,7 +139,7 @@ public class ApiController {
 	public Highscore editHighscore(@PathVariable Integer id,@RequestParam("user_id") Integer user_id,@RequestParam("user_id") Integer score) {
 		Highscore highscore = Highscore.fetchById(id);
 		highscore.setScore(score);
-		highscore.setUser_id(user_id);
+		highscore.setUserId(user_id);
 		highscore.update();
 		return highscore;
 	}
@@ -132,13 +150,13 @@ public class ApiController {
 		highscore.delete();
 		return highscore;
 	}
-	 */
+
 	//fact type
 
 	@RequestMapping(value="/rest/fact_type", method=RequestMethod.GET)
 	public List<FactType> getFactTypes() {
-		List<FactType> countries = FactType.fetchAll();
-		return countries;
+		List<FactType> factTypes = FactType.fetchAll();
+		return factTypes;
 	}
 
 	@RequestMapping(value="/rest/fact_type", method=RequestMethod.POST)
@@ -271,8 +289,8 @@ public class ApiController {
 
 	@RequestMapping(value="/rest/country_order", method=RequestMethod.POST)
 	public CountryOrder addCountryOrder(@RequestParam("country_id") int countryId,
-			@RequestParam("route_order") int routeOrder) {
-		CountryOrder countryOrder = new CountryOrder(countryId, routeOrder);
+			@RequestParam("route_order") int routeOrder, @RequestParam("poster_image") String posterImage) {
+		CountryOrder countryOrder = new CountryOrder(countryId, routeOrder, posterImage);
 		countryOrder.save();
 		return countryOrder;
 
@@ -301,7 +319,7 @@ public class ApiController {
 		countryOrder.delete();
 		return countryOrder;
 	}
-	/*
+
 
 	// fact_type_question_wording
 
@@ -310,7 +328,7 @@ public class ApiController {
 		return FactTypeQuestionWording.fetchAll();
 	}
 
-	@RequestMapping(value="/rest/fact_type_question_wording}", method=RequestMethod.POST)
+	@RequestMapping(value="/rest/fact_type_question_wording", method=RequestMethod.POST)
 	public FactTypeQuestionWording addFactTypeQuestionWording(
 			@RequestParam("question_id") Integer question_id,
 			@RequestParam("question_wording") String question_wording) {
@@ -327,8 +345,8 @@ public class ApiController {
 	@RequestMapping(value="/rest/fact_type_question_wording/{id}", method=RequestMethod.PUT)
 	public FactTypeQuestionWording editFactTypeQuestionWording(@PathVariable Integer id,@RequestParam("question_id") Integer question_id,@RequestParam("question_wording") String question_wording) {
 		FactTypeQuestionWording factTypeQuestionWording = FactTypeQuestionWording.fetchById(id);
-		factTypeQuestionWording.setQuestion_id(question_id);
-		factTypeQuestionWording.setQuestion_wording(question_wording);
+		factTypeQuestionWording.setQuestionId(question_id);
+		factTypeQuestionWording.setQuestionWording(question_wording);
 		factTypeQuestionWording.update();
 		return factTypeQuestionWording;
 	}
@@ -340,18 +358,19 @@ public class ApiController {
 		return factTypeQuestionWording;
 	}
 
-	 */
+
 	// fact
 
 	@RequestMapping(value="/rest/fact", method=RequestMethod.GET)
-	public List<Fact> getFacts() {
-		List<Fact> facts = Fact.fetchAll();
+	public List<Fact> getFacts(@RequestParam("_start") int start, @RequestParam("_end") int end) {
+		List<Fact> facts = Fact.fetchAll(start, end);
 		return facts;
 	}
 
 	@RequestMapping(value="/rest/fact", method=RequestMethod.POST)
-	public Fact addFact(@RequestParam("yago_id") String yagoId, @RequestParam("country_id") int countryId, @RequestParam("data") String data, @RequestParam("type_id") int factTypeId, @RequestParam("rank") int rank) {
-		Fact fact = new Fact("",countryId, data, factTypeId, rank);
+	public Fact addFact(@RequestParam("yago_id") String yagoId, @RequestParam("country_id") int countryId, @RequestParam("data") String data, @RequestParam("type_id") int factTypeId, 
+			@RequestParam("label") String label, @RequestParam("rank") int rank) {
+		Fact fact = new Fact(-1, "",countryId, data, factTypeId, label, rank, false);
 		fact.save();
 		return fact;
 	}
@@ -374,9 +393,10 @@ public class ApiController {
 	}
 
 	@RequestMapping(value="/rest/fact/{id}", method=RequestMethod.DELETE)
-	public Country deleteFact(@PathVariable Integer id) {
-		Country fact = Country.fetchById(id);
-		fact.delete();
+	public Fact deleteFact(@PathVariable Integer id) {
+		Fact fact = Fact.fetchById(id);
+		//fact.delete();
+		//TODO
 		return fact;
 	}
 

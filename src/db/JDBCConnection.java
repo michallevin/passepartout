@@ -33,10 +33,10 @@ public class JDBCConnection {
 			System.out.println("Unable to load the MySQL JDBC driver..");
 			return false;
 		}
-		System.out.println("Driver loaded successfully");
+
 
 		// creating the connection
-		System.out.print("Trying to connect... ");
+		//System.out.print("Trying to connect... ");
 		
 		try {
 			
@@ -50,7 +50,7 @@ public class JDBCConnection {
 			conn = null;
 			return false;
 		}
-		System.out.println("Connected!");
+		System.out.println("created database connection");
 		return true;
 	}
 	

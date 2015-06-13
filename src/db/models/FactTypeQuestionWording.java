@@ -15,19 +15,18 @@ import db.JDBCConnection;
 public class FactTypeQuestionWording {
 
 	private int id;
-	private int question_id;
-	private String question_wording;
+	private int questionId;
+	private String questionWording;
 
-	public FactTypeQuestionWording(int question_id, String question_wording) {
-		this.setQuestion_id(question_id);
-		this.setQuestion_wording(question_wording);
+	public FactTypeQuestionWording(int questionId, String questionWording) {
+		this.setQuestionId(questionId);
+		this.setQuestionWording(questionWording);
 	}
 
-	public FactTypeQuestionWording(int id, int question_id,
-			String question_wording) {
+	public FactTypeQuestionWording(int id, int questionId, String questionWording) {
 		this.setId(id);
-		this.setQuestion_id(question_id);
-		this.setQuestion_wording(question_wording);
+		this.setQuestionId(questionId);
+		this.setQuestionWording(questionWording);
 	}
 
 	public void save() {
@@ -37,14 +36,14 @@ public class FactTypeQuestionWording {
 			try (Statement statement = conn.createStatement()) {
 
 				statement
-						.executeUpdate(
-								String.format(
-										""
-												+ "INSERT INTO fact_type_question_wording(question_id, question_wording) "
-												+ "VALUES('%s', '%s')",
-										question_id, getQuestion_wording()
-												.replace("'", "''")),
-								Statement.RETURN_GENERATED_KEYS);
+				.executeUpdate(
+						String.format(
+								""
+										+ "INSERT INTO fact_type_question_wording(question_id, question_wording) "
+										+ "VALUES('%s', '%s')",
+										questionId, getQuestion_wording()
+										.replace("'", "''")),
+										Statement.RETURN_GENERATED_KEYS);
 
 				try (ResultSet genKeys = statement.getGeneratedKeys()) {
 					if (genKeys.next()) {
@@ -109,30 +108,6 @@ public class FactTypeQuestionWording {
 		return result;
 	}
 
-	public String getQuestion_wording() {
-		return question_wording;
-	}
-
-	public void setQuestion_wording(String question_wording) {
-		this.question_wording = question_wording;
-	}
-
-	public int getId() {
-		return id;
-	}
-
-	public void setId(int id) {
-		this.id = id;
-	}
-
-	public int getQuestion_id() {
-		return question_id;
-	}
-
-	public void setQuestion_id(int question_id) {
-		this.question_id = question_id;
-	}
-
 	public void update() {
 		Connection conn;
 		try {
@@ -140,10 +115,10 @@ public class FactTypeQuestionWording {
 			try (Statement statement = conn.createStatement()) {
 
 				statement
-						.executeUpdate(String
-								.format("UPDATE fact_type_question_wording SET question_wording = '%s', question_id = %d updated = 1 WHERE id = %d",
-										InputHelper.santize(question_wording),
-										question_id, id));
+				.executeUpdate(String
+						.format("UPDATE fact_type_question_wording SET question_wording = '%s', question_id = %d updated = 1 WHERE id = %d",
+								InputHelper.santize(questionWording),
+								questionId, id));
 
 			} catch (SQLException e) {
 				System.out.println("ERROR executeQuery - " + e.getMessage());
@@ -160,9 +135,9 @@ public class FactTypeQuestionWording {
 			try (Statement statement = conn.createStatement()) {
 
 				statement
-						.executeUpdate(String
-								.format("UPDATE fact_type_question_wording SET deleted = 1, updated = 1 WHERE id = %d",
-										id));
+				.executeUpdate(String
+						.format("UPDATE fact_type_question_wording SET deleted = 1, updated = 1 WHERE id = %d",
+								id));
 
 			} catch (SQLException e) {
 				System.out.println("ERROR executeQuery - " + e.getMessage());
@@ -170,6 +145,35 @@ public class FactTypeQuestionWording {
 		} catch (IOException | ParseException e1) {
 			e1.printStackTrace();
 		}
+	}
+
+	public String getQuestion_wording() {
+		return questionWording;
+	}
+
+	public void setQuestionWording(String questionWording) {
+		this.questionWording = questionWording;
+	}
+
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
+	}
+
+	public int getQuestionId() {
+		return questionId;
+	}
+
+	public void setQuestionId(int questionId) {
+		this.questionId = questionId;
+	}
+
+	public void replace() {
+		// TODO Auto-generated method stub
+		
 	}
 
 }
