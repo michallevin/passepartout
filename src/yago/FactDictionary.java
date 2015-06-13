@@ -11,15 +11,19 @@ public class FactDictionary {
 	private static FactDictionary instance = null;
 	
 	private HashMap<String, HashMap<String, Fact>> factMap;
+	private HashMap<String, Fact> factsByYagoId;
 	
 	protected FactDictionary() {
 		factMap = new HashMap<String, HashMap<String, Fact>>();
+		factsByYagoId = new HashMap<String, Fact>();
 		List<Fact> allFacts = Fact.fetchAll();
 		for (Fact fact : allFacts) {
-			if (fact.getYagoId() == null || fact.getYagoId().length() == 0) continue;
+			string yagoId = fact.getYagoId();
+			if (yagoId) == null || yagoId.length() == 0) continue;
+			factsByYagoId.put(yagoId, fact)
 			if (!factMap.containsKey(fact.getData()))
 				factMap.put(fact.getData(), new  HashMap<String, Fact>());
-			factMap.get(fact.getData()).put(fact.getYagoId(), fact);
+			factMap.get(fact.getData()).put(yagoId, fact);
 		}
 	} 
 	
@@ -59,11 +63,16 @@ public class FactDictionary {
 		}			
 		return null;
 	}
+	
+	public Fact getFactByYagoId(string yagoId) {
+		return factsByYagoId.containsKey(yagoId) ? factsByYagoId.get(yagoId) : null;
+	}
 
 	public void addFact(Fact fact) {
 		if (!factMap.containsKey(fact.getData()))
 			factMap.put(fact.getData(), new HashMap<String, Fact>());
 		factMap.get(fact.getData()).put(fact.getYagoId(), fact);
+		factsByYagoId.put(fact.getYagoId(), fact)
 	}
 
 
