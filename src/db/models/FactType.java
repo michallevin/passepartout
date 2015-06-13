@@ -14,6 +14,16 @@ import db.JDBCConnection;
 
 public class FactType {
 
+	private static final String SELECT_BY_ID = "SELECT * FROM fact WHERE deleted = 0 AND id = ?";
+	private static final String SELECT_ALL = "SELECT * FROM fact_type LEFT JOIN fact_type_question_wording on fact_type_question_wording.fact_id = fact_type.id";
+	private static final String SELECT_RANDOM = "SELECT * FROM fact_type "
+			+ " JOIN fact_type_question_wording on fact_type_question_wording.fact_id = fact_type.id"
+			+ " WHERE question_wording IS NOT NULL"
+			+ " and is_literal = ?"
+			+ " ORDER BY RAND() LIMIT 0,1";
+	private static final String DELETE = "UPDATE fact_type SET deleted = 1, updated = 1 WHERE id = ?";
+	private static final String UPDATE_BY_ID = "UPDATE fact_type SET name = ?, updated = 1 WHERE id = ?";
+	private static final String INSERT = "INSERT INTO fact_type(name, is_literal) VALUES(?, ?)";
 	private String typeName;
 	private String questionWording;
 	private int id;
@@ -44,8 +54,7 @@ public class FactType {
 			conn = JDBCConnection.getConnection();
 			try (Statement statement = conn.createStatement()){
 				statement.executeUpdate(String.format(""
-						+ "INSERT INTO fact_type(name, is_literal) "
-						+ "VALUES('%s', %b)", getTypeName(), isLiteral()), Statement.RETURN_GENERATED_KEYS);
+						+ INSERT, getTypeName(), isLiteral()), Statement.RETURN_GENERATED_KEYS);
 
 				try (ResultSet genKeys = statement.getGeneratedKeys()) {
 					if (genKeys.next()) {
@@ -73,7 +82,7 @@ public class FactType {
 			try (Statement statement = conn.createStatement()){
 
 				statement.executeUpdate(String.format(""
-						+ "UPDATE fact_type SET name = '%s', updated = 1 WHERE id = %d", InputHelper.santize(typeName), id));
+						+ UPDATE_BY_ID, InputHelper.santize(typeName), id));
 
 				
 			} catch (SQLException e) {
@@ -93,7 +102,7 @@ public class FactType {
 			try (Statement statement = conn.createStatement()){
 
 				statement.executeUpdate(String.format(""
-						+ "UPDATE fact_type SET deleted = 1, updated = 1 WHERE id = %d", id));
+						+ DELETE, id));
 
 				
 			} catch (SQLException e) {
@@ -111,11 +120,7 @@ public class FactType {
 		try {
 			conn = JDBCConnection.getConnection();
 			try (Statement statement = conn.createStatement();
-					ResultSet rs = statement.executeQuery(String.format("SELECT * FROM fact_type "
-							+ " JOIN fact_type_question_wording on fact_type_question_wording.fact_id = fact_type.id"
-							+ " WHERE question_wording IS NOT NULL"
-							+ " and is_literal = %s"
-							+ " ORDER BY RAND() LIMIT 0,1", isLiteral ? "true" : "false"));) {
+					ResultSet rs = statement.executeQuery(String.format(SELECT_RANDOM, isLiteral ? "true" : "false"));) {
 				while (rs.next() == true) {
 					return new FactType(rs.getInt("id"),
 							rs.getString("name"),
@@ -139,7 +144,7 @@ public class FactType {
 		try {
 			conn = JDBCConnection.getConnection();
 			try (Statement statement = conn.createStatement();
-					ResultSet rs = statement.executeQuery("SELECT * FROM fact_type LEFT JOIN fact_type_question_wording on fact_type_question_wording.fact_id = fact_type.id");) {
+					ResultSet rs = statement.executeQuery(SELECT_ALL);) {
 				while (rs.next() == true) {
 					result.add(new FactType(rs.getInt("id"), rs.getString("name"), rs.getBoolean("is_literal"), rs.getString("question_wording")));
 				}
@@ -183,7 +188,7 @@ public class FactType {
 			try {
 				conn = JDBCConnection.getConnection();
 				try (Statement statement = conn.createStatement();
-						ResultSet rs = statement.executeQuery(String.format("SELECT * FROM fact WHERE deleted = 0 AND id = %d", id));) {
+						ResultSet rs = statement.executeQuery(String.format(SELECT_BY_ID, id));) {
 					while (rs.next() == true) {
 						return new FactType(rs.getInt("id"), rs.getString("name"), rs.getBoolean("is_literal"), rs.getString("question_wording"));
 					}

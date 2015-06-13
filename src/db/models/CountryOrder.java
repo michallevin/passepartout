@@ -2,6 +2,7 @@ package db.models;
 
 import java.io.IOException;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -13,6 +14,11 @@ import db.JDBCConnection;
 
 public class CountryOrder {
 
+	private static final String DELETE = "UPDATE country_order SET deleted = 1, updated = 1 WHERE id = ?";
+	private static final String UPDATE_BY_ID = "UPDATE country_order SET country_id = ?, route_order = ?, updated = 1 WHERE id = ?";
+	private static final String SELECT_ALL = "SELECT * FROM country_order WHERE deleted = 0";
+	private static final String SELECT_BY_ID = "SELECT * FROM country_order WHERE deleted = 0 AND id = ?";
+	private static final String INSERT = "INSERT INTO country_order(country_id, route_order) VALUES(?, ?)";
 	private int id;
 	private int countryId;
 	private int routeOrder;
@@ -25,7 +31,7 @@ public class CountryOrder {
 		this.routeOrder = routeOrder;
 		this.setPosterImage(posterImage);
 	}
-	
+
 	public CountryOrder(int countryId, int routeOrder, String posterImage) {
 
 		this.countryId = countryId;
@@ -34,17 +40,17 @@ public class CountryOrder {
 
 	}
 
-	
-	
+
+
 	public void save() {
 		Connection conn;
 		try {
 			conn = JDBCConnection.getConnection();
-			try (Statement statement = conn.createStatement()){
+			try (PreparedStatement statement = conn.prepareStatement(INSERT, Statement.RETURN_GENERATED_KEYS)){
 
-				statement.executeUpdate(String.format(""
-						+ "INSERT INTO country_order(country_id, route_order) "
-						+ "VALUES(%d, %d)", countryId, routeOrder), Statement.RETURN_GENERATED_KEYS);
+				statement.setInt(1, countryId);
+				statement.setInt(2, routeOrder);
+				statement.executeUpdate();
 
 				try (ResultSet genKeys = statement.getGeneratedKeys()) {
 					if (genKeys.next()) {
@@ -52,7 +58,7 @@ public class CountryOrder {
 						this.setId(id);
 					}
 				}
-				
+
 
 			} catch (SQLException e) {
 				System.out.println("ERROR executeQuery - " + e.getMessage());
@@ -62,15 +68,17 @@ public class CountryOrder {
 		}
 
 	}
-	
+
 	public static CountryOrder fetchById(int id) {
 		Connection conn;
 		try {
 			conn = JDBCConnection.getConnection();
-			try (Statement statement = conn.createStatement();
-					ResultSet rs = statement.executeQuery(String.format("SELECT * FROM country_order WHERE deleted = 0 AND id = %d", id));) {
-				while (rs.next() == true) {
-					return new CountryOrder(rs.getInt("id"), rs.getInt("country_id"), rs.getInt("route_order"),  rs.getString("poster_image"));
+			try (PreparedStatement statement = conn.prepareStatement(SELECT_BY_ID)){
+				statement.setInt(1, id);
+				try (ResultSet rs = statement.executeQuery()) {
+					while (rs.next() == true) {
+						return new CountryOrder(rs.getInt("id"), rs.getInt("country_id"), rs.getInt("route_order"),  rs.getString("poster_image"));
+					}
 				}
 			} catch (SQLException e) {
 				System.out.println("ERROR executeQuery - " + e.getMessage());
@@ -81,16 +89,17 @@ public class CountryOrder {
 		}
 		return null;
 	}
-	
+
 	public static List<CountryOrder> fetchAll() {
 		List<CountryOrder> result = new ArrayList<CountryOrder>();
 		Connection conn;
 		try {
 			conn = JDBCConnection.getConnection();
-			try (Statement statement = conn.createStatement();
-					ResultSet rs = statement.executeQuery("SELECT * FROM country_order WHERE deleted = 0");) {
-				while (rs.next() == true) {
-					result.add(new CountryOrder(rs.getInt("id"), rs.getInt("country_id"), rs.getInt("route_order"),  rs.getString("poster_image")));
+			try (PreparedStatement statement = conn.prepareStatement(SELECT_ALL)){
+				try (ResultSet rs = statement.executeQuery()) {
+					while (rs.next() == true) {
+						result.add(new CountryOrder(rs.getInt("id"), rs.getInt("country_id"), rs.getInt("route_order"),  rs.getString("poster_image")));
+					}
 				}
 			} catch (SQLException e) {
 				System.out.println("ERROR executeQuery - " + e.getMessage());
@@ -101,7 +110,7 @@ public class CountryOrder {
 		}
 		return result;
 	}
-	
+
 	public int getCountryId() {
 		return countryId;
 	}
@@ -109,7 +118,7 @@ public class CountryOrder {
 	public void setCountryId(int countryId) {
 		this.countryId = countryId;
 	}
-	
+
 	public int getRouteOrder() {
 		return routeOrder;
 	}
@@ -132,13 +141,12 @@ public class CountryOrder {
 		Connection conn;
 		try {
 			conn = JDBCConnection.getConnection();
-			try (Statement statement = conn.createStatement()){
+			try (PreparedStatement statement = conn.prepareStatement(UPDATE_BY_ID)){
+				statement.setInt(1, countryId);
+				statement.setInt(2, routeOrder);
+				statement.setInt(3, id);
+				statement.executeUpdate();
 
-				statement.executeUpdate(String.format(""
-						+ "UPDATE country_order SET country_id = %d, route_order = %d, updated = 1 WHERE id = %d",
-						countryId, routeOrder, id));
-
-				
 			} catch (SQLException e) {
 				System.out.println("ERROR executeQuery - " + e.getMessage());
 			}
@@ -146,19 +154,14 @@ public class CountryOrder {
 			e1.printStackTrace();
 		}
 	}
-
-
 
 	public void delete() {
 		Connection conn;
 		try {
 			conn = JDBCConnection.getConnection();
-			try (Statement statement = conn.createStatement()){
-
-				statement.executeUpdate(String.format(""
-						+ "UPDATE country_order SET deleted = 1, updated = 1 WHERE id = %d", id));
-
-				
+			try (PreparedStatement statement = conn.prepareStatement(DELETE)){
+				statement.setInt(1, id);
+				statement.executeUpdate();
 			} catch (SQLException e) {
 				System.out.println("ERROR executeQuery - " + e.getMessage());
 			}
@@ -166,6 +169,7 @@ public class CountryOrder {
 			e1.printStackTrace();
 		}
 	}
+
 
 	public String getPosterImage() {
 		return posterImage;
@@ -177,7 +181,7 @@ public class CountryOrder {
 
 	public void replace() {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 
