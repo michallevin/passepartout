@@ -14,9 +14,12 @@ import db.JDBCConnection;
 
 public class FactType {
 
-	private static final String SELECT_BY_ID = "SELECT * FROM fact WHERE deleted = 0 AND id = ?";
-	private static final String SELECT_ALL = "SELECT * FROM fact_type LEFT JOIN fact_type_question_wording ON fact_type_question_wording.fact_id = fact_type.id";
-	private static final String SELECT_RANDOM = "SELECT * FROM fact_type "
+	private static final String SELECT_BY_ID = "SELECT fact_type.id, fact_type.name, fact_type.is_literal "+
+						   "fact_type.question_wording FROM fact WHERE deleted = 0 AND id = ?";
+	private static final String SELECT_ALL = "SELECT fact_type.id, fact_type.name, fact_type.is_literal "+
+						   "fact_type.question_wording FROM fact_type LEFT JOIN fact_type_question_wording ON fact_type_question_wording.fact_id = fact_type.id";
+	private static final String SELECT_RANDOM = "SELECT fact_type.id, fact_type.name, fact_type.is_literal "
+	                + "fact_type.question_wording FROM fact_type "
 			+ " JOIN fact_type_question_wording on fact_type_question_wording.fact_id = fact_type.id"
 			+ " WHERE question_wording IS NOT NULL"
 			+ " and is_literal = ?"
@@ -193,7 +196,10 @@ public class FactType {
 				statement.setInt(1, id);
 				try (ResultSet rs = statement.executeQuery()) {
 					while (rs.next() == true) {
-						return new FactType(rs.getInt("id"), rs.getString("name"), rs.getBoolean("is_literal"), rs.getString("question_wording"));
+						return new FactType(rs.getInt("id"),
+						rs.getString("name"),
+						rs.getBoolean("is_literal"),
+						rs.getString("question_wording"));
 					}
 				}
 				} catch (SQLException e) {
