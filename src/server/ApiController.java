@@ -31,7 +31,7 @@ public class ApiController {
 		List<Question> questions = new ArrayList<Question>();
 		int i = 0;
 		for (Country country : countries) {
-			Question question = Question.generateQuestion(country, userId, false);
+			Question question = Question.generateQuestion(country, userId, i%2 == 0, i/2 == 0 ? 0 : i+1 );
 			question.setScore((int) ((Math.floor(i/3)+1)*100));
 			question.setPosterImage(country.getPosterImage());
 			question.setLabel(country.getLabel());
