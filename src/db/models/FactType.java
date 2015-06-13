@@ -14,6 +14,16 @@ import db.JDBCConnection;
 
 public class FactType {
 
+	private static final String SELECT_BY_ID = "SELECT * FROM fact WHERE deleted = 0 AND id = ?";
+	private static final String SELECT_ALL = "SELECT * FROM fact_type LEFT JOIN fact_type_question_wording on fact_type_question_wording.fact_id = fact_type.id";
+	private static final String SELECT_RANDOM = "SELECT * FROM fact_type "
+			+ " JOIN fact_type_question_wording on fact_type_question_wording.fact_id = fact_type.id"
+			+ " WHERE question_wording IS NOT NULL"
+			+ " and is_literal = ?"
+			+ " ORDER BY RAND() LIMIT 0,1";
+	private static final String DELETE = "UPDATE fact_type SET deleted = 1, updated = 1 WHERE id = ?";
+	private static final String UPDATE_BY_ID = "UPDATE fact_type SET name = ?, updated = 1 WHERE id = ?";
+	private static final String INSERT = "INSERT INTO fact_type(name, is_literal) VALUES(?, ?)";
 	private String typeName;
 	private String questionWording;
 	private int id;
@@ -42,11 +52,11 @@ public class FactType {
 		Connection conn;
 		try {
 			conn = JDBCConnection.getConnection();
-			try (Statement statement = conn.createStatement()){
-				statement.executeUpdate(String.format(""
-						+ "INSERT INTO fact_type(name, is_literal) "
-						+ "VALUES('%s', %b)", getTypeName(), isLiteral()), Statement.RETURN_GENERATED_KEYS);
-
+			try (PreparedStatement statement = conn.prepareStatement(INSERT, Statement.RETURN_GENERATED_KEYS)){
+				statement.setString(1, getTypeName());
+				statement.setBoolean(2, isLiteral());
+				statement.executeUpdate();
+	
 				try (ResultSet genKeys = statement.getGeneratedKeys()) {
 					if (genKeys.next()) {
 						int id = (int) genKeys.getLong(1);
@@ -70,12 +80,11 @@ public class FactType {
 		Connection conn;
 		try {
 			conn = JDBCConnection.getConnection();
-			try (Statement statement = conn.createStatement()){
+			try (PreparedStatement statement = conn.prepareStatement(UPDATE_BY_ID)){
+				statement.setString(1, typeName);
+				statement.setInt(2, id);
+				statement.executeUpdate();
 
-				statement.executeUpdate(String.format(""
-						+ "UPDATE fact_type SET name = '%s', updated = 1 WHERE id = %d", InputHelper.santize(typeName), id));
-
-				
 			} catch (SQLException e) {
 				System.out.println("ERROR executeQuery - " + e.getMessage());
 			}
@@ -90,37 +99,33 @@ public class FactType {
 		Connection conn;
 		try {
 			conn = JDBCConnection.getConnection();
-			try (Statement statement = conn.createStatement()){
+			try (PreparedStatement statement = conn.prepareStatement(DELETE_BY_ID)){
+				statement.setInt(1, id);
+				statement.executeUpdate();
 
-				statement.executeUpdate(String.format(""
-						+ "UPDATE fact_type SET deleted = 1, updated = 1 WHERE id = %d", id));
-
-				
 			} catch (SQLException e) {
 				System.out.println("ERROR executeQuery - " + e.getMessage());
 			}
 		} catch (IOException | ParseException e1) {
 			e1.printStackTrace();
-		}				
+		}
 	}
-	
-	
 	
 	public static FactType getRandom(boolean isLiteral) {
 		Connection conn;
 		try {
 			conn = JDBCConnection.getConnection();
-			try (Statement statement = conn.createStatement();
-					ResultSet rs = statement.executeQuery(String.format("SELECT * FROM fact_type "
-							+ " JOIN fact_type_question_wording on fact_type_question_wording.fact_id = fact_type.id"
-							+ " WHERE question_wording IS NOT NULL"
-							+ " and is_literal = %s"
-							+ " ORDER BY RAND() LIMIT 0,1", isLiteral ? "true" : "false"));) {
+			try (PreparedStatement statement = conn.prepareStatement(SElECT_RANDOM)) {
+				statement.setBoolean(1, isLiteral);
+			
+				try (ResultSet rs = statement.executeQuery()) {
+	
 				while (rs.next() == true) {
 					return new FactType(rs.getInt("id"),
 							rs.getString("name"),
 							rs.getBoolean("is_literal"),
 							rs.getString("question_wording"));
+				}
 				}
 			} catch (SQLException e) {
 				System.out.println("ERROR executeQuery - " + e.getMessage());
@@ -138,10 +143,11 @@ public class FactType {
 		Connection conn;
 		try {
 			conn = JDBCConnection.getConnection();
-			try (Statement statement = conn.createStatement();
-					ResultSet rs = statement.executeQuery("SELECT * FROM fact_type LEFT JOIN fact_type_question_wording on fact_type_question_wording.fact_id = fact_type.id");) {
+			try (PreparedStatement statement = conn.prepareStatement(SELECT_ALL)) {
+				try (ResultSet rs = statement.executeQuery()) {
 				while (rs.next() == true) {
 					result.add(new FactType(rs.getInt("id"), rs.getString("name"), rs.getBoolean("is_literal"), rs.getString("question_wording")));
+				}
 				}
 			} catch (SQLException e) {
 				System.out.println("ERROR executeQuery - " + e.getMessage());
@@ -182,11 +188,13 @@ public class FactType {
 			Connection conn;
 			try {
 				conn = JDBCConnection.getConnection();
-				try (Statement statement = conn.createStatement();
-						ResultSet rs = statement.executeQuery(String.format("SELECT * FROM fact WHERE deleted = 0 AND id = %d", id));) {
+				try (PreparedStatement statement = conn.prepareStatement(SELECT_BY_ID)) {
+				statement.setInt(1, id);
+				try (ResultSet rs = statement.executeQuery()) {
 					while (rs.next() == true) {
 						return new FactType(rs.getInt("id"), rs.getString("name"), rs.getBoolean("is_literal"), rs.getString("question_wording"));
 					}
+				}
 				} catch (SQLException e) {
 					System.out.println("ERROR executeQuery - " + e.getMessage());
 				}

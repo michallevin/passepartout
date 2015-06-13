@@ -34,6 +34,12 @@ angular
           templateUrl: 'views/highscores.html',
           controller: 'ScoresCtrl'
         })
+
+      })
+      .when('/admin', {
+        templateUrl: 'views/admin.html',
+        controller: 'AdminCtrl'
+      })
       .otherwise({
         redirectTo: '/'
       });

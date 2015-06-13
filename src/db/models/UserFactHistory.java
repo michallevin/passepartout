@@ -14,7 +14,7 @@ import db.JDBCConnection;
 
 public class UserFactHistory {
 
-	private static final String INSERT = "INSERT INTO user_fact_history(user_id, fact_id) VALUES(?, ?)";
+	private static final String INSERT = "INSERT INTO user_fact_history (user_id, fact_id) VALUES (?, ?)";
 	private static final String DELETE_BY_ID = "UPDATE user_fact_history SET deleted = 1, updated = 1 WHERE id = ?";
 	private static final String UPDATE_BY_ID = "UPDATE user_fact_history SET user_id = ?, fact_id = ?, updated = 1 WHERE id = ?";
 	private static final String SELECT_ALL = "SELECT * FROM user_fact_history WHERE deleted = 0";
@@ -115,8 +115,8 @@ public class UserFactHistory {
 			conn = JDBCConnection.getConnection();
 			try (PreparedStatement statement = conn.prepareStatement(UPDATE_BY_ID)){
 				statement.setInt(1, userId);
-				statement.setInt(1, factId);
-				statement.setInt(1, id);
+				statement.setInt(2, factId);
+				statement.setInt(3, id);
 				statement.executeUpdate();
 
 			} catch (SQLException e) {
