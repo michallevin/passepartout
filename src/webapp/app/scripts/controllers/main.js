@@ -22,7 +22,7 @@ angular.module('passepartoutApp')
 		$User.getUserId(function() {
 			console.log("loaded questions");
 			$scope.loading = false;
-			$location.path('/game');
+			$location.path('/intro');
 		});
 
 	};
@@ -48,6 +48,16 @@ angular.module('passepartoutApp')
 //		});
 
 	};
+	$scope.gotoIntro = function() {
+		console.log($scope.username.name);
+//		$User.name=$scope.username.name;
+//		$scope.loading = true;
+//		$User.getHighScores(function() {
+//			console.log("loaded questions");
+//			$scope.loading = false;
+			$location.path('/intro');
+//		});
 
+	};
 
 });
