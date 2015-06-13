@@ -17,19 +17,19 @@ angular.module('passepartoutApp')
 		$AdminService.startImport(function() {
 			$scope.isImporting = true;	
 		});
-	}
+	};
 
 	$scope.cancelImport = function() {
 		$AdminService.cancelImport(function() {
 			$scope.isImporting = false;
 		});
-	}
+	};
 
 	$scope.getImportUpdate = function() {
 		$AdminService.getImportUpdate(function(isImporting) {
 			$scope.isImporting = isImporting;
 		});
-	}
+	};
 
 
 });

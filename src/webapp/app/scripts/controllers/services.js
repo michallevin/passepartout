@@ -89,7 +89,7 @@ passepartoutApp.user = angular.module('passepartoutApp.user',[])
 	}
 
 	
-	return new 	$User()
+	return new 	$User();
 });
 
 passepartoutApp.highscores = angular.module('passepartoutApp.highscores',['passepartoutApp.user'])
@@ -115,6 +115,49 @@ passepartoutApp.highscores = angular.module('passepartoutApp.highscores',['passe
 	
 		}).bind(this))}
 
-	return new $Highscores()
+	return new $Highscores();
 });
+
+
+// passepartoutApp.highscores = angular.module('passepartoutApp.admin')
+
+// .factory('$Admin', function($http, $User) {
+
+// 	function $Admin() { }
+
+// 	$Admin.prototype.startImport = function(callback){
+
+// 		$http({
+// 			url : "http://localhost:8080/import/start",
+// 			method : "GET",
+// 			params : {
+// 			}
+// 		}).success((function(data) {			
+// 			callback();
+// 		}).bind(this))}
+
+// 	$Admin.prototype.cancelImport = function(callback){
+
+// 		$http({
+// 			url : "http://localhost:8080/import/cancel",
+// 			method : "GET",
+// 			params : {
+// 			}
+// 		}).success((function(data) {			
+// 			callback();
+// 		}).bind(this))}
+
+// 	$Admin.prototype.getImportUpdate = function(callback){
+
+// 		$http({
+// 			url : "http://localhost:8080/import/status",
+// 			method : "GET",
+// 			params : {
+// 			}
+// 		}).success((function(data) {			
+// 			callback(data);
+// 		}).bind(this))}
+
+// 	return new $Admin();
+// });
 
