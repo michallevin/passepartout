@@ -6,6 +6,21 @@
 
 <div class="jumbotron"
 	style="background: url(images/world_map.jpg) top center">
+	
+		<div >
+		<h4 style="font-family: 'Cinzel', serif;" >
+			<b>Score : {{score}} </b>
+		</h4>
+		<h4 style="font-family: 'Cinzel', serif;">
+			<b>Lives: {{lives}} </b>
+		</h4>
+		
+	</div>
+	
+	
+	
+	
+	
 	<div ng-repeat="question in questions"
 		ng-show="$index == currentQuestion" style="">
 		<h1 style="font-family: 'Cinzel', serif;" ng-hide="$index % 1== 1">
@@ -33,6 +48,8 @@
 
 		</div>
 	</div>
+
+	
 
 	<div ng-show="lives==0">
 		<h4 style="font-family: 'Cinzel', serif;" ng-click="submitScore()">
