@@ -26,6 +26,17 @@ angular.module('passepartoutApp')
 		});
 
 	};
+	$scope.gotoHighScores = function() {
+		console.log($scope.username.name);
+//		$User.name=$scope.username.name;
+//		$scope.loading = true;
+//		$User.getHighScores(function() {
+//			console.log("loaded questions");
+//			$scope.loading = false;
+			$location.path('/highscores');
+//		});
+
+	};
 
 
 

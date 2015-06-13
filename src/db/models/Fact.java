@@ -28,8 +28,8 @@ public class Fact {
 	private static final String DELETE_BY_ID = "UPDATE fact SET deleted = 1, updated = 1 WHERE id = ?";
 
 	private static final String SELECT_WRONG_ANSWERS = "SELECT * FROM fact "
-			+ "WHERE type_id = ? AND and country_id <> ? AND "
-			+ "data not in (SELECT data FROM fact WHERE type_id = ? AND country_id = ?) "
+			+ "WHERE type_id = ? AND country_id <> ? "
+			+ "AND data NOT IN (SELECT data FROM fact WHERE type_id = ? AND country_id = ?) "
 			+ "ORDER BY RAND() "
 			+ "LIMIT 3";
 
