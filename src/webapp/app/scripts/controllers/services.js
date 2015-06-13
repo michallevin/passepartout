@@ -108,7 +108,7 @@ passepartoutApp.highscores = angular.module('passepartoutApp.highscores',['passe
 	$Highscores.prototype.getHighscores = function(){
 
 		$http({
-			url : baseApiLocation + "highscore",
+			url : baseApiLocation + "highscore/top",
 			method : "GET",
 			params : {
 			}
