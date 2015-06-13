@@ -89,8 +89,8 @@ public class YagoImport {
 			
 			
 			if (importsList.contains("init")) {
-				GameConfigInit.setCountryOrder();
-				GameConfigInit.setQuestionWordings();
+				//GameConfigInit.setCountryOrder();
+				//GameConfigInit.setQuestionWordings();
 
 			}
 			
