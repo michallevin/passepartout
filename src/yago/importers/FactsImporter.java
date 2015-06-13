@@ -25,7 +25,7 @@ public class FactsImporter extends BaseImporter {
 		if (attr3.length() > 255) return;
 		Fact fact = Fact.parseFact(id, attr1, attr2,  attr3);
 		if (fact != null) {
-			Fact existing = FactDictionary.getInstance().getFact(fact);
+			Fact existing = FactDictionary.getInstance().getFactByYagoId(id);
 			if (existing == null)  {
 				//fact.save();
 				FactDictionary.getInstance().addFact(fact);

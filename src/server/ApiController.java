@@ -32,7 +32,7 @@ public class ApiController {
 		List<Question> questions = new ArrayList<Question>();
 		int i = 0;
 		for (Country country : countries) {
-			Question question = Question.generateQuestion(country, userId, false);
+			Question question = Question.generateQuestion(country, userId, i%2 == 0, i/2 == 0 ? 0 : i+1 );
 			question.setScore((int) ((Math.floor(i/3)+1)*100));
 			question.setPosterImage(country.getPosterImage());
 			question.setLabel(country.getLabel());
@@ -127,8 +127,13 @@ public class ApiController {
 	public List<Highscore> getHighScores() {
 		return Highscore.fetchAll();
 	}
-
-	@RequestMapping(value="/rest/highscore}", method=RequestMethod.POST)
+	
+		@RequestMapping(value="/rest/highscore/top", method=RequestMethod.GET)
+	public List<Highscore> getTopHighScores() {
+		return Highscore.fetchTopScores(10);
+	}
+	
+		@RequestMapping(value="/rest/highscore}", method=RequestMethod.POST)
 	public Highscore addHighScore(@RequestParam("user_id") Integer user_id, @RequestParam("score") Integer score) {
 		Highscore highscore = new Highscore(user_id, score);
 		highscore.save();

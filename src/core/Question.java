@@ -20,7 +20,7 @@ public class Question {
 	private static Random r = new Random();
 	
 	
-	public static Question generateQuestion(Country country, int userId, boolean isLiteral) {
+	public static Question generateQuestion(Country country, int userId, boolean isLiteral, int difficulty) {
 
 		List<Fact> otherOptions = new ArrayList<Fact>();
 		FactType factType = null;
@@ -28,7 +28,7 @@ public class Question {
 		
 		while (otherOptions.size() < 3) {
 			factType = FactType.getRandom(isLiteral);
-			answer = Fact.getFact(country.getId(), factType.getId(), userId);
+			answer = Fact.getFact(country.getId(), factType.getId(), userId, isLiteral, difficulty);
 			if (answer == null) continue;
 			otherOptions = Fact.getWrongAnswers(factType.getId(), country.getId());
 		}
