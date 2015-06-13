@@ -122,8 +122,13 @@ public class ApiController {
 	public List<Highscore> getHighScores() {
 		return Highscore.fetchAll();
 	}
-
-	@RequestMapping(value="/rest/highscore}", method=RequestMethod.POST)
+	
+		@RequestMapping(value="/rest/highscore/top", method=RequestMethod.GET)
+	public List<Highscore> getTopHighScores() {
+		return Highscore.fetchTopScores(10);
+	}
+	
+		@RequestMapping(value="/rest/highscore}", method=RequestMethod.POST)
 	public Highscore addHighScore(@RequestParam("user_id") Integer user_id, @RequestParam("score") Integer score) {
 		Highscore highscore = new Highscore(user_id, score);
 		highscore.save();
