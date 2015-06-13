@@ -38,17 +38,11 @@ public class FactTypeQuestionWording {
 		Connection conn;
 		try {
 			conn = JDBCConnection.getConnection();
-			try (Statement statement = conn.createStatement()) {
-
-				statement
-				.executeUpdate(
-						String.format(
-								""
-										+ INSERT,
-										questionId, getQuestion_wording()
-										.replace("'", "''")),
-										Statement.RETURN_GENERATED_KEYS);
-
+			try (PreparedStatement statement = conn.prepareStatement(INSERT_QUERY, Statement.RETURN_GENERATED_KEYS)){
+				statement.setInt(1, questionId);
+				statement.setString(2, getQuestion_wording());
+				statement.executeUpdate();
+		
 				try (ResultSet genKeys = statement.getGeneratedKeys()) {
 					if (genKeys.next()) {
 						int id = (int) genKeys.getLong(1);
@@ -69,15 +63,14 @@ public class FactTypeQuestionWording {
 		Connection conn;
 		try {
 			conn = JDBCConnection.getConnection();
-			try (Statement statement = conn.createStatement();
-					ResultSet rs = statement
-							.executeQuery(String
-									.format(SELECT_BY_ID,
-											id));) {
-				while (rs.next() == true) {
-					return new FactTypeQuestionWording(rs.getInt("id"),
-							rs.getInt("question_id"),
-							rs.getString("question_wording"));
+			try (PreparedStatement statement = conn.prepareStatement(SELECT_BY_ID)) {
+				statement.setInt(1, id);
+				try (ResultSet rs = statement.executeQuery()) {
+					while (rs.next() == true) {
+						return new FactTypeQuestionWording(rs.getInt("id"),
+								rs.getInt("question_id"),
+								rs.getString("question_wording"));
+					}
 				}
 			} catch (SQLException e) {
 				System.out.println("ERROR executeQuery - " + e.getMessage());
@@ -94,13 +87,13 @@ public class FactTypeQuestionWording {
 		Connection conn;
 		try {
 			conn = JDBCConnection.getConnection();
-			try (Statement statement = conn.createStatement();
-					ResultSet rs = statement
-							.executeQuery(SELECT_ALL);) {
-				while (rs.next() == true) {
-					result.add(new FactTypeQuestionWording(rs.getInt("id"), rs
-							.getInt("question_id"), rs
-							.getString("question_wording")));
+			try (PreparedStatement statement = conn.prepareStatement(SELECT_ALL)) {
+				try (ResultSet rs = statement.executeQuery()) {
+					while (rs.next() == true) {
+						result.add(new FactTypeQuestionWording(rs.getInt("id"), rs
+								.getInt("question_id"), rs
+								.getString("question_wording")));
+					}
 				}
 			} catch (SQLException e) {
 				System.out.println("ERROR executeQuery - " + e.getMessage());
@@ -116,14 +109,11 @@ public class FactTypeQuestionWording {
 		Connection conn;
 		try {
 			conn = JDBCConnection.getConnection();
-			try (Statement statement = conn.createStatement()) {
-
-				statement
-				.executeUpdate(String
-						.format(UPDATE_BY_ID,
-								InputHelper.santize(questionWording),
-								questionId, id));
-
+			try (PreparedStatement statement = conn.prepareStatement(UPDATE_BY_ID)){
+				statement.setString(1, questionWording);
+				statement.setInt(2, questionId);
+				statement.setInt(3, id);
+				statement.executeUpdate();
 			} catch (SQLException e) {
 				System.out.println("ERROR executeQuery - " + e.getMessage());
 			}
@@ -131,17 +121,13 @@ public class FactTypeQuestionWording {
 			e1.printStackTrace();
 		}
 	}
-
 	public void delete() {
 		Connection conn;
 		try {
 			conn = JDBCConnection.getConnection();
-			try (Statement statement = conn.createStatement()) {
-
-				statement
-				.executeUpdate(String
-						.format(DELETE,
-								id));
+			try (PreparedStatement statement = conn.prepareStatement(DELETE_BY_ID)){
+				statement.setInt(1, id);
+				statement.executeUpdate();
 
 			} catch (SQLException e) {
 				System.out.println("ERROR executeQuery - " + e.getMessage());
@@ -149,6 +135,7 @@ public class FactTypeQuestionWording {
 		} catch (IOException | ParseException e1) {
 			e1.printStackTrace();
 		}
+	
 	}
 
 	public String getQuestion_wording() {
