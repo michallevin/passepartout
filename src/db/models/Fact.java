@@ -33,12 +33,28 @@ public class Fact {
 			+ "ORDER BY RAND() "
 			+ "LIMIT 3";
 
-	private static final String SElECT_RANDOM_FACT = "SELECT *, count(1) as appearance_count FROM fact "
+	private static final String SElECT_RANDOM_LITERAL_FACT = "SELECT *, count(1) as appearance_count FROM fact "
 			+ "LEFT JOIN user_fact_history "
 			+ "ON fact.id = user_fact_history.fact_id AND user_fact_history.user_id = ? AND user_fact_history.deleted = 0 "
 			+ "WHERE country_id = ? AND type_id = ? AND fact.deleted = 0 "
 			+ "GROUP BY fact.id "
 			+ "ORDER BY appearance_count ASC, RAND() LIMIT 1";
+
+	private static final String SElECT_RANDOM_FACT_BY_DIFFICULTY = "SELECT *, count(1) as appearance_count FROM fact "
+			+ "LEFT JOIN user_fact_history "
+			+ "ON fact.id = user_fact_history.fact_id AND user_fact_history.user_id = ? AND user_fact_history.deleted = 0 "
+			+ "WHERE country_id = ? AND type_id = ? AND fact.deleted = 0 AND fact.rank = ?"
+			+ "GROUP BY fact.id "
+			+ "ORDER BY appearance_count ASC, RAND() LIMIT 1";
+			
+	private static final String SElECT_FACT_BY_RANK = "SELECT * FROM fact "
+			+ "LEFT JOIN user_fact_history "
+			+ "WHERE  fact.deleted = 0 AND ROWNUM() in {?, ?, ?, ?, ?, ?, ?, ?, ?}"
+			+ "ORDER BY fact.rank ASC, RAND() LIMIT 1";
+
+	private static final String UPDATE_RANK = "UPDATE fact SET rank = ?"
+						   "WHERE rank > ? AND rank < ?";
+
 
 	private String yagoId;
 	private int countryId;
@@ -48,7 +64,7 @@ public class Fact {
 	private int id;
 	private int rank;
 	private boolean updated;
-
+g
 	private boolean dirty = false;
 
 	public static Fact parseFact(String yagoId, String attr1, String type, String attr2) {
@@ -70,6 +86,7 @@ public class Fact {
 		Integer typeId = TypeDictionary.getInstance().getId(type, isLiteral);
 		return new Fact(-1, yagoId, country.getId(), data, typeId, null, 0, false);
 	}
+
 
 	public Fact(int id, String yagoId, int countryId, String data, int factTypeId, String label, int rank, boolean updated) {
 		this.id = id;
@@ -112,17 +129,21 @@ public class Fact {
 
 	}
 
-	public static Fact getFact(int countryId, int factTypeId, int userId) {
+	public static Fact getFact(int countryId, int factTypeId, int userId, boolean isLiteral, int difficulty) {
 
 		Connection conn;
 		Fact fact = null;
 		try {
 			conn = JDBCConnection.getConnection();
 			// Get the least viewed by user random fact
+			string query = isLiteral ? SElECT_RANDOM_LITERAL_FACT : SElECT_RANDOM_LITERAL_FACT;
 			try (PreparedStatement statement = conn.prepareStatement(SElECT_RANDOM_FACT)) {
 				statement.setInt(1, userId);
 				statement.setInt(2, countryId);
 				statement.setInt(3, factTypeId);
+				if (isLiteral){
+					statement.setInt(4, difficulty);
+				}
 				try (ResultSet rs = statement.executeQuery()) {
 					while (rs.next() == true) {
 						fact = new Fact(
@@ -291,6 +312,47 @@ public class Fact {
 		}
 		this.dirty = false;
 	}
+	
+	public static void updateFactRanks(int factsCount) {
+		if (!dirty) return;
+		Connection conn;
+		List<Intreger> linksByRank = new ArrayList<Integer>();
+		try {
+			conn = JDBCConnection.getConnection();
+			try (PreparedStatement statement = conn.prepareStatement(SElECT_FACT_BY_RANK)){
+				statement.setInt(1, 1/factsCount);
+				statement.setInt(2, 2/factsCount);
+				statement.setInt(3, 3/factsCount);
+				statement.setInt(4, 4/factsCount);
+				statement.setInt(5, 5/factsCount);
+				statement.setInt(6, 6/factsCount);
+				statement.setInt(7, 7/factsCount);
+				statement.setInt(8, 8/factsCount);
+				statement.setInt(9, 9/factsCount);
+				try (ResultSet rs = statement.executeQuery()) {
+					while (rs.next() == true) {
+						linksByRank.add(rs.getInt("rank"));
+					}
+				}
+			} catch (SQLException e) {
+				System.out.println("ERROR executeQuery - " + e.getMessage());
+			}
+			for (int i = 0; i < linksByRank.length ; i++){
+				try (PreparedStatement statement = conn.prepareStatement(UPDATE_RANK)){
+					statement.setInt(1, i == 0 ? 0 : linksByRank[i]);
+					statement.setInt(2,  i == linksByRank.length -1 ? Integer.MAX_VALUE : linksByRank[i+1]);
+					statement.executeUpdate();
+
+				} catch (SQLException e) {
+					System.out.println("ERROR executeQuery - " + e.getMessage());
+				}	
+			}
+
+		} catch (IOException | ParseException e1) {
+			e1.printStackTrace();
+		}
+		this.dirty = false;
+	}
 
 	public void delete() {
 		Connection conn;
@@ -302,7 +364,7 @@ public class Fact {
 
 			} catch (SQLException e) {
 				System.out.println("ERROR executeQuery - " + e.getMessage());
-			}
+			
 		} catch (IOException | ParseException e1) {
 			e1.printStackTrace();
 		}
