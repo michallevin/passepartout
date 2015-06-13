@@ -42,7 +42,7 @@ angular.module('passepartoutApp')
 	
 	$scope.submitScore = function() {
 		$User.setHighscore($scope.score)
-		//go to high score page
+		$location.path('/highscores');
 	}
 	
 	$scope.startOver= function() {

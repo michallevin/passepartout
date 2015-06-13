@@ -30,7 +30,7 @@
 				src="images/highscores.png"/ style="width: 80%"><br> Wall Of Fame</a> <a class="col btn" style="width: 35%"
 				ng-click="startGame()"> <img src="images/btn.png"
 				style="text-align: center; width: 100%" height="50%" alt="submit" /><br>Let's Travel!
-			</a> <a class="col btn" style="width: 30%" ng-click="startGame()"> <img
+			</a> <a class="col btn" style="width: 30%" ng-click="gotoAdmin()"> <img
 				src="images/admin-compass.png"
 				style="text-align: center; width: 80%" height="40%" alt="submit" />
 				<br>Staff Only
@@ -40,9 +40,8 @@
 
 </div>
 
-<audio controls loop>
-  <source src="horse.ogg" type="audio/ogg">
-  <source src="horse.mp3" type="audio/mpeg">
+<audio controls loop autoplay>
+  <source src="../music.mp3" type="audio/mpeg"> 
   Your browser does not support the audio element.
 </audio>
 
