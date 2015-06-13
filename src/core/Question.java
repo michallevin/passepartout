@@ -34,19 +34,19 @@ public class Question {
 		}
 		
 		Question question = new Question();
-		question.setQuestionText(factType.getQuestionWording().replace("$countryName", country.getName()));
+		question.setQuestionText(factType.getQuestionWording().replace("$countryName", country.getLabel()));
 		
 		question.setAnswerIndex(r.nextInt(4));
 		question.setOptions(new ArrayList<String>());
 		int i = 0;
 		for (Fact option : otherOptions) {
 			if (i == question.getAnswerIndex())
-				question.getOptions().add(answer.getData());
-			question.getOptions().add(option.getData());
+				question.getOptions().add(answer.getReadableData(country.getLabel()));
+			question.getOptions().add(option.getReadableData(country.getLabel()));
 			i += 1;
 		}
 		if (question.getAnswerIndex() == 3)
-			question.getOptions().add(answer.getData());
+			question.getOptions().add(answer.getReadableData(country.getLabel()));
 
 		return question;
 	}
