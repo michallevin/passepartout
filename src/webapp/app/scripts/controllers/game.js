@@ -76,7 +76,7 @@ angular.module('passepartoutApp')
 	
 	$scope.submitScore = function() {
 		$User.setHighscore($scope.score)
-		//go to high score page
+		$location.path('/highscores');
 	}
 	
 	$scope.startOver= function() {
@@ -84,7 +84,7 @@ angular.module('passepartoutApp')
 		$Questions.getQuestions($User.id, function() {
 			console.log("loaded questions");
 			$scope.loading = false;
-			$scope.questions=$Questions.questions;
+			$scope.questions = $Questions.questions;
 			$scope.currentQuestion = 0;
 			$scope.lives = 3;
 			$scope.score = 0;

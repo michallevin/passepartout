@@ -1,3 +1,4 @@
+<link href='http://fonts.googleapis.com/css?family=Fredericka+the+Great' rel='stylesheet' type='text/css'>
 
 <link href='http://fonts.googleapis.com/css?family=Cinzel'
 	rel='stylesheet' type='text/css'>
@@ -12,13 +13,24 @@
 	<div>
 		<div ng-repeat="score in scores">
 			<div class="row">
-				<a class="col"
-					style="background: url(http://www.texturepalace.com/wp-content/uploads/vintage-paper-texture-for-photoshop-3.jpg) top center; border-style: solid; border-width: 5px; font-family: 'Cinzel', serif;">{{score.name}}bla
-					bla</a> <a class="col"
-					style="background: url(http://www.texturepalace.com/wp-content/uploads/vintage-paper-texture-for-photoshop-3.jpg) top center; border-style: solid; border-width: 5px; font-family: 'Cinzel', serif;">{{score.score}}56</a>
+				<h3 style="color: black">
+
+					<div class="col"
+						style="background: url(http://www.texturepalace.com/wp-content/uploads/vintage-paper-texture-for-photoshop-3.jpg) top center; display: inline; border-color: black; border-style: solid; border-width: 2px; font-family: 'Fredericka the Great', cursive;">
+						{{score.name}}</div>
+					<div class="col"
+						style="background: url(http://www.texturepalace.com/wp-content/uploads/vintage-paper-texture-for-photoshop-3.jpg) top center; display: inline; border-color: black; border-style: solid; border-width: 2px; font-family: 'Fredericka the Great', cursive;">
+						{{score.score}}</div>
+
+
+				</h3>
+
 			</div>
 
-
 		</div>
+		<audio controls loop autoplay>
+			<source src="../music.mp3" type="audio/mpeg">
+			Your browser does not support the audio element.
+		</audio>
 	</div>
 </div>
