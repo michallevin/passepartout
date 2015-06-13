@@ -21,26 +21,37 @@ public class Fact {
 
 	private static final String UPDATE_BY_ID_FROM_IMPORT = "UPDATE fact SET country_id = ?, data = ?, type_id = ?, rank = ?, label= ? WHERE id = ? and updated = 0";
 	private static final String UPDATE_BY_ID = "UPDATE fact SET country_id = ?, data = ?, type_id = ?, rank = ?, label= ? updated = 1 WHERE id = ?";
-	private static final String SELECT_BY_ID = "SELECT * FROM fact WHERE deleted = 0 AND id = ?";
-	private static final String SELECT_ALL = "SELECT * FROM fact WHERE deleted = 0";
-	private static final String SELECT_ALL_PAGED = "SELECT * FROM fact WHERE deleted = 0 LIMIT ?, ?";
+	private static final String SELECT_BY_ID = "SELECT fact.id, fact.yago_id, fact.country_id " +
+						   "fact.data, fact.type_id, fact.label, fact.rank, fact.updated " +
+						   "FROM fact WHERE deleted = 0 AND id = ?";
+	private static final String SELECT_ALL = "SELECT fact.id, fact.yago_id, fact.country_id " +
+						   "fact.data, fact.type_id, fact.label, fact.rank, fact.updated " +
+						   "FROM fact WHERE deleted = 0";
+	private static final String SELECT_ALL_PAGED = "SELECT fact.id, fact.yago_id, fact.country_id " +
+						   "fact.data, fact.type_id, fact.label, fact.rank, fact.updated " +
+						   "FROM fact WHERE deleted = 0 LIMIT ?, ?";
 	private static final String INSERT_QUERY = "INSERT INTO fact (yago_id, country_id, data, type_id, rank) VALUES (?, ?, ?, ?, ?)";
 	private static final String DELETE_BY_ID = "UPDATE fact SET deleted = 1, updated = 1 WHERE id = ?";
 
-	private static final String SELECT_WRONG_ANSWERS = "SELECT * FROM fact "
-			+ "WHERE type_id = ? AND country_id <> ? "
+	private static final String SELECT_WRONG_ANSWERS = "SELECT fact.id, fact.yago_id, fact.country_id " +
+						   "fact.data, fact.type_id, fact.label, fact.rank, fact.updated " +
+						   "FROM fact WHERE type_id = ? AND country_id <> ? "
 			//+ "AND data NOT IN (SELECT data FROM fact WHERE type_id = ? AND country_id = ?) "
 			+ "ORDER BY RAND() "
 			+ "LIMIT 3";
 
-	private static final String SElECT_RANDOM_LITERAL_FACT = "SELECT *, count(1) as appearance_count FROM fact "
+	private static final String SElECT_RANDOM_LITERAL_FACT = "SELECT fact.id, fact.yago_id, fact.country_id " +
+						   "fact.data, fact.type_id, fact.label, fact.rank, fact.updated " +
+						   ", count(1) as appearance_count FROM fact " +
 			+ "LEFT JOIN user_fact_history "
 			+ "ON fact.id = user_fact_history.fact_id AND user_fact_history.user_id = ? AND user_fact_history.deleted = 0 "
 			+ "WHERE country_id = ? AND type_id = ? AND fact.deleted = 0 "
 			+ "GROUP BY fact.id "
 			+ "ORDER BY appearance_count ASC, RAND() LIMIT 1";
 
-	private static final String SElECT_FACT_BY_DIFFICULTY = "SELECT *, count(1) as appearance_count FROM fact "
+	private static final String SElECT_FACT_BY_DIFFICULTY = "SELECT fact.id, fact.yago_id, fact.country_id " +
+						   "fact.data, fact.type_id, fact.label, fact.rank, fact.updated " +
+						   ", count(1) as appearance_count FROM fact " +
 			+ "LEFT JOIN user_fact_history "
 			+ "ON fact.id = user_fact_history.fact_id AND user_fact_history.user_id = ? AND user_fact_history.deleted = 0 "
 			+ "WHERE country_id = ? AND type_id = ? AND fact.deleted = 0 "
@@ -199,7 +210,14 @@ public class Fact {
 				statement.setInt(2, end-start);
 				try (ResultSet rs = statement.executeQuery()) {
 					while (rs.next() == true) {
-						result.add(new Fact(rs.getInt("id"), rs.getString("yago_id"), rs.getInt("country_id"), rs.getString("data"), rs.getInt("type_id"),rs.getString("label"), rs.getInt("rank"), rs.getBoolean("updated")));
+						result.add(new Fact(rs.getInt("id"),
+								    rs.getString("yago_id"),
+								    rs.getInt("country_id"),
+								    rs.getString("data"),
+								    rs.getInt("type_id"),
+								    rs.getString("label"),
+								    rs.getInt("rank"),
+								    rs.getBoolean("updated")));
 					}
 				}
 			} catch (SQLException e) {
@@ -242,8 +260,14 @@ public class Fact {
 				try (ResultSet rs = statement.executeQuery()) {
 					while (rs.next() == true) {
 						return new Fact(
-								rs.getInt("id"), rs.getString("yago_id"), rs.getInt("country_id"), rs.getString("data"),
-								rs.getInt("type_id"), rs.getString("label"), rs.getInt("rank"), rs.getBoolean("updated")
+								rs.getInt("id"),
+								rs.getString("yago_id"),
+								rs.getInt("country_id"),
+								rs.getString("data"),
+								rs.getInt("type_id"),
+								rs.getString("label"),
+								rs.getInt("rank"),
+								rs.getBoolean("updated")
 								);
 					}
 				}

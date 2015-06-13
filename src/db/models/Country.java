@@ -17,9 +17,12 @@ public class Country {
 	private static final String DELETE_BY_ID = "UPDATE country SET deleted = 1, updated = 1 WHERE id = ?";
 	private static final String UPDATE_AFTER_IMPORT = "UPDATE country SET name = ?, label = ? WHERE id = ? and updated = 0";
 	private static final String UPDATE = "UPDATE country SET name = ?, label = ?, updated = 1 WHERE id = ?";
-	private static final String SELECT_BY_ORDER = "SELECT * FROM country JOIN country_order ON country_order.country_id = country.id WHERE route_order IS NOT NULL AND country.deleted = 0 AND country_order.deleted = 0 ORDER BY route_order";
-	private static final String SELECT_ALL = "SELECT * FROM country WHERE deleted = 0";
-	private static final String SELECT_BY_ID = "SELECT * FROM country WHERE deleted = 0 AND id = ?";
+	private static final String SELECT_BY_ORDER = "SELECT country.id, country.yago_id, country.name, country.label, country.updated " + 
+						"FROM country JOIN country_order ON country_order.country_id = country.id WHERE route_order IS NOT NULL AND country.deleted = 0 AND country_order.deleted = 0 ORDER BY route_order";
+	private static final String SELECT_ALL = "SELECT country.id, country.yago_id, country.name, country.label, country.updated " + 
+						"FROM country WHERE deleted = 0";
+	private static final String SELECT_BY_ID = "SELECT country.id, country.yago_id, country.name, country.label, country.updated " + 
+						"FROM country WHERE deleted = 0 AND id = ?";
 	private static final String INSERT = "INSERT INTO country(yago_id, name) VALUES(?, ?)";
 	private String name;
 	private int id;
