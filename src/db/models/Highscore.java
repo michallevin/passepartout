@@ -16,6 +16,7 @@ public class Highscore {
 	private static final String DELETE_BY_ID = "UPDATE highscore SET deleted = 1, updated = 1 WHERE id = ?";
 	private static final String UPDATE_BY_ID = "UPDATE highscore SET user_id = ?, score = ? updated = 1 WHERE id = ?";
 	private static final String SELECT_ALL = "SELECT user_id, score FROM highscore WHERE deleted = 0";
+	private static final String SELECT_TOP = "SELECT user_id, score FROM highscore WHERE deleted = 0 ORDER BY score DESC LIMIT ?";
 	private static final String SELECT_BY_ID = "SELECT * FROM highscore JOIN user ON user.id = highscore.user_id WHERE deleted = 0 AND id = ?";
 	private static final String INSERT = "INSERT INTO highscore (user_id, score) VALUES (?, ?)";
 
@@ -81,6 +82,28 @@ public class Highscore {
 			e1.printStackTrace();
 		}
 		return null;
+	}
+	
+		public static List<Highscore> fetchTop(int scoresCount) {
+		List<Highscore> result = new ArrayList<Highscore>();
+		Connection conn;
+		try {
+			conn = JDBCConnection.getConnection();
+			try (PreparedStatement statement = conn.prepareStatement(SELECT_TOP)){
+				statement.setInt(1, scoresCount);
+				try (ResultSet rs = statement.executeQuery()) {
+					while (rs.next() == true) {
+						result.add(new Highscore(rs.getInt("user_id"), rs.getInt("score")));
+					}
+				}
+			} catch (SQLException e) {
+				System.out.println("ERROR executeQuery - " + e.getMessage());
+			}
+
+		} catch (IOException | ParseException e1) {
+			e1.printStackTrace();
+		}
+		return result;
 	}
 
 	public static List<Highscore> fetchAll() {
