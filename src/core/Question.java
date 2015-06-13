@@ -30,8 +30,6 @@ public class Question {
 			factType = FactType.getRandom(isLiteral);
 			answer = Fact.getFact(country.getId(), factType.getId(), userId);
 			if (answer == null) continue;
-			factType = FactType.getRandom(isLiteral);
-			answer = Fact.getFact(country.getId(), factType.getId(), userId);
 			otherOptions = Fact.getWrongAnswers(factType.getId(), country.getId());
 		}
 		

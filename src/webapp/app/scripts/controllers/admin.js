@@ -15,7 +15,7 @@ angular.module('passepartoutApp')
 		
 	$scope.startImport = function() {
 		$AdminService.startImport(function() {
-			$scope.isImporting = true;
+			$scope.isImporting = true;	
 		});
 	}
 

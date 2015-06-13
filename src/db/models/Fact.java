@@ -29,7 +29,7 @@ public class Fact {
 
 	private static final String SELECT_WRONG_ANSWERS = "SELECT * FROM fact "
 			+ "WHERE type_id = ? AND country_id <> ? "
-			+ "AND data NOT IN (SELECT data FROM fact WHERE type_id = ? AND country_id = ?) "
+			//+ "AND data NOT IN (SELECT data FROM fact WHERE type_id = ? AND country_id = ?) "
 			+ "ORDER BY RAND() "
 			+ "LIMIT 3";
 
@@ -157,8 +157,8 @@ public class Fact {
 			try (PreparedStatement statement = conn.prepareStatement(SELECT_WRONG_ANSWERS)) {
 				statement.setInt(1, factTypeId);
 				statement.setInt(2, countryId);
-				statement.setInt(3, factTypeId);
-				statement.setInt(4, countryId);
+				//statement.setInt(3, factTypeId);
+				//statement.setInt(4, countryId);
 				try (ResultSet rs = statement.executeQuery()) {
 					while (rs.next() == true) {
 						result.add(new Fact(
