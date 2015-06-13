@@ -1,5 +1,5 @@
 
-
+<link href='http://fonts.googleapis.com/css?family=Fredericka+the+Great' rel='stylesheet' type='text/css'>
 
 <link href='http://fonts.googleapis.com/css?family=Cinzel'
 	rel='stylesheet' type='text/css'>
@@ -8,18 +8,18 @@
 	style="background: url(images/world_map.jpg) top center" >
 	
 	<div  ng-show="lives > 0">
-		<h4 style="font-family: 'Cinzel', serif;" >
+		<h4 style="font-family: 'Fredericka the Great', cursive;" >
 			<b>Score : {{score}} </b>
 		</h4>
-		<h4 style="font-family: 'Cinzel', serif;">
+		<h4 style="font-family: 'Fredericka the Great', cursive;">
 			<b>Lives: {{lives}} </b>
 		</h4>
 		
 
 		<div ng-repeat="question in questions"
 			ng-show="$index == currentQuestion" style="">
-			<h1 style="font-family: 'Cinzel', serif;" ng-hide="$index % 1== 1">
-				<b>Welcome to {{question.questionText.split(" ")[5]}}!</b>
+			<h1 style="font-family: 'Fredericka the Great', cursive;" ng-hide="$index % 1== 1">
+				<b>Welcome to {{questions[$index-1].label}}!</b>
 			</h1>
 			<p class="lead">
 				<img src="images/belguim1.jpg"
@@ -28,11 +28,11 @@
 			</p>
 			<div
 				style="background: url(http://www.texturepalace.com/wp-content/uploads/vintage-paper-texture-for-photoshop-3.jpg) top center; border-style: solid; border-width: 5px;">
-				<h3 style="font-family: 'Cinzel', serif;">
+				<h3 style="font-family: 'Fredericka the Great', cursive;">
 					<b>{{question.questionText}}?</b>
 				</h3>
 				<div ng-repeat="answer in question.options">
-					<h4 style="font-family: 'Cinzel', serif;"
+					<h4 style="font-family: 'Fredericka the Great', cursive;"
 						ng-click="guessAnswer($index)">
 						<b>{{answer}}</b>
 					</h4>
@@ -47,20 +47,20 @@
 	</div>
 
 	<div ng-show="lives==0">
-		<h1 style="font-family: 'Cinzel', serif;" ng-hide="$index % 1== 1">
+		<h1 style="font-family: 'Fredericka the Great', cursive;" ng-hide="$index % 1== 1">
 			<b>Game over!</b>
 		</h1>
 		<h2>
 			Your score is {{score}}
 		</h2>
 		<br/>
-		<h4 style="font-family: 'Cinzel', serif;" ng-click="submitScore()">
+		<h4 style="font-family: 'Fredericka the Great', cursive;" ng-click="submitScore()">
 			<b>Submit highscore</b>
 		</h4>
-		<h4 style="font-family: 'Cinzel', serif;" ng-click="startOver()">
+		<h4 style="font-family: 'Fredericka the Great', cursive;" ng-click="startOver()">
 			<b>Start over</b>
 		</h4>
-		<h4 style="font-family: 'Cinzel', serif;" ng-click="endGame()">
+		<h4 style="font-family: 'Fredericka the Great', cursive;" ng-click="endGame()">
 			<b>Menu</b>
 		</h4>
 	</div>
