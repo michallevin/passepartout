@@ -17,8 +17,8 @@ public class UserFactHistory {
 	private static final String INSERT = "INSERT INTO user_fact_history (user_id, fact_id) VALUES (?, ?)";
 	private static final String DELETE_BY_ID = "UPDATE user_fact_history SET deleted = 1, updated = 1 WHERE id = ?";
 	private static final String UPDATE_BY_ID = "UPDATE user_fact_history SET user_id = ?, fact_id = ?, updated = 1 WHERE id = ?";
-	private static final String SELECT_ALL = "SELECT * FROM user_fact_history WHERE deleted = 0";
-	private static final String SELECT_BY_ID = "SELECT * FROM user_fact_history WHERE deleted = 0 AND id = ?";
+	private static final String SELECT_ALL = "SELECT user_fact_history.id, user_id, fact_id FROM user_fact_history WHERE deleted = 0";
+	private static final String SELECT_BY_ID = "SELECT user_fact_history.id, user_id, fact_id FROM user_fact_history WHERE deleted = 0 AND id = ?";
 
 	private int id;
 	private int userId;
@@ -95,7 +95,9 @@ public class UserFactHistory {
 			try (PreparedStatement statement = conn.prepareStatement(SELECT_ALL)){
 				try (ResultSet rs = statement.executeQuery()) {
 					while (rs.next() == true) {
-						result.add(new UserFactHistory(rs.getInt("id"), rs.getInt("userId"), rs.getInt("factId")));
+						result.add(new UserFactHistory(rs.getInt("id"),
+									       rs.getInt("userId"),
+									       rs.getInt("factId")));
 					}
 				}
 			} catch (SQLException e) {
