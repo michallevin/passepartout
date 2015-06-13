@@ -10,31 +10,25 @@
 angular.module('passepartoutApp')
 .controller('AdminCrl', function ($scope, $http, $AdminService) {
 
-	$scope.currentQuestion = 0;
-	$scope.lives = 3;
+	$scope.isImporting = false;
 
+		
+	$scope.startImport = function() {
+		$AdminService.startImport(function() {
+			$scope.isImporting = true;
+		});
+	}
 
-//	$scope.init = function() {
-//		//$http(localhost:8080/rest/question)
-//		$Questions.getQuestions();
-//		$scope.questions = $Questions.questions;
-//
-//	}
-	
-	$scope.questions=$Questions.questions
-	
-	$scope.guessAnswer = function(index) {
-		//console.log(index);
-		if (index == $scope.questions[$scope.currentQuestion].answerIndex) {
-			alert("Yes!");
-			$scope.currentQuestion += 1;
-		}
-		else {
-			alert("NO!");
-			$scope.currentQuestion += 1;
-			$scope.lives -= 1;
-		}
+	$scope.cancelImport = function() {
+		$AdminService.cancelImport(function() {
+			$scope.isImporting = false;
+		});
+	}
 
+	$scope.getImportUpdate = function() {
+		$AdminService.getImportUpdate(function(isImporting) {
+			$scope.isImporting = isImporting;
+		});
 	}
 
 
