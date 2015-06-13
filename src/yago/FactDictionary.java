@@ -18,9 +18,9 @@ public class FactDictionary {
 		factsByYagoId = new HashMap<String, Fact>();
 		List<Fact> allFacts = Fact.fetchAll();
 		for (Fact fact : allFacts) {
-			string yagoId = fact.getYagoId();
-			if (yagoId) == null || yagoId.length() == 0) continue;
-			factsByYagoId.put(yagoId, fact)
+			String yagoId = fact.getYagoId();
+			if (yagoId == null || yagoId.length() == 0) continue;
+			factsByYagoId.put(yagoId, fact);
 			if (!factMap.containsKey(fact.getData()))
 				factMap.put(fact.getData(), new  HashMap<String, Fact>());
 			factMap.get(fact.getData()).put(yagoId, fact);
@@ -64,7 +64,7 @@ public class FactDictionary {
 		return null;
 	}
 	
-	public Fact getFactByYagoId(string yagoId) {
+	public Fact getFactByYagoId(String yagoId) {
 		return factsByYagoId.containsKey(yagoId) ? factsByYagoId.get(yagoId) : null;
 	}
 
@@ -72,7 +72,12 @@ public class FactDictionary {
 		if (!factMap.containsKey(fact.getData()))
 			factMap.put(fact.getData(), new HashMap<String, Fact>());
 		factMap.get(fact.getData()).put(fact.getYagoId(), fact);
-		factsByYagoId.put(fact.getYagoId(), fact)
+		factsByYagoId.put(fact.getYagoId(), fact);
+	}
+
+	public int getCount() {
+		// TODO Auto-generated method stub
+		return factsByYagoId.size();
 	}
 
 

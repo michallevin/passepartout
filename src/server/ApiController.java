@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import core.GameConfigInit;
 import core.Question;
+import yago.FactDictionary;
 import yago.YagoImport;
 import db.models.Country;
 import db.models.CountryOrder;
@@ -32,7 +33,7 @@ public class ApiController {
 		List<Question> questions = new ArrayList<Question>();
 		int i = 0;
 		for (Country country : countries) {
-			Question question = Question.generateQuestion(country, userId, i%2 == 0, i/2 == 0 ? 0 : i+1 );
+			Question question = Question.generateQuestion(country, userId, i % 2 == 0, i + 1 );
 			question.setScore((int) ((Math.floor(i/3)+1)*100));
 			question.setPosterImage(country.getPosterImage());
 			question.setLabel(country.getLabel());
@@ -65,7 +66,7 @@ public class ApiController {
 						GameConfigInit.setCountryOrder();
 						GameConfigInit.setQuestionWordings();
 					}
-				
+					Fact.updateFactRanks(FactDictionary.getInstance().getCount());
 				}
 			}
 		};
@@ -130,7 +131,7 @@ public class ApiController {
 	
 		@RequestMapping(value="/rest/highscore/top", method=RequestMethod.GET)
 	public List<Highscore> getTopHighScores() {
-		return Highscore.fetchTopScores(10);
+		return Highscore.fetchTop(10);
 	}
 	
 		@RequestMapping(value="/rest/highscore}", method=RequestMethod.POST)
