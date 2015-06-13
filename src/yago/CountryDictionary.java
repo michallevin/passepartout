@@ -26,9 +26,9 @@ public class CountryDictionary {
 		return instance;
 	}
 	
-	public Integer getCountryId(String countryName) {
+	public Country getCountry(String countryName) {
 		if (getCountryMap().containsKey(countryName)) {
-			return getCountryMap().get(countryName).getId();
+			return getCountryMap().get(countryName);
 		}
 		else {
 			return null;

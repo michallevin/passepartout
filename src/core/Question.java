@@ -22,13 +22,18 @@ public class Question {
 	
 	public static Question generateQuestion(Country country, int userId, boolean isLiteral) {
 
-		FactType factType = FactType.getRandom(isLiteral);
-		Fact answer = Fact.getFact(country.getId(), factType.getId(), userId);
-		while (answer == null) {
+		List<Fact> otherOptions = new ArrayList<Fact>();
+		FactType factType = null;
+		Fact answer = null;
+		
+		while (otherOptions.size() < 3) {
 			factType = FactType.getRandom(isLiteral);
 			answer = Fact.getFact(country.getId(), factType.getId(), userId);
+			if (answer == null) continue;
+			factType = FactType.getRandom(isLiteral);
+			answer = Fact.getFact(country.getId(), factType.getId(), userId);
+			otherOptions = Fact.getWrongAnswers(factType.getId(), country.getId());
 		}
-		List<Fact> otherOptions = Fact.getWrongAnswers(factType.getId(), answer.getData());
 		
 		Question question = new Question();
 		question.setQuestionText(factType.getQuestionWording().replace("$countryName", country.getName()));
@@ -42,6 +47,9 @@ public class Question {
 			question.getOptions().add(option.getData());
 			i += 1;
 		}
+		if (question.getAnswerIndex() == 3)
+			question.getOptions().add(answer.getData());
+
 		return question;
 	}
 

@@ -3,10 +3,11 @@ package yago.importers;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.text.ParseException;
-import java.util.List;
+import java.util.Collection;
 
 import yago.CountryDictionary;
 import yago.FactDictionary;
+import yago.YagoImport;
 import db.JDBCConnection;
 import db.models.Country;
 import db.models.Fact;
@@ -14,16 +15,33 @@ import db.models.Fact;
 public class DictionaryUpdater {
 
 	public static void updateFactDictionary() {
+		if (YagoImport.shouldCancel()) return;
+		
 		try {
 			JDBCConnection.getConnection().setAutoCommit(false);
 
 			System.out.println("start label update for facts");
 
 			//update labels and ranks (if we calculated them) for all facts
+			int i = 0;
 			for (String factData : FactDictionary.getInstance().getFactMap().keySet()) {
-				List<Fact> factList = FactDictionary.getInstance().getFactMap().get(factData);
-				for (Fact fact : factList)
-					fact.updateFromImport();
+				Collection<Fact> factList = FactDictionary.getInstance().getFactMap().get(factData).values();
+				for (Fact fact : factList) {
+					if (YagoImport.shouldCancel()) break;
+
+					if (fact.isNew())
+						fact.save();
+					else
+						fact.updateFromImport();
+				
+					if (i > 0 && i % 10000 == 0) {
+						if (i % 1000000 == 0)
+							System.out.println("");
+						System.out.print(".");
+						JDBCConnection.getConnection().commit();
+					}
+					++i;
+				}
 			}
 
 			System.out.println("commiting");
@@ -38,7 +56,8 @@ public class DictionaryUpdater {
 	}
 
 	public static void updateCountryDictionary() {
-		
+		if (YagoImport.shouldCancel()) return;
+
 		
 		try {
 			JDBCConnection.getConnection().setAutoCommit(false);
@@ -47,6 +66,8 @@ public class DictionaryUpdater {
 
 
 			for (String countryName : CountryDictionary.getInstance().getCountryMap().keySet()) {
+				if (YagoImport.shouldCancel()) break;
+
 				Country country = CountryDictionary.getInstance().getCountryMap().get(countryName);
 				country.updateFromImport();
 			}

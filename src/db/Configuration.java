@@ -1,7 +1,7 @@
 package db;
 
 public class Configuration {
-	private static final String location = "remote";
+	private static final String location = "local";
 	
 	public String hostName;
 	public String port;
@@ -20,7 +20,7 @@ public class Configuration {
 			config.setUserName("DbMysql08");
 			config.setPassword("DbMysql08");
 		}
-		else if (location.equals("remote")) {
+		else if (location.equals("local")) {
 			config.hostName = "127.0.0.1";
 			config.port = "3306";
 			config.dbName = "passepartout";

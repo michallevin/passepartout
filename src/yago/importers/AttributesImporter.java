@@ -2,6 +2,7 @@ package yago.importers;
 
 import java.io.FileNotFoundException;
 
+import yago.FactDictionary;
 import db.models.Fact;
 
 public class AttributesImporter extends BaseImporter {
@@ -12,7 +13,7 @@ public class AttributesImporter extends BaseImporter {
 	public AttributesImporter() throws FileNotFoundException {
 		super();
 	}
-	
+
 
 	@Override
 	public String getFileName() {
@@ -24,15 +25,26 @@ public class AttributesImporter extends BaseImporter {
 			return input.replace("[[", "<").replace("]]", ">").replace(" ", "_");
 		return input;
 	}
-	
+
 	@Override
 	public void handleRow(String id, String attr1, String attr2, String attr3,
 			String line) {
-		if (attr3.endsWith(EN)) {
-			Fact fact = new Fact(id, attr1, attr2, replaceEntityMarker(cleanInput(attr3, EN)), true);
-			fact.saveFromImport();
+
+		if (!attr3.endsWith(EN) || attr3.length() > 255) return;
+		Fact fact = Fact.parseFact(id, attr1, attr2, replaceEntityMarker(cleanInput(attr3, EN)));
+		if (fact == null) return;
+		Fact existing = FactDictionary.getInstance().getFact(fact);
+		if (existing == null)  {
+			//fact.save();
+			FactDictionary.getInstance().addFact(fact);
+		}
+		else if (!existing.isUpdated()) {//make sure fact what not edited by user
+			existing.updateFields(fact);
 		}
 	}
+
+
+
 }
 
 

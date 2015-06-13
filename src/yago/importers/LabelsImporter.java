@@ -8,7 +8,7 @@ import yago.FactDictionary;
 public class LabelsImporter extends BaseImporter {
 
 	private static final String FILENAME = "res//yagoLabels.tsv";
-	private static final String LABEL = "rdfs:label";
+	private static final String LABEL = "skos:prefLabel";
 
 	public LabelsImporter() throws FileNotFoundException {
 		super();

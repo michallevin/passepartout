@@ -58,13 +58,17 @@ public class ApiController {
 									"facts", 
 									"literalFacts", 
 									"labels"
-									});
+							});
 				else {
 
 				}
 			}
 		};
 		t.start();
+	}
+	@RequestMapping(value="/import/cancel", method=RequestMethod.GET)
+	public void cancelImport() {
+		YagoImport.cancelImport();
 	}
 
 	@RequestMapping(value="/import/status", method=RequestMethod.GET)
@@ -84,7 +88,7 @@ public class ApiController {
 
 	@RequestMapping(value="/rest/country", method=RequestMethod.POST)
 	public Country addCountry(@RequestParam("name") String name, @RequestParam("label") String label) {
-		Country country = new Country(-1, "", name, label);
+		Country country = new Country(-1, "", name, label, false);
 		country.save();
 		return country;
 
@@ -113,7 +117,7 @@ public class ApiController {
 	}
 
 	// highscore
-	
+
 	@RequestMapping(value="/rest/highscore", method=RequestMethod.GET)
 	public List<Highscore> getHighScores() {
 		return Highscore.fetchAll();
@@ -146,7 +150,7 @@ public class ApiController {
 		highscore.delete();
 		return highscore;
 	}
-	 
+
 	//fact type
 
 	@RequestMapping(value="/rest/fact_type", method=RequestMethod.GET)
@@ -315,7 +319,7 @@ public class ApiController {
 		countryOrder.delete();
 		return countryOrder;
 	}
-	
+
 
 	// fact_type_question_wording
 
@@ -341,8 +345,8 @@ public class ApiController {
 	@RequestMapping(value="/rest/fact_type_question_wording/{id}", method=RequestMethod.PUT)
 	public FactTypeQuestionWording editFactTypeQuestionWording(@PathVariable Integer id,@RequestParam("question_id") Integer question_id,@RequestParam("question_wording") String question_wording) {
 		FactTypeQuestionWording factTypeQuestionWording = FactTypeQuestionWording.fetchById(id);
-		factTypeQuestionWording.setQuestion_id(question_id);
-		factTypeQuestionWording.setQuestion_wording(question_wording);
+		factTypeQuestionWording.setQuestionId(question_id);
+		factTypeQuestionWording.setQuestionWording(question_wording);
 		factTypeQuestionWording.update();
 		return factTypeQuestionWording;
 	}
@@ -354,7 +358,7 @@ public class ApiController {
 		return factTypeQuestionWording;
 	}
 
-	 
+
 	// fact
 
 	@RequestMapping(value="/rest/fact", method=RequestMethod.GET)
@@ -366,7 +370,7 @@ public class ApiController {
 	@RequestMapping(value="/rest/fact", method=RequestMethod.POST)
 	public Fact addFact(@RequestParam("yago_id") String yagoId, @RequestParam("country_id") int countryId, @RequestParam("data") String data, @RequestParam("type_id") int factTypeId, 
 			@RequestParam("label") String label, @RequestParam("rank") int rank) {
-		Fact fact = new Fact("",countryId, data, factTypeId, label, rank);
+		Fact fact = new Fact(-1, "",countryId, data, factTypeId, label, rank, false);
 		fact.save();
 		return fact;
 	}
@@ -389,9 +393,10 @@ public class ApiController {
 	}
 
 	@RequestMapping(value="/rest/fact/{id}", method=RequestMethod.DELETE)
-	public Country deleteFact(@PathVariable Integer id) {
-		Country fact = Country.fetchById(id);
-		fact.delete();
+	public Fact deleteFact(@PathVariable Integer id) {
+		Fact fact = Fact.fetchById(id);
+		//fact.delete();
+		//TODO
 		return fact;
 	}
 

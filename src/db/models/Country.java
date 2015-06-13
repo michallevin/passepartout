@@ -20,25 +20,19 @@ public class Country {
 	private String label;
 	private boolean dirty = false;
 	private String posterImage;
+	private boolean updated;
 
-	public Country(int id, String yagoId, String name, String label) {
+	public Country(int id, String yagoId, String name, String label, boolean updated) {
 
 		this.id = id;
 		this.name = name;
 		this.label = label;
 		this.yagoId = yagoId;
+		this.updated = updated;
 	}
 
-	public Country(String yagoId, String name) {
-
-		this.name = name;
-		this.yagoId = yagoId;
-	}
-
-
-	public Country(String name) {
-		this.name = name;
-		this.yagoId = "";
+	public static Country parseCountry(String yagoId, String name) {
+		return new Country(-1, yagoId, name, null, false);
 	}
 	
 	public void save() {
@@ -77,7 +71,7 @@ public class Country {
 			try (Statement statement = conn.createStatement();
 					ResultSet rs = statement.executeQuery(String.format("SELECT * FROM country WHERE deleted = 0 AND id = %d", id));) {
 				while (rs.next() == true) {
-					return new Country(rs.getInt("id"), rs.getString("yago_id"), rs.getString("name"), rs.getString("label"));
+					return new Country(rs.getInt("id"), rs.getString("yago_id"), rs.getString("name"), rs.getString("label"), rs.getBoolean("updated"));
 				}
 			} catch (SQLException e) {
 				System.out.println("ERROR executeQuery - " + e.getMessage());
@@ -97,7 +91,7 @@ public class Country {
 			try (Statement statement = conn.createStatement();
 					ResultSet rs = statement.executeQuery("SELECT * FROM country WHERE deleted = 0");) {
 				while (rs.next() == true) {
-					result.add(new Country(rs.getInt("id"), rs.getString("yago_id"), rs.getString("name"), rs.getString("label")));
+					result.add(new Country(rs.getInt("id"), rs.getString("yago_id"), rs.getString("name"), rs.getString("label"), rs.getBoolean("updated")));
 				}
 			} catch (SQLException e) {
 				System.out.println("ERROR executeQuery - " + e.getMessage());
@@ -117,8 +111,8 @@ public class Country {
 			try (Statement statement = conn.createStatement();
 					ResultSet rs = statement.executeQuery("SELECT * FROM country JOIN country_order ON country_order.country_id = country.id WHERE route_order IS NOT NULL AND country.deleted = 0 AND country_order.deleted = 0 ORDER BY route_order");) {
 				while (rs.next() == true) {
-					Country country = new Country(rs.getInt("id"), rs.getString("yago_id"), rs.getString("name"), rs.getString("label"));
-					country.setPosterImage(rs.getString("poster_label"));
+					Country country = new Country(rs.getInt("id"), rs.getString("yago_id"), rs.getString("name"), rs.getString("label"), rs.getBoolean("updated"));
+					country.posterImage = rs.getString("poster_label");
 					result.add(country);
 				}
 			} catch (SQLException e) {
@@ -131,26 +125,6 @@ public class Country {
 		return result;
 	}
 	
-	
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		dirty = true;
-		this.name = name;
-	}
-
-	public int getId() {
-		return id;
-	}
-
-	public void setId(int id) {
-		dirty = true;
-		this.id = id;
-	}
-
-
 
 	public void update() {
 		if (!dirty) return;
@@ -195,9 +169,6 @@ public class Country {
 
 	}
 
-
-	
-	
 	public void delete() {
 		Connection conn;
 		try {
@@ -216,11 +187,37 @@ public class Country {
 		}				
 	}
 
+	
+	public void updateFields(Country other) {
+		setName(other.getName());
+	}
+	
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		if (name != null && this.name != null && name.equals(this.name)) return;
+		dirty = true;
+		this.name = name;
+	}
+
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		if (id == this.id) return;
+		dirty = true;
+		this.id = id;
+	}
+
 	public String getLabel() {
 		return label;
 	}
 
 	public void setLabel(String label) {
+		if (label != null && this.label != null && label.equals(this.label)) return;
 		dirty = true;
 		this.label = label;
 	}
@@ -229,8 +226,12 @@ public class Country {
 		return posterImage;
 	}
 
-	public void setPosterImage(String posterImage) {
-		this.posterImage = posterImage;
+	public boolean isUpdated() {
+		return updated;
+	}
+
+	public void setUpdated(boolean updated) {
+		this.updated = updated;
 	}
 
 

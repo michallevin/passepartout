@@ -175,5 +175,10 @@ public class CountryOrder {
 		this.posterImage = posterImage;
 	}
 
+	public void replace() {
+		// TODO Auto-generated method stub
+		
+	}
+
 
 }

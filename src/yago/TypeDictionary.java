@@ -2,6 +2,7 @@ package yago;
 
 import java.util.HashMap;
 import java.util.List;
+
 import db.models.FactType;
 
 public class TypeDictionary {
@@ -33,14 +34,21 @@ public class TypeDictionary {
 			return typeMap.get(typeName).getId();
 		}
 		else {
-			FactType fact = new FactType(-1, typeName, isLiteral);
-			int id = fact.save();
+			FactType factType = new FactType(-1, typeName, isLiteral);
+			int id = factType.save();
 			if (id != -1) {
-				typeMap.put(typeName, fact);
+				typeMap.put(typeName, factType);
 			}
 			return id;
 		}
 
+	}
+
+	public FactType getType(String typeName) {
+		if (typeMap.containsKey(typeName)) {
+			return typeMap.get(typeName);
+		}
+		return null;
 	}
 	
 

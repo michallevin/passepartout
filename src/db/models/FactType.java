@@ -139,7 +139,7 @@ public class FactType {
 		try {
 			conn = JDBCConnection.getConnection();
 			try (Statement statement = conn.createStatement();
-					ResultSet rs = statement.executeQuery("SELECT * FROM fact_type JOIN fact_type_question_wording on fact_type_question_wording.fact_id = fact_type.id");) {
+					ResultSet rs = statement.executeQuery("SELECT * FROM fact_type LEFT JOIN fact_type_question_wording on fact_type_question_wording.fact_id = fact_type.id");) {
 				while (rs.next() == true) {
 					result.add(new FactType(rs.getInt("id"), rs.getString("name"), rs.getBoolean("is_literal"), rs.getString("question_wording")));
 				}
