@@ -52,10 +52,11 @@ public class FactType {
 		Connection conn;
 		try {
 			conn = JDBCConnection.getConnection();
-			try (Statement statement = conn.createStatement()){
-				statement.executeUpdate(String.format(""
-						+ INSERT, getTypeName(), isLiteral()), Statement.RETURN_GENERATED_KEYS);
-
+			try (PreparedStatement statement = conn.prepareStatement(INSERT, Statement.RETURN_GENERATED_KEYS)){
+				statement.setString(1, getTypeName());
+				statement.setBoolean(2, isLiteral());
+				statement.executeUpdate();
+	
 				try (ResultSet genKeys = statement.getGeneratedKeys()) {
 					if (genKeys.next()) {
 						int id = (int) genKeys.getLong(1);
@@ -79,12 +80,11 @@ public class FactType {
 		Connection conn;
 		try {
 			conn = JDBCConnection.getConnection();
-			try (Statement statement = conn.createStatement()){
+			try (PreparedStatement statement = conn.prepareStatement(UPDATE_BY_ID)){
+				statement.setString(1, typeName);
+				statement.setInt(2, id);
+				statement.executeUpdate();
 
-				statement.executeUpdate(String.format(""
-						+ UPDATE_BY_ID, InputHelper.santize(typeName), id));
-
-				
 			} catch (SQLException e) {
 				System.out.println("ERROR executeQuery - " + e.getMessage());
 			}
@@ -99,33 +99,33 @@ public class FactType {
 		Connection conn;
 		try {
 			conn = JDBCConnection.getConnection();
-			try (Statement statement = conn.createStatement()){
+			try (PreparedStatement statement = conn.prepareStatement(DELETE_BY_ID)){
+				statement.setInt(1, id);
+				statement.executeUpdate();
 
-				statement.executeUpdate(String.format(""
-						+ DELETE, id));
-
-				
 			} catch (SQLException e) {
 				System.out.println("ERROR executeQuery - " + e.getMessage());
 			}
 		} catch (IOException | ParseException e1) {
 			e1.printStackTrace();
-		}				
+		}
 	}
-	
-	
 	
 	public static FactType getRandom(boolean isLiteral) {
 		Connection conn;
 		try {
 			conn = JDBCConnection.getConnection();
-			try (Statement statement = conn.createStatement();
-					ResultSet rs = statement.executeQuery(String.format(SELECT_RANDOM, isLiteral ? "true" : "false"));) {
+			try (PreparedStatement statement = conn.prepareStatement(SElECT_RANDOM)) {
+				statement.setBoolean(1, isLiteral);
+			
+				try (ResultSet rs = statement.executeQuery()) {
+	
 				while (rs.next() == true) {
 					return new FactType(rs.getInt("id"),
 							rs.getString("name"),
 							rs.getBoolean("is_literal"),
 							rs.getString("question_wording"));
+				}
 				}
 			} catch (SQLException e) {
 				System.out.println("ERROR executeQuery - " + e.getMessage());
@@ -143,10 +143,11 @@ public class FactType {
 		Connection conn;
 		try {
 			conn = JDBCConnection.getConnection();
-			try (Statement statement = conn.createStatement();
-					ResultSet rs = statement.executeQuery(SELECT_ALL);) {
+			try (PreparedStatement statement = conn.prepareStatement(SELECT_ALL)) {
+				try (ResultSet rs = statement.executeQuery()) {
 				while (rs.next() == true) {
 					result.add(new FactType(rs.getInt("id"), rs.getString("name"), rs.getBoolean("is_literal"), rs.getString("question_wording")));
+				}
 				}
 			} catch (SQLException e) {
 				System.out.println("ERROR executeQuery - " + e.getMessage());
@@ -187,11 +188,13 @@ public class FactType {
 			Connection conn;
 			try {
 				conn = JDBCConnection.getConnection();
-				try (Statement statement = conn.createStatement();
-						ResultSet rs = statement.executeQuery(String.format(SELECT_BY_ID, id));) {
+				try (PreparedStatement statement = conn.prepareStatement(SELECT_BY_ID)) {
+				statement.setInt(1, id);
+				try (ResultSet rs = statement.executeQuery()) {
 					while (rs.next() == true) {
 						return new FactType(rs.getInt("id"), rs.getString("name"), rs.getBoolean("is_literal"), rs.getString("question_wording"));
 					}
+				}
 				} catch (SQLException e) {
 					System.out.println("ERROR executeQuery - " + e.getMessage());
 				}
