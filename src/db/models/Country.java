@@ -2,6 +2,7 @@ package db.models;
 
 import java.io.IOException;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -9,11 +10,26 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 
+
+
+
+
+
+
+
+
 import db.InputHelper;
 import db.JDBCConnection;
 
 public class Country {
 
+	private static final String DELETE_BY_ID = "UPDATE country SET deleted = 1, updated = 1 WHERE id = ?";
+	private static final String UPDATE_AFTER_IMPORT = "UPDATE country SET name = ?, label = ? WHERE id = ? and updated = 0";
+	private static final String UPDATE = "UPDATE country SET name = ?, label = ?, updated = 1 WHERE id = ?";
+	private static final String SELECT_BY_ORDER = "SELECT * FROM country JOIN country_order ON country_order.country_id = country.id WHERE route_order IS NOT NULL AND country.deleted = 0 AND country_order.deleted = 0 ORDER BY route_order";
+	private static final String SELECT_ALL = "SELECT * FROM country WHERE deleted = 0";
+	private static final String SELECT_BY_ID = "SELECT * FROM country WHERE deleted = 0 AND id = ?";
+	private static final String INSERT = "INSERT INTO country(yago_id, name) VALUES(?, ?)";
 	private String name;
 	private int id;
 	private String yagoId;
@@ -34,24 +50,23 @@ public class Country {
 	public static Country parseCountry(String yagoId, String name) {
 		return new Country(-1, yagoId, name, null, false);
 	}
-	
+
 	public void save() {
 		Connection conn;
-		try {
+		try{
 			conn = JDBCConnection.getConnection();
-			try (Statement statement = conn.createStatement()){
+			try (PreparedStatement statement = conn.prepareStatement(INSERT, Statement.RETURN_GENERATED_KEYS)){
 
-				statement.executeUpdate(String.format(""
-						+ "INSERT INTO country(yago_id, name) "
-						+ "VALUES('%s', '%s')", yagoId, getName().replace("'", "''")), Statement.RETURN_GENERATED_KEYS);
-
+				statement.setString(1, yagoId);
+				statement.setString(2, getName().replace("'", "''"));
+				statement.executeUpdate();
 				try (ResultSet genKeys = statement.getGeneratedKeys()) {
 					if (genKeys.next()) {
 						int id = (int) genKeys.getLong(1);
 						this.setId(id);
 					}
 				}
-				
+
 
 			} catch (SQLException e) {
 				System.out.println("ERROR executeQuery - " + e.getMessage());
@@ -60,18 +75,18 @@ public class Country {
 			e1.printStackTrace();
 		}
 		dirty = false;
-
-
 	}
-	
+
 	public static Country fetchById(int id) {
 		Connection conn;
 		try {
 			conn = JDBCConnection.getConnection();
-			try (Statement statement = conn.createStatement();
-					ResultSet rs = statement.executeQuery(String.format("SELECT * FROM country WHERE deleted = 0 AND id = %d", id));) {
-				while (rs.next() == true) {
-					return new Country(rs.getInt("id"), rs.getString("yago_id"), rs.getString("name"), rs.getString("label"), rs.getBoolean("updated"));
+			try (PreparedStatement statement = conn.prepareStatement(SELECT_BY_ID)){
+				statement.setInt(1, id);
+				try (ResultSet rs = statement.executeQuery()) {
+					while (rs.next() == true) {
+						return new Country(rs.getInt("id"), rs.getString("yago_id"), rs.getString("name"), rs.getString("label"), rs.getBoolean("updated"));
+					}
 				}
 			} catch (SQLException e) {
 				System.out.println("ERROR executeQuery - " + e.getMessage());
@@ -82,16 +97,17 @@ public class Country {
 		}
 		return null;
 	}
-	
+
 	public static List<Country> fetchAll() {
 		List<Country> result = new ArrayList<Country>();
 		Connection conn;
 		try {
 			conn = JDBCConnection.getConnection();
-			try (Statement statement = conn.createStatement();
-					ResultSet rs = statement.executeQuery("SELECT * FROM country WHERE deleted = 0");) {
-				while (rs.next() == true) {
-					result.add(new Country(rs.getInt("id"), rs.getString("yago_id"), rs.getString("name"), rs.getString("label"), rs.getBoolean("updated")));
+			try (PreparedStatement statement = conn.prepareStatement(SELECT_ALL)) {
+				try (ResultSet rs = statement.executeQuery()) {
+					while (rs.next() == true) {
+						result.add(new Country(rs.getInt("id"), rs.getString("yago_id"), rs.getString("name"), rs.getString("label"), rs.getBoolean("updated")));
+					}
 				}
 			} catch (SQLException e) {
 				System.out.println("ERROR executeQuery - " + e.getMessage());
@@ -108,12 +124,13 @@ public class Country {
 		Connection conn;
 		try {
 			conn = JDBCConnection.getConnection();
-			try (Statement statement = conn.createStatement();
-					ResultSet rs = statement.executeQuery("SELECT * FROM country JOIN country_order ON country_order.country_id = country.id WHERE route_order IS NOT NULL AND country.deleted = 0 AND country_order.deleted = 0 ORDER BY route_order");) {
-				while (rs.next() == true) {
-					Country country = new Country(rs.getInt("id"), rs.getString("yago_id"), rs.getString("name"), rs.getString("label"), rs.getBoolean("updated"));
-					country.posterImage = rs.getString("poster_label");
-					result.add(country);
+			try (PreparedStatement statement = conn.prepareStatement(SELECT_BY_ORDER)) {
+				try (ResultSet rs = statement.executeQuery()) {
+					while (rs.next() == true) {
+						Country country = new Country(rs.getInt("id"), rs.getString("yago_id"), rs.getString("name"), rs.getString("label"), rs.getBoolean("updated"));
+						country.posterImage = rs.getString("poster_label");
+						result.add(country);
+					}
 				}
 			} catch (SQLException e) {
 				System.out.println("ERROR executeQuery - " + e.getMessage());
@@ -124,7 +141,7 @@ public class Country {
 		}
 		return result;
 	}
-	
+
 
 	public void update() {
 		if (!dirty) return;
@@ -132,12 +149,12 @@ public class Country {
 		Connection conn;
 		try {
 			conn = JDBCConnection.getConnection();
-			try (Statement statement = conn.createStatement()){
+			try (PreparedStatement statement = conn.prepareStatement(UPDATE)){
+				statement.setString(1, name);
+				statement.setString(2, label);
+				statement.setInt(3, id);
+				statement.executeUpdate();
 
-				statement.executeUpdate(String.format(""
-						+ "UPDATE country SET name = '%s', label = '%s', updated = 1 WHERE id = %d", InputHelper.santize(name), InputHelper.santize(label), id));
-
-				
 			} catch (SQLException e) {
 				System.out.println("ERROR executeQuery - " + e.getMessage());
 			}
@@ -153,11 +170,11 @@ public class Country {
 		Connection conn;
 		try {
 			conn = JDBCConnection.getConnection();
-			try (Statement statement = conn.createStatement()){
-
-				statement.executeUpdate(String.format(""
-						+ "UPDATE country SET name = '%s', label = '%s' WHERE id = %d and updated = 0",
-						InputHelper.santize(name), InputHelper.santize(label), id));
+			try (PreparedStatement statement = conn.prepareStatement(UPDATE_AFTER_IMPORT)){
+				statement.setString(1, name);
+				statement.setString(2, label);
+				statement.setInt(3, id);
+				statement.executeUpdate();
 
 			} catch (SQLException e) {
 				System.out.println("ERROR executeQuery - " + e.getMessage());
@@ -173,12 +190,9 @@ public class Country {
 		Connection conn;
 		try {
 			conn = JDBCConnection.getConnection();
-			try (Statement statement = conn.createStatement()){
-
-				statement.executeUpdate(String.format(""
-						+ "UPDATE country SET deleted = 1, updated = 1 WHERE id = %d", InputHelper.santize(name), id));
-
-				
+			try (PreparedStatement statement = conn.prepareStatement(DELETE_BY_ID)){
+				statement.setInt(1, id);
+				statement.executeUpdate();
 			} catch (SQLException e) {
 				System.out.println("ERROR executeQuery - " + e.getMessage());
 			}
@@ -187,11 +201,11 @@ public class Country {
 		}				
 	}
 
-	
+
 	public void updateFields(Country other) {
 		setName(other.getName());
 	}
-	
+
 	public String getName() {
 		return name;
 	}
