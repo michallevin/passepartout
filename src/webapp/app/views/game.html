@@ -3,7 +3,14 @@
 
 <link href='http://fonts.googleapis.com/css?family=Cinzel'
 	rel='stylesheet' type='text/css'>
-
+<style>
+	.red {
+		color:red !important;
+	}
+	.green{
+		color:green !important;
+	}
+</style>
 <div class="jumbotron"
 	style="background: url(images/world_map.jpg) top center" >
 	
@@ -32,9 +39,9 @@
 					<b>{{question.questionText}}?</b>
 				</h3>
 				<div ng-repeat="answer in question.options">
-					<h4 style="font-family: 'Cinzel', serif;"
+					<h4 class="{{getAnswerClass($index)}}" style="font-family: 'Cinzel', serif;"
 						ng-click="guessAnswer($index)">
-						<b>{{answer}}</b>
+						<b>{{getAnswerText(answer)}}</b>
 					</h4>
 				</div>
 
