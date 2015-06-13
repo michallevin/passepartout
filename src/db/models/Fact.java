@@ -258,12 +258,14 @@ public class Fact {
 	}
 
 	public String getReadableData(String countryName) {
+		 
 		if (label != null && label.length() > 0)
-			return label.replace(countryName, "").replaceAll("\\(.*?\\)", "");
+			return StringEscapeUtils.unescapeJava(label.replace(countryName, "").replaceAll("\\(.*?\\)", ""));
 		else 
-			return data.replace("<", "").replace(">", "").replace("_", " ").replace("[", "").replace("]", "")
+			return StringEscapeUtils.unescapeJava(
+					data.replace("<", "").replace(">", "").replace("_", " ").replace("[", "").replace("]", "")
 				.replace("}", "").replace("{", "").replace("^^xsd:integer", "").replace("\"", "")
-				.replaceFirst("[a-zA-Z][a-zA-Z]/", "").replace(countryName, "").replaceAll("\\(.*?\\)", "");
+				.replaceFirst("[a-zA-Z][a-zA-Z]/", "").replace(countryName, "").replaceAll("\\(.*?\\)", ""));
 	}
 	
 	public void update() {

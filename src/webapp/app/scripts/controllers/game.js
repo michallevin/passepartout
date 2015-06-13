@@ -15,17 +15,7 @@ angular.module('passepartoutApp')
 	$scope.score = 0;
 	$scope.guessed=-1;
 
-
-//	$scope.init = function() {
-//		//$http(localhost:8080/rest/question)
-//		$Questions.getQuestions();
-//		$scope.questions = $Questions.questions;
-//
-//	}
-
-	
 	$scope.questions=$Questions.questions;
-	
 	
 	$scope.getAnswerText = function(text) {
 
