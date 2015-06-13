@@ -16,8 +16,14 @@ public class CountryOrder {
 
 	private static final String DELETE = "UPDATE country_order SET deleted = 1, updated = 1 WHERE id = ?";
 	private static final String UPDATE_BY_ID = "UPDATE country_order SET route_name = ?, country_id = ?, route_order = ?, updated = 1 WHERE id = ?";
-	private static final String SELECT_ALL = "SELECT * FROM country_order WHERE deleted = 0";
-	private static final String SELECT_BY_ID = "SELECT * FROM country_order WHERE deleted = 0 AND id = ?";
+	private static final String SELECT_ALL = "SELECT country_order.id, country_order.country_id " +
+						 "country_order.route_order, country_order.poster_image, " +
+			                         "country_order.route_name " + 
+			                         "FROM country_order WHERE deleted = 0";
+	private static final String SELECT_BY_ID = "SELECT country_order.id, country_order.country_id " +
+						   "country_order.route_order, country_order.poster_image, " +
+			                           "country_order.route_name " +
+			                           "FROM country_order WHERE deleted = 0 AND id = ?";
 	private static final String INSERT = "INSERT INTO country_order(country_id, route_order, poster_image, route_name) VALUES(?, ?, ?, ?)";
 	private int id;
 	private int countryId;
@@ -82,7 +88,11 @@ public class CountryOrder {
 				statement.setInt(1, id);
 				try (ResultSet rs = statement.executeQuery()) {
 					while (rs.next() == true) {
-						return new CountryOrder(rs.getInt("id"), rs.getInt("country_id"), rs.getInt("route_order"),  rs.getString("poster_image"), rs.getString("route_name"));
+						return new CountryOrder(rs.getInt("id"),
+									rs.getInt("country_id"),
+									rs.getInt("route_order"),
+									rs.getString("poster_image"),
+									rs.getString("route_name"));
 					}
 				}
 			} catch (SQLException e) {
@@ -103,7 +113,11 @@ public class CountryOrder {
 			try (PreparedStatement statement = conn.prepareStatement(SELECT_ALL)){
 				try (ResultSet rs = statement.executeQuery()) {
 					while (rs.next() == true) {
-						result.add(new CountryOrder(rs.getInt("id"), rs.getInt("country_id"), rs.getInt("route_order"),  rs.getString("poster_image"), rs.getString("route_name")));
+						result.add(new CountryOrder(rs.getInt("id"),
+									    rs.getInt("country_id"),
+									    rs.getInt("route_order"), 
+									    rs.getString("poster_image"),
+									    rs.getString("route_name")));
 					}
 				}
 			} catch (SQLException e) {
