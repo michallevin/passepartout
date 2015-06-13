@@ -14,6 +14,11 @@ import db.JDBCConnection;
 
 public class FactTypeQuestionWording {
 
+	private static final String DELETE = "UPDATE fact_type_question_wording SET deleted = 1, updated = 1 WHERE id = ?";
+	private static final String UPDATE_BY_ID = "UPDATE fact_type_question_wording SET question_wording = ?, question_id = ? updated = 1 WHERE id = ?";
+	private static final String SELECT_ALL = "SELECT * FROM fact_type_question_wording WHERE deleted = 0";
+	private static final String SELECT_BY_ID = "SELECT * FROM fact_type_question_wording WHERE deleted = 0 AND id = ?";
+	private static final String INSERT = "INSERT INTO fact_type_question_wording(question_id, question_wording) VALUES(?, ?)";
 	private int id;
 	private int questionId;
 	private String questionWording;
@@ -39,8 +44,7 @@ public class FactTypeQuestionWording {
 				.executeUpdate(
 						String.format(
 								""
-										+ "INSERT INTO fact_type_question_wording(question_id, question_wording) "
-										+ "VALUES('%s', '%s')",
+										+ INSERT,
 										questionId, getQuestion_wording()
 										.replace("'", "''")),
 										Statement.RETURN_GENERATED_KEYS);
@@ -68,7 +72,7 @@ public class FactTypeQuestionWording {
 			try (Statement statement = conn.createStatement();
 					ResultSet rs = statement
 							.executeQuery(String
-									.format("SELECT * FROM fact_type_question_wording WHERE deleted = 0 AND id = %d",
+									.format(SELECT_BY_ID,
 											id));) {
 				while (rs.next() == true) {
 					return new FactTypeQuestionWording(rs.getInt("id"),
@@ -92,7 +96,7 @@ public class FactTypeQuestionWording {
 			conn = JDBCConnection.getConnection();
 			try (Statement statement = conn.createStatement();
 					ResultSet rs = statement
-							.executeQuery("SELECT * FROM fact_type_question_wording WHERE deleted = 0");) {
+							.executeQuery(SELECT_ALL);) {
 				while (rs.next() == true) {
 					result.add(new FactTypeQuestionWording(rs.getInt("id"), rs
 							.getInt("question_id"), rs
@@ -116,7 +120,7 @@ public class FactTypeQuestionWording {
 
 				statement
 				.executeUpdate(String
-						.format("UPDATE fact_type_question_wording SET question_wording = '%s', question_id = %d updated = 1 WHERE id = %d",
+						.format(UPDATE_BY_ID,
 								InputHelper.santize(questionWording),
 								questionId, id));
 
@@ -136,7 +140,7 @@ public class FactTypeQuestionWording {
 
 				statement
 				.executeUpdate(String
-						.format("UPDATE fact_type_question_wording SET deleted = 1, updated = 1 WHERE id = %d",
+						.format(DELETE,
 								id));
 
 			} catch (SQLException e) {
