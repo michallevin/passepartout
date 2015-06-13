@@ -16,9 +16,9 @@ public class User {
 
 	private static final String DELETE_BY_ID = "UPDATE user SET deleted = 1, updated = 1 WHERE id = ?";
 	private static final String UPDATE_BY_ID = "UPDATE user SET name = ?, updated = 1 WHERE id = ?";
-	private static final String SELECT_ALL = "SELECT * FROM user WHERE deleted = 0";
-	private static final String SELECT_BY_NAME = "SELECT * FROM user WHERE deleted = 0 AND name = ?";
-	private static final String SELECT_BY_ID = "SELECT * FROM user WHERE deleted = 0 AND id = ?";
+	private static final String SELECT_ALL = "SELECT id, name FROM user WHERE deleted = 0";
+	private static final String SELECT_BY_NAME = "SELECT id, name FROM user WHERE deleted = 0 AND name = ?";
+	private static final String SELECT_BY_ID = "SELECT id, name FROM user WHERE deleted = 0 AND id = ?";
 	private static final String INSERT = "INSERT INTO user (name) VALUES (?)";
 
 	private String name;
