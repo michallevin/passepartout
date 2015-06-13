@@ -14,6 +14,7 @@ angular.module('passepartoutApp')
 	$scope.lives = 3;
 	$scope.score = 0;
 	$scope.guessed=-1;
+	$scope.gameOver=0;
 
 
 //	$scope.init = function() {
@@ -52,10 +53,10 @@ angular.module('passepartoutApp')
 		$scope.guessed=index;
 
 		if (index == $scope.questions[$scope.currentQuestion].answerIndex) { //yes!
-			setTimeout(function(){$scope.currentQuestion += 1; $scope.guessed=-1;$scope.$apply();}, 3000);
-			
-			
-			
+			setTimeout(function(){$scope.currentQuestion += 1; $scope.guessed=-1;if ($scope.currentQuestion==$scope.questions.length) {
+				console.log("insideeee");
+				$scope.gameOver=1;
+			}$scope.$apply();}, 1000);
 			$scope.score+=$scope.questions[$scope.currentQuestion].score;
 		}
 		else { //no!
@@ -66,17 +67,26 @@ angular.module('passepartoutApp')
 					$scope.currentQuestion += 1;
 					}
 				$scope.guessed=-1;
+				if ($scope.currentQuestion==$scope.questions.length) {
+					console.log("insideeee")
+					$scope.gameOver=1;
+				}
 				$scope.$apply()
 
-				}, 3000);
+				}, 1000);
+		}
+		console.log($scope.currentQuestion)
+		console.log($scope.questions.length)
+	
 			
-	}
+	
 	}
 	
 	
 	$scope.submitScore = function() {
 		$User.setHighscore($scope.score)
 		$location.path('/highscores');
+		$scope.gameOver=0;
 	}
 	
 	$scope.startOver= function() {
@@ -89,13 +99,14 @@ angular.module('passepartoutApp')
 			$scope.lives = 3;
 			$scope.score = 0;
 		});
-
+		$scope.gameOver=0;
 	}
 	
 	$scope.endGame = function() {
 		$scope.currentQuestion = 0;
 		$scope.lives = 3;
 		$scope.score=0;
+		$scope.gameOver=0;
 		$location.path('/');
 	}
 

@@ -16,6 +16,11 @@ angular.module('passepartoutApp')
 	};
 
 	$scope.startGame = function() {
+		
+		if (!$scope.username.name) {
+			alert("You must choose a username!")
+			return;
+		}
 		console.log($scope.username.name);
 		$User.name=$scope.username.name;
 		$scope.loading = true;
