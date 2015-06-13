@@ -48,7 +48,7 @@ passepartoutApp.user = angular.module('passepartoutApp.user',[])
 	function $User(){
 		this.id=-1;
 		this.name;
-		this.score;
+	
 		
 	}
 
@@ -70,14 +70,17 @@ passepartoutApp.user = angular.module('passepartoutApp.user',[])
 			
 		}).bind(this))}
 
-	$User.prototype.setHighscore = function(){
+	$User.prototype.setHighscore = function(user_score){
 
 		$http({
-			url : baseApiLocation + "/highscore",
+			url : baseApiLocation + "highscore",
 			method : "POST",
-			params : {
+			headers : {
+				'Content-Type' : 'application/x-www-form-urlencoded',
+			},
+			data : {
 				user_id : this.id,
-				user_score : this.score
+				score : user_score
 			}
 		}).success((function(data) {
 
@@ -95,13 +98,8 @@ passepartoutApp.highscores = angular.module('passepartoutApp.highscores',['passe
 
 	function $Highscores(){
 		this.highscores=[];
-		this.doneGettingData = false;
 	}
 
-
-	$Highscores.prototype.isDataFromServerLoaded = function(){
-		return this.doneGettingData;
-	}
 
 	$Highscores.prototype.getHighscores = function(){
 
@@ -112,20 +110,9 @@ passepartoutApp.highscores = angular.module('passepartoutApp.highscores',['passe
 			}
 		}).success((function(data) {
 
-			var highscores_data = data;
-			this.highscores=[];
-			var response = highscoes_data['response'];
-			for (index = 0; index < response.length; ++index) {
-				score = JSON.parse(response[index]);
-
-				current_score = {
-						user_id : JSON.parse(score['user_id']),
-						score : JSON.parse(question['score'])
-				};
-
-				this.highscores.push(current_score);
-			};
-			this.doneGettingData=true;
+			this.highscores= data;
+			
+	
 		}).bind(this))}
 
 	return new $Highscores()

@@ -8,10 +8,11 @@
  * Controller of the passepartoutApp
  */
 angular.module('passepartoutApp')
-.controller('GameCtrl', function ($scope, $http, $Questions) {
+.controller('GameCtrl', function ($scope, $http, $Questions, $User, $location) {
 
 	$scope.currentQuestion = 0;
-	$scope.lives = 3;
+	$scope.lives = 0;
+	$scope.score=0;
 
 
 //	$scope.init = function() {
@@ -28,13 +29,38 @@ angular.module('passepartoutApp')
 		if (index == $scope.questions[$scope.currentQuestion].answerIndex) {
 			alert("Yes!");
 			$scope.currentQuestion += 1;
+			$scope.score+=100;
 		}
 		else {
 			alert("NO!");
-			$scope.currentQuestion += 1;
 			$scope.lives -= 1;
-		}
-
+			if ($scope.lives>0) {
+				$scope.currentQuestion += 1; }
+					}
+	}
+	
+	
+	$scope.submitScore = function() {
+		$User.setHighscore($scope.score)
+		//go to high score page
+	}
+	
+	$scope.startOver= function() {
+		$scope.loading = true;
+		$User.getUserId(function() {
+			console.log("loaded questions");
+			$scope.loading = false;
+			$scope.questions=$Questions.questions;
+			$scope.currentQuestion = 0;
+			$scope.lives = 3;
+		});
+	}
+	
+	$scope.endGame = function() {
+		$scope.currentQuestion = 0;
+		$scope.lives = 3;
+		$scope.score=0;
+		$location.path('/');
 	}
 
 
