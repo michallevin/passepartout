@@ -29,7 +29,7 @@ angular.module('passepartoutApp')
 		if (index == $scope.questions[$scope.currentQuestion].answerIndex) {
 			alert("Yes!");
 			$scope.currentQuestion += 1;
-			$scope.score+=100;
+			$scope.score+=$scope.questions[$scope.currentQuestion].score;
 		}
 		else {
 			alert("NO!");
