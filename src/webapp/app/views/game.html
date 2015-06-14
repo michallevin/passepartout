@@ -21,22 +21,24 @@
 		<h4 style="font-family: 'Fredericka the Great', cursive;">
 			<b>Lives: {{lives}} </b>
 		</h4>
-		
+		<h4 style="font-family: 'Fredericka the Great', cursive;">
+			<b>Current Question: {{currentQuestion+1}} </b>
+		</h4>
 
 		<div ng-repeat="question in questions"
 			ng-show="$index == currentQuestion" style="">
-			<h1 style="font-family: 'Fredericka the Great', cursive;">
-				<b>Welcome to {{question.label}}!</b>
+			<h1 style="font-family: 'Fredericka the Great', cursive;" ng-hide="$index % 1== 1">
+				<b>Welcome to {{questions[$index-1].label}}!</b>
 			</h1>
 			<p class="lead">
-				<img src="/images/{{question.posterImage}}"
-					 alt="Passepartout" width="30%" height="30%"
-				>
+				<img src="images/belguim1.jpg"
+					/*{{question.photo}}*/  alt="Passepartout" width="30%" height="30%"
+					ng-hide="$index % 1== 1">
 			</p>
 			<div
 				style="background: url(http://www.texturepalace.com/wp-content/uploads/vintage-paper-texture-for-photoshop-3.jpg) top center; border-style: solid; border-width: 5px;">
 				<h3 style="font-family: 'Fredericka the Great', cursive;">
-					<b>{{question.questionText}}</b>
+					<b>{{question.questionText}}?</b>
 				</h3>
 				<div ng-repeat="answer in question.options">
 
@@ -45,14 +47,21 @@
 						<b>{{getAnswerText(answer)}}</b>
 					</h4>
 				</div>
+
+
+
+
 			</div>
 		</div>
 
 	</div>
 
-	<div ng-show="!loading && lives==0">
-		<h1 style="font-family: 'Fredericka the Great', cursive;" ng-hide="$index % 1== 1">
+	<div ng-show="gameOver==1 || lives==0">
+		<h1 ng-show="lives==0" style="font-family: 'Fredericka the Great', cursive;">
 			<b>Game over!</b>
+		</h1>
+			<h1 ng-show="lives!=0" style="font-family: 'Fredericka the Great', cursive;">
+			<b>Congratulations! You've gone around the world in 80 days!</b>
 		</h1>
 		<h2>
 			Your score is {{score}}
@@ -67,12 +76,6 @@
 		<h4 style="font-family: 'Fredericka the Great', cursive;" ng-click="endGame()">
 			<b>Menu</b>
 		</h4>
-	
 	</div>
-	<div ng-show="loading" style="text-align:center; margin-top:100px;">
-			<img src='images/ajax-loader.gif'><br/>
-			Loading...
-		</div>
-
 
 </div>
