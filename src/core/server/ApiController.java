@@ -53,15 +53,15 @@ public class ApiController {
 		Thread t = new Thread() {
 			public void run() {
 				if (!YagoImport.isImporting()) {
-//					YagoImport.startImport(
-//							new String[] {
-//									"links", 
-//									//"countries", 
-//									"attributes", 
-//									"facts", 
-//									"literalFacts", 
-//									"labels"
-//							});
+					YagoImport.startImport(
+							new String[] {
+									"links", 
+									"countries", 
+									"attributes", 
+									"facts", 
+									"literalFacts", 
+									"labels"
+							});
 					
 					GameConfigInit.setCountryOrder();
 					GameConfigInit.setQuestionWordings();
@@ -134,8 +134,8 @@ public class ApiController {
 	}
 
 	@RequestMapping(value="/rest/highscore", method=RequestMethod.POST)
-	public Highscore addHighScore(@RequestParam("user_id") Integer user_id, @RequestParam("score") Integer score) {
-		Highscore highscore = new Highscore(user_id, score);
+	public Highscore addHighScore(@RequestParam("user_id") Integer userId, @RequestParam("score") Integer score) {
+		Highscore highscore = new Highscore(userId, score);
 		highscore.save();
 		return highscore;
 	}
@@ -146,10 +146,10 @@ public class ApiController {
 	}
 
 	@RequestMapping(value="/rest/highscore/{id}", method=RequestMethod.PUT)
-	public Highscore editHighscore(@PathVariable Integer id,@RequestParam("user_id") Integer user_id,@RequestParam("user_id") Integer score) {
+	public Highscore editHighscore(@PathVariable Integer id,@RequestParam("user_id") Integer userId, @RequestParam("score") Integer score) {
 		Highscore highscore = Highscore.fetchById(id);
 		highscore.setScore(score);
-		highscore.setUserId(user_id);
+		highscore.setUserId(userId);
 		highscore.update();
 		return highscore;
 	}
@@ -237,7 +237,7 @@ public class ApiController {
 		return user;
 	}
 
-	@RequestMapping(value="/rest/user/login", method=RequestMethod.GET)
+	@RequestMapping(value="/rest/user/login", method=RequestMethod.POST)
 	public User login(@RequestParam("name") String name) {
 		// Fetch user by name, or create user if it doesn't exist
 		User user = User.fetchByName(name);
@@ -340,9 +340,9 @@ public class ApiController {
 
 	@RequestMapping(value="/rest/fact_type_question_wording", method=RequestMethod.POST)
 	public FactTypeQuestionWording addFactTypeQuestionWording(
-			@RequestParam("question_id") Integer question_id,
-			@RequestParam("question_wording") String question_wording) {
-		FactTypeQuestionWording factTypeQuestionWording = new FactTypeQuestionWording(question_id,question_wording);
+			@RequestParam("question_id") Integer questionId,
+			@RequestParam("question_wording") String questionWording) {
+		FactTypeQuestionWording factTypeQuestionWording = new FactTypeQuestionWording(questionId, questionWording);
 		factTypeQuestionWording.save();
 		return factTypeQuestionWording;
 	}
@@ -353,10 +353,10 @@ public class ApiController {
 	}
 
 	@RequestMapping(value="/rest/fact_type_question_wording/{id}", method=RequestMethod.PUT)
-	public FactTypeQuestionWording editFactTypeQuestionWording(@PathVariable Integer id,@RequestParam("factId") Integer factId, @RequestParam("question_wording") String question_wording) {
+	public FactTypeQuestionWording editFactTypeQuestionWording(@PathVariable Integer id, @RequestParam("factId") Integer factId, @RequestParam("question_wording") String questionWording) {
 		FactTypeQuestionWording factTypeQuestionWording = FactTypeQuestionWording.fetchById(id);
 		factTypeQuestionWording.setFactId(factId);
-		factTypeQuestionWording.setQuestionWording(question_wording);
+		factTypeQuestionWording.setQuestionWording(questionWording);
 		factTypeQuestionWording.update();
 		return factTypeQuestionWording;
 	}
@@ -405,8 +405,7 @@ public class ApiController {
 	@RequestMapping(value="/rest/fact/{id}", method=RequestMethod.DELETE)
 	public Fact deleteFact(@PathVariable Integer id) {
 		Fact fact = Fact.fetchById(id);
-		//fact.delete();
-		//TODO
+		fact.delete();
 		return fact;
 	}
 

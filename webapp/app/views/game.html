@@ -1,0 +1,81 @@
+
+<link href='http://fonts.googleapis.com/css?family=Fredericka+the+Great' rel='stylesheet' type='text/css'>
+
+<link href='http://fonts.googleapis.com/css?family=Cinzel'
+	rel='stylesheet' type='text/css'>
+<style>
+	.red {
+		color:red !important;
+	}
+	.green{
+		color:green !important;
+	}
+</style>
+<div class="jumbotron" ng-show="!loading"
+	style="background: url(images/world_map.jpg) top center" >
+	
+	<div  ng-show="lives > 0">
+		<h4 style="font-family: 'Fredericka the Great', cursive;" >
+			<b>Score : {{score}} </b>
+		</h4>
+		<h4 style="font-family: 'Fredericka the Great', cursive;">
+			<b>Lives: {{lives}} </b>
+		</h4>
+		<h4 style="font-family: 'Fredericka the Great', cursive;">
+			<b>Current Question: {{currentQuestion+1}} </b>
+		</h4>
+
+		<div ng-repeat="question in questions"
+			ng-show="$index == currentQuestion" style="">
+			<h1 style="font-family: 'Fredericka the Great', cursive;">
+				<b>Welcome to {{question.label}}!</b>
+			</h1>
+			<p class="lead">
+				<img src="images/{{question.posterImage}}"
+				 alt="Passepartout" width="30%" height="30%"
+				>
+			</p>
+			<div
+				style="background: url(http://www.texturepalace.com/wp-content/uploads/vintage-paper-texture-for-photoshop-3.jpg) top center; border-style: solid; border-width: 5px;">
+				<h3 style="font-family: 'Fredericka the Great', cursive;">
+					<b>{{question.questionText}}</b>
+				</h3>
+				<div ng-repeat="answer in question.options">
+
+					<h4 class="{{getAnswerClass($index)}}" style="font-family: 'Fredericka the Great', cursive;"
+						ng-click="guessAnswer($index)">
+						<b>{{answer}}</b>
+					</h4>
+				</div>
+			</div>
+		</div>
+
+	</div>
+
+	<div ng-show="gameOver==1 || lives==0">
+		<h1 ng-show="lives==0" style="font-family: 'Fredericka the Great', cursive;">
+			<b>Game over!</b>
+		</h1>
+			<h1 ng-show="lives!=0" style="font-family: 'Fredericka the Great', cursive;">
+			<b>Congratulations! You've gone around the world in 80 days!</b>
+		</h1>
+		<h2>
+			Your score is {{score}}
+		</h2>
+		<br/>
+		<h4 style="font-family: 'Fredericka the Great', cursive;" ng-click="submitScore()">
+			<b>Submit highscore</b>
+		</h4>
+		<h4 style="font-family: 'Fredericka the Great', cursive;" ng-click="startOver()">
+			<b>Start over</b>
+		</h4>
+		<h4 style="font-family: 'Fredericka the Great', cursive;" ng-click="endGame()">
+			<b>Menu</b>
+		</h4>
+	</div>
+
+</div>
+<div ng-show="loading" style="text-align:center; margin-top:100px;">
+<img src='images/ajax-loader.gif'><br/>
+Loading...</div>
+

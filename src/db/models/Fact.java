@@ -19,7 +19,7 @@ import db.JDBCConnection;
 public class Fact {
 
 	private static final String UPDATE_BY_ID_FROM_IMPORT = "UPDATE fact SET country_id = ?, data = ?, type_id = ?, rank = ?, label= ? WHERE id = ? and updated = 0";
-	private static final String UPDATE_BY_ID = "UPDATE fact SET country_id = ?, data = ?, type_id = ?, rank = ?, label= ? updated = 1 WHERE id = ?";
+	private static final String UPDATE_BY_ID = "UPDATE fact SET country_id = ?, data = ?, type_id = ?, rank = ?, label = ?, updated = 1 WHERE id = ?";
 	private static final String SELECT_BY_ID = "SELECT fact.id, fact.yago_id, fact.country_id, "
 			+ "fact.data, fact.type_id, fact.label, fact.rank, fact.updated "
 			+ "FROM fact WHERE deleted = 0 AND id = ?";

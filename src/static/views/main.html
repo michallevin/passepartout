@@ -1,0 +1,47 @@
+
+<link href='http://fonts.googleapis.com/css?family=Cinzel'
+	rel='stylesheet' type='text/css'>
+<link href='http://fonts.googleapis.com/css?family=Josefin+Sans'
+	rel='stylesheet' type='text/css'>
+<link href='http://fonts.googleapis.com/css?family=Fredericka+the+Great' rel='stylesheet' type='text/css'>
+
+<div class="jumbotron" ng-show="!loading"
+	style="background: url(images/world_map.jpg) top center">
+	<h1 style="font-family: 'Cinzel', serif;">
+		<b>Passepartout</b>
+	</h1>
+	<p class="lead" style="font-family: 'Cinzel', serif;">
+		<img src="images/passepartout.jpg" alt="Passepartout" style="border-radius: 80%"><br>
+		<b>Around the world in 80 days</b>
+	</p>
+
+	<form
+		style="background: url(http://www.texturepalace.com/wp-content/uploads/vintage-paper-texture-for-photoshop-3.jpg) top center; border-style: solid; border-width: 1px; font-family: 'Fredericka the Great', cursive;"
+		name="myForm" ng-show="!loading">
+		<label><p>
+				<b>Username:</b>
+			</p> <input type="text" name="input" ng-model="username.name"
+			ng-pattern="username.word" required ng-trim="false"> </label> <span
+			class="error" ng-show="myForm.input.$error.required">
+			Required!</span> <span class="error" ng-show="myForm.input.$error.pattern">
+			Single word only!</span>
+
+		<p style="text-align: center">
+			<a class="col btn" ng-click="gotoHighScores()"  style="width: 30%" ><img
+				src="images/highscores.png"/ style="width: 80%"><br> Wall Of Fame</a> <a class="col btn" style="width: 35%"
+				ng-click="gotoIntro()"> <img src="images/btn.png"
+				style="text-align: center; width: 100%" height="50%" alt="submit" /><br>Let's Travel!
+			</a> <a class="col btn" style="width: 30%" ng-click="gotoAdmin()"> <img
+				src="images/admin-compass.png"
+				style="text-align: center; width: 80%" height="40%" alt="submit" />
+				<br>Staff Only
+			</a>
+		</p>
+	</form>
+
+</div>
+
+<div ng-show="loading" style="text-align:center; margin-top:100px;">
+<img src='images/ajax-loader.gif'><br/>
+Loading...</div>
+

@@ -17,13 +17,14 @@ public class FactType {
 	private static final String SELECT_BY_ID = "SELECT fact_type.id, fact_type.name, fact_type.is_literal, "
 			+ "question_wording FROM fact WHERE deleted = 0 AND id = ?";
 	private static final String SELECT_ALL = "SELECT fact_type.id, fact_type.name, fact_type.is_literal, "
-			+ "question_wording FROM fact_type LEFT JOIN fact_type_question_wording ON fact_type_question_wording.fact_id = fact_type.id";
+			+ "question_wording FROM fact_type LEFT JOIN fact_type_question_wording ON fact_type_question_wording.fact_id = fact_type.id"
+			+ "WHERE fact_type.deleted = 0 and fact_type_question_wording.deleted = 0";
 	
 	private static final String SELECT_RANDOM = "SELECT fact_type.id, fact_type.name, fact_type.is_literal,"
 			+ " fact_type_question_wording.question_wording FROM fact_type "
 			+ " JOIN fact_type_question_wording on fact_type_question_wording.fact_id = fact_type.id"
 			+ " WHERE question_wording IS NOT NULL"
-			+ " and is_literal = ?"
+			+ " and is_literal = ? and fact_type.deleted = 0 and fact_type_question_wording.deleted = 0" 
 			+ " ORDER BY RAND() LIMIT 0,1";
 	private static final String DELETE_BY_ID = "UPDATE fact_type SET deleted = 1, updated = 1 WHERE id = ?";
 	private static final String UPDATE_BY_ID = "UPDATE fact_type SET name = ?, updated = 1 WHERE id = ?";
