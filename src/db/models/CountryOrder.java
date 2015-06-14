@@ -16,14 +16,14 @@ public class CountryOrder {
 
 	private static final String DELETE = "UPDATE country_order SET deleted = 1, updated = 1 WHERE id = ?";
 	private static final String UPDATE_BY_ID = "UPDATE country_order SET route_name = ?, country_id = ?, route_order = ?, updated = 1 WHERE id = ?";
-	private static final String SELECT_ALL = "SELECT country_order.id, country_order.country_id " +
-						 "country_order.route_order, country_order.poster_image, " +
-			                         "country_order.route_name " + 
-			                         "FROM country_order WHERE deleted = 0";
-	private static final String SELECT_BY_ID = "SELECT country_order.id, country_order.country_id " +
-						   "country_order.route_order, country_order.poster_image, " +
-			                           "country_order.route_name " +
-			                           "FROM country_order WHERE deleted = 0 AND id = ?";
+	private static final String SELECT_ALL = "SELECT country_order.id, country_order.country_id "
+			+ "country_order.route_order, country_order.poster_image, "
+			+ "country_order.route_name "
+			+ "FROM country_order WHERE deleted = 0";
+	private static final String SELECT_BY_ID = "SELECT country_order.id, country_order.country_id "
+			+ "country_order.route_order, country_order.poster_image, "
+			+ "country_order.route_name "
+			+ "FROM country_order WHERE deleted = 0 AND id = ?";
 	private static final String INSERT = "INSERT INTO country_order(country_id, route_order, poster_image, route_name) VALUES(?, ?, ?, ?)";
 	private int id;
 	private int countryId;
@@ -31,7 +31,8 @@ public class CountryOrder {
 	private String routeName;
 	private String posterImage;
 
-	public CountryOrder(int id, int countryId, int routeOrder, String posterImage, String routeName) {
+	public CountryOrder(int id, int countryId, int routeOrder,
+			String posterImage, String routeName) {
 
 		this.setId(id);
 		this.countryId = countryId;
@@ -40,7 +41,8 @@ public class CountryOrder {
 		this.setName(routeName);
 	}
 
-	public CountryOrder(int countryId, int routeOrder, String posterImage, String routeName) {
+	public CountryOrder(int countryId, int routeOrder, String posterImage,
+			String routeName) {
 
 		this.countryId = countryId;
 		this.routeOrder = routeOrder;
@@ -49,13 +51,12 @@ public class CountryOrder {
 
 	}
 
-
-
 	public void save() {
 		Connection conn;
 		try {
 			conn = JDBCConnection.getConnection();
-			try (PreparedStatement statement = conn.prepareStatement(INSERT, Statement.RETURN_GENERATED_KEYS)){
+			try (PreparedStatement statement = conn.prepareStatement(INSERT,
+					Statement.RETURN_GENERATED_KEYS)) {
 
 				statement.setInt(1, countryId);
 				statement.setInt(2, routeOrder);
@@ -70,7 +71,6 @@ public class CountryOrder {
 					}
 				}
 
-
 			} catch (SQLException e) {
 				System.out.println("ERROR executeQuery - " + e.getMessage());
 			}
@@ -84,15 +84,16 @@ public class CountryOrder {
 		Connection conn;
 		try {
 			conn = JDBCConnection.getConnection();
-			try (PreparedStatement statement = conn.prepareStatement(SELECT_BY_ID)){
+			try (PreparedStatement statement = conn
+					.prepareStatement(SELECT_BY_ID)) {
 				statement.setInt(1, id);
 				try (ResultSet rs = statement.executeQuery()) {
 					while (rs.next() == true) {
 						return new CountryOrder(rs.getInt("id"),
-									rs.getInt("country_id"),
-									rs.getInt("route_order"),
-									rs.getString("poster_image"),
-									rs.getString("route_name"));
+								rs.getInt("country_id"),
+								rs.getInt("route_order"),
+								rs.getString("poster_image"),
+								rs.getString("route_name"));
 					}
 				}
 			} catch (SQLException e) {
@@ -110,14 +111,15 @@ public class CountryOrder {
 		Connection conn;
 		try {
 			conn = JDBCConnection.getConnection();
-			try (PreparedStatement statement = conn.prepareStatement(SELECT_ALL)){
+			try (PreparedStatement statement = conn
+					.prepareStatement(SELECT_ALL)) {
 				try (ResultSet rs = statement.executeQuery()) {
 					while (rs.next() == true) {
-						result.add(new CountryOrder(rs.getInt("id"),
-									    rs.getInt("country_id"),
-									    rs.getInt("route_order"), 
-									    rs.getString("poster_image"),
-									    rs.getString("route_name")));
+						result.add(new CountryOrder(rs.getInt("id"), rs
+								.getInt("country_id"),
+								rs.getInt("route_order"), rs
+										.getString("poster_image"), rs
+										.getString("route_name")));
 					}
 				}
 			} catch (SQLException e) {
@@ -154,13 +156,12 @@ public class CountryOrder {
 		this.id = id;
 	}
 
-
-
 	public void update() {
 		Connection conn;
 		try {
 			conn = JDBCConnection.getConnection();
-			try (PreparedStatement statement = conn.prepareStatement(UPDATE_BY_ID)){
+			try (PreparedStatement statement = conn
+					.prepareStatement(UPDATE_BY_ID)) {
 				statement.setInt(1, countryId);
 				statement.setInt(2, routeOrder);
 				statement.setInt(3, id);
@@ -178,7 +179,7 @@ public class CountryOrder {
 		Connection conn;
 		try {
 			conn = JDBCConnection.getConnection();
-			try (PreparedStatement statement = conn.prepareStatement(DELETE)){
+			try (PreparedStatement statement = conn.prepareStatement(DELETE)) {
 				statement.setInt(1, id);
 				statement.executeUpdate();
 			} catch (SQLException e) {
@@ -188,7 +189,6 @@ public class CountryOrder {
 			e1.printStackTrace();
 		}
 	}
-
 
 	public String getPosterImage() {
 		return posterImage;
@@ -210,6 +210,5 @@ public class CountryOrder {
 	public void setName(String name) {
 		this.routeName = name;
 	}
-
 
 }

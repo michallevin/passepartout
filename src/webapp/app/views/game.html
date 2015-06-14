@@ -45,16 +45,12 @@
 						<b>{{getAnswerText(answer)}}</b>
 					</h4>
 				</div>
-
-
-
-
 			</div>
 		</div>
 
 	</div>
 
-	<div ng-show="lives==0">
+	<div ng-show="!loading && lives==0">
 		<h1 style="font-family: 'Fredericka the Great', cursive;" ng-hide="$index % 1== 1">
 			<b>Game over!</b>
 		</h1>
@@ -71,6 +67,12 @@
 		<h4 style="font-family: 'Fredericka the Great', cursive;" ng-click="endGame()">
 			<b>Menu</b>
 		</h4>
+	
 	</div>
+	<div ng-show="loading" style="text-align:center; margin-top:100px;">
+			<img src='images/ajax-loader.gif'><br/>
+			Loading...
+		</div>
+
 
 </div>

@@ -1,4 +1,4 @@
-package server;
+package core.server;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,9 +10,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import parsing.YagoImport;
 import core.GameConfigInit;
 import core.Question;
-import yago.YagoImport;
 import db.models.Country;
 import db.models.CountryOrder;
 import db.models.FactType;
@@ -55,19 +55,17 @@ public class ApiController {
 				if (!YagoImport.isImporting()) {
 //					YagoImport.startImport(
 //							new String[] {
-//									//"links", 
+//									"links", 
 //									//"countries", 
-//									//"attributes", 
-//									//"facts", 
-//									//"literalFacts", 
-//									//"labels"
+//									"attributes", 
+//									"facts", 
+//									"literalFacts", 
+//									"labels"
 //							});
-				
-					if (true) {
-						GameConfigInit.setCountryOrder();
-						GameConfigInit.setQuestionWordings();
-					}
-					//Fact.updateFactRanks(FactDictionary.getInstance().getCount());
+					
+					GameConfigInit.setCountryOrder();
+					GameConfigInit.setQuestionWordings();
+
 				}
 			}
 		};
@@ -129,13 +127,13 @@ public class ApiController {
 	public List<Highscore> getHighScores() {
 		return Highscore.fetchAll();
 	}
-	
-		@RequestMapping(value="/rest/highscore/top", method=RequestMethod.GET)
+
+	@RequestMapping(value="/rest/highscore/top", method=RequestMethod.GET)
 	public List<Highscore> getTopHighScores() {
 		return Highscore.fetchTop(10);
 	}
-	
-		@RequestMapping(value="/rest/highscore}", method=RequestMethod.POST)
+
+	@RequestMapping(value="/rest/highscore", method=RequestMethod.POST)
 	public Highscore addHighScore(@RequestParam("user_id") Integer user_id, @RequestParam("score") Integer score) {
 		Highscore highscore = new Highscore(user_id, score);
 		highscore.save();

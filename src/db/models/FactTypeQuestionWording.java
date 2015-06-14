@@ -16,12 +16,12 @@ public class FactTypeQuestionWording {
 
 	private static final String DELETE = "UPDATE fact_type_question_wording SET deleted = 1, updated = 1 WHERE id = ?";
 	private static final String UPDATE_BY_ID = "UPDATE fact_type_question_wording SET question_wording = ?, fact_id = ? updated = 1 WHERE id = ?";
-	private static final String SELECT_ALL = "SELECT fact_type_question_wording.id, " +
-						 "fact_type_question_wording.fact_id, question_wording "+
-+						  "FROM fact_type_question_wording WHERE deleted = 0";
-	private static final String SELECT_BY_ID = "SELECT fact_type_question_wording.id, " +
-						 "fact_type_question_wording.fact_id, question_wording "+
-+						  "FROM fact_type_question_wording WHERE deleted = 0 AND id = ?";
+	private static final String SELECT_ALL = "SELECT fact_type_question_wording.id, "
+			+ "fact_type_question_wording.fact_id, question_wording "
+			+ "FROM fact_type_question_wording WHERE deleted = 0";
+	private static final String SELECT_BY_ID = "SELECT fact_type_question_wording.id, "
+			+ "fact_type_question_wording.fact_id, question_wording "
+			+ "FROM fact_type_question_wording WHERE deleted = 0 AND id = ?";
 	private static final String INSERT = "INSERT INTO fact_type_question_wording (fact_id, question_wording) VALUES(?, ?)";
 	private int id;
 	private int factId;
@@ -42,11 +42,12 @@ public class FactTypeQuestionWording {
 		Connection conn;
 		try {
 			conn = JDBCConnection.getConnection();
-			try (PreparedStatement statement = conn.prepareStatement(INSERT, Statement.RETURN_GENERATED_KEYS)){
+			try (PreparedStatement statement = conn.prepareStatement(INSERT,
+					Statement.RETURN_GENERATED_KEYS)) {
 				statement.setInt(1, factId);
 				statement.setString(2, getQuestion_wording());
 				statement.executeUpdate();
-		
+
 				try (ResultSet genKeys = statement.getGeneratedKeys()) {
 					if (genKeys.next()) {
 						int id = (int) genKeys.getLong(1);
@@ -67,7 +68,8 @@ public class FactTypeQuestionWording {
 		Connection conn;
 		try {
 			conn = JDBCConnection.getConnection();
-			try (PreparedStatement statement = conn.prepareStatement(SELECT_BY_ID)) {
+			try (PreparedStatement statement = conn
+					.prepareStatement(SELECT_BY_ID)) {
 				statement.setInt(1, id);
 				try (ResultSet rs = statement.executeQuery()) {
 					while (rs.next() == true) {
@@ -91,12 +93,13 @@ public class FactTypeQuestionWording {
 		Connection conn;
 		try {
 			conn = JDBCConnection.getConnection();
-			try (PreparedStatement statement = conn.prepareStatement(SELECT_ALL)) {
+			try (PreparedStatement statement = conn
+					.prepareStatement(SELECT_ALL)) {
 				try (ResultSet rs = statement.executeQuery()) {
 					while (rs.next() == true) {
-						result.add(new FactTypeQuestionWording(rs.getInt("id"), rs
-								.getInt("fact_id"), rs
-								.getString("question_wording")));
+						result.add(new FactTypeQuestionWording(rs.getInt("id"),
+								rs.getInt("fact_id"), rs
+										.getString("question_wording")));
 					}
 				}
 			} catch (SQLException e) {
@@ -113,7 +116,8 @@ public class FactTypeQuestionWording {
 		Connection conn;
 		try {
 			conn = JDBCConnection.getConnection();
-			try (PreparedStatement statement = conn.prepareStatement(UPDATE_BY_ID)){
+			try (PreparedStatement statement = conn
+					.prepareStatement(UPDATE_BY_ID)) {
 				statement.setString(1, questionWording);
 				statement.setInt(2, factId);
 				statement.setInt(3, id);
@@ -125,11 +129,12 @@ public class FactTypeQuestionWording {
 			e1.printStackTrace();
 		}
 	}
+
 	public void delete() {
 		Connection conn;
 		try {
 			conn = JDBCConnection.getConnection();
-			try (PreparedStatement statement = conn.prepareStatement(DELETE)){
+			try (PreparedStatement statement = conn.prepareStatement(DELETE)) {
 				statement.setInt(1, id);
 				statement.executeUpdate();
 
@@ -139,7 +144,7 @@ public class FactTypeQuestionWording {
 		} catch (IOException | ParseException e1) {
 			e1.printStackTrace();
 		}
-	
+
 	}
 
 	public String getQuestion_wording() {
@@ -167,7 +172,7 @@ public class FactTypeQuestionWording {
 	}
 
 	public void replace() {
-		
+
 	}
 
 }

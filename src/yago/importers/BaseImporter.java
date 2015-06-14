@@ -7,7 +7,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.text.ParseException;
 
-import yago.YagoImport;
+import parsing.YagoImport;
 import db.JDBCConnection;
 
 public abstract class BaseImporter {
@@ -36,7 +36,7 @@ public abstract class BaseImporter {
 			return;
 		}
 		
-		System.out.println(String.format("file: '%s'", getFileName()));
+		System.out.println(String.format("reading file: '%s'", getFileName()));
 
 		try {
 			JDBCConnection.getConnection().setAutoCommit(false);
@@ -61,7 +61,7 @@ public abstract class BaseImporter {
 				}
 			}
 			System.out.println("");
-			System.out.println("Commiting last records");
+
 
 			this.finished();
 
@@ -86,7 +86,7 @@ public abstract class BaseImporter {
 	
 	
 	public void finished() {
-		System.out.println("importing finished");
+		System.out.println("finished reading file");
 		
 	}
 }

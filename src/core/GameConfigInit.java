@@ -1,7 +1,7 @@
 package core;
 
-import yago.CountryDictionary;
-import yago.TypeDictionary;
+import parsing.CountryDictionary;
+import parsing.TypeDictionary;
 import db.models.Country;
 import db.models.CountryOrder;
 import db.models.FactType;
@@ -57,9 +57,9 @@ public class GameConfigInit {
 				{"<hasOfficialLanguage>", "Which of these is an official language of $countryName?"}, 
 				{"<hasNumberOfPeople>", "How many people live in $countryName?"}, 
 				{"<infobox/en/headquarters>", "Which of these has its headquarters in $countryName?"}, 
-				{"<infobox/en/imagemap>", "Which of these is $countryName?"}, 
+				//{"<infobox/en/imagemap>", "Which of these is $countryName?"}, 
 				{"<hasMotto>", "Which of these is the motto of $countryName?"}, 
-				{"<infobox/en/imageflag>", "Which of these is the flag of $countryName?"}, 
+				//{"<infobox/en/imageflag>", "Which of these is the flag of $countryName?"}, 
 				{"<infobox/en/areakm>", "What is the area of $countryName?"}, 
 				//{"<infobox/en/cctld>", "What is the TLD of $countryName?"}, 
 				{"<infobox/en/capital>", "What is the capital of $countryName?"}, 

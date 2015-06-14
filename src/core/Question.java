@@ -22,11 +22,13 @@ public class Question {
 	
 	public static Question generateQuestion(Country country, int userId, boolean isLiteral, int difficulty) {
 
+		System.out.println("generating question " + country.getLabel());
 		List<Fact> otherOptions = new ArrayList<Fact>();
 		FactType factType = null;
 		Fact answer = null;
 		
 		while (otherOptions.size() < 3) {
+			System.out.print(".");
 			factType = FactType.getRandom(isLiteral);
 			answer = Fact.getFact(country.getId(), factType.getId(), userId, isLiteral, difficulty);
 			if (answer == null) continue;

@@ -1,4 +1,4 @@
-package yago;
+package parsing;
 
 import java.util.HashMap;
 import java.util.List;

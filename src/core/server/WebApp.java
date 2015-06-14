@@ -1,4 +1,4 @@
-package server;
+package core.server;
 
 public class WebApp {
 

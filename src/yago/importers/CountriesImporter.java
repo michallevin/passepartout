@@ -3,7 +3,7 @@ package yago.importers;
 
 import java.io.FileNotFoundException;
 
-import yago.CountryDictionary;
+import parsing.CountryDictionary;
 import db.models.Country;
 
 public class CountriesImporter extends BaseImporter{
@@ -32,9 +32,7 @@ public class CountriesImporter extends BaseImporter{
 				newCountry.save();
 				CountryDictionary.getInstance().getCountryMap().put(countryName, newCountry);
 			}
-			else if (!existing.isUpdated()) {
-				existing.updateFields(newCountry);
-			}
+			
 		}
 
 	}

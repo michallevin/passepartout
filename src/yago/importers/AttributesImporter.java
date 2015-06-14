@@ -2,7 +2,7 @@ package yago.importers;
 
 import java.io.FileNotFoundException;
 
-import yago.FactDictionary;
+import parsing.FactDictionary;
 import db.models.Fact;
 
 public class AttributesImporter extends BaseImporter {
@@ -35,7 +35,6 @@ public class AttributesImporter extends BaseImporter {
 		if (fact == null) return;
 		Fact existing = FactDictionary.getInstance().getFactByYagoId(id);
 		if (existing == null)  {
-			//fact.save();
 			FactDictionary.getInstance().addFact(fact);
 		}
 		else if (!existing.isUpdated()) {//make sure fact what not edited by user

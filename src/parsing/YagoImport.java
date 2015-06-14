@@ -1,4 +1,4 @@
-package yago;
+package parsing;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -82,15 +82,14 @@ public class YagoImport {
 				System.out.println("skipping labeling");
 			}
 			
-			System.out.println("updating all facts");
+			System.out.println("inserting/updating all facts");
 			DictionaryUpdater.updateFactDictionary();
 			System.out.println("updating all countries");
 			DictionaryUpdater.updateCountryDictionary();
 			
+			FactDictionary.getInstance().clear();
 			
-		
 			System.out.println("import process finished");
-
 			
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();

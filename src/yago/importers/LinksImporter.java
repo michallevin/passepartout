@@ -4,7 +4,7 @@ import java.io.FileNotFoundException;
 
 import org.apache.commons.lang3.StringEscapeUtils;
 
-import yago.FactDictionary;
+import parsing.FactDictionary;
 
 public class LinksImporter extends BaseImporter {
 
