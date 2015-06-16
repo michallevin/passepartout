@@ -1,1 +1,1 @@
-java -jar Application.jar
+java -jar passepartout-0.0.1-SNAPSHOT.jar
