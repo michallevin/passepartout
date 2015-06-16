@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import javax.servlet.http.HttpServletResponse;
+
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -86,8 +88,9 @@ public class ApiController {
 	// country
 
 	@RequestMapping(value="/rest/country", method=RequestMethod.GET)
-	public List<Country> getCountries() {
-		List<Country> countries = Country.fetchAll();
+	public List<Country> getCountries(@RequestParam("_start") int start, @RequestParam("_end") int end, HttpServletResponse response) {
+		List<Country> countries = Country.fetchAll(start, end);
+	    response.setHeader("X-Total-Count", Country.getCount().toString());
 		return countries;
 	}
 
@@ -124,24 +127,19 @@ public class ApiController {
 	// highscore
 
 	@RequestMapping(value="/rest/highscore", method=RequestMethod.GET)
-	public List<Highscore> getHighScores() {
-		return Highscore.fetchAll();
+	public List<Highscore> getHighScores(@RequestParam("_start") int start, @RequestParam("_end") int end, HttpServletResponse response) {
+	    response.setHeader("X-Total-Count", Highscore.getCount().toString());
+		return Highscore.fetchAll(start, end);
+
 	}
 
 	@RequestMapping(value="/rest/highscore/top", method=RequestMethod.GET)
 	public List<Highscore> getTopHighScores() {
 		return Highscore.fetchTop(10);
 	}
-
-	@RequestMapping(value="/rest/highscore/add", method=RequestMethod.GET)
-	public Highscore addHighScore2(@RequestParam("user_id") Integer userId, @RequestParam("score") Integer score) {
-		Highscore highscore = new Highscore(userId, score);
-		highscore.save();
-		return highscore;
-	}
 	
 	@RequestMapping(value="/rest/highscore", method=RequestMethod.POST)
-	public Highscore addHighScore(@RequestParam("user_id") Integer userId, @RequestParam("score") Integer score) {
+	public Highscore addHighScore(@RequestParam("userId") Integer userId, @RequestParam("score") Integer score) {
 		Highscore highscore = new Highscore(userId, score);
 		highscore.save();
 		return highscore;
@@ -153,7 +151,7 @@ public class ApiController {
 	}
 
 	@RequestMapping(value="/rest/highscore/{id}", method=RequestMethod.PUT)
-	public Highscore editHighscore(@PathVariable Integer id,@RequestParam("user_id") Integer userId, @RequestParam("score") Integer score) {
+	public Highscore editHighscore(@PathVariable Integer id,@RequestParam("userId") Integer userId, @RequestParam("score") Integer score) {
 		Highscore highscore = Highscore.fetchById(id);
 		highscore.setScore(score);
 		highscore.setUserId(userId);
@@ -171,13 +169,14 @@ public class ApiController {
 	//fact type
 
 	@RequestMapping(value="/rest/fact_type", method=RequestMethod.GET)
-	public List<FactType> getFactTypes() {
-		List<FactType> factTypes = FactType.fetchAll();
+	public List<FactType> getFactTypes(@RequestParam("_start") int start, @RequestParam("_end") int end, HttpServletResponse response) {
+		List<FactType> factTypes = FactType.fetchAll(start, end);
+	    response.setHeader("X-Total-Count", FactType.getCount().toString());
 		return factTypes;
 	}
 
 	@RequestMapping(value="/rest/fact_type", method=RequestMethod.POST)
-	public FactType addFactType(@RequestParam("name") String name, @RequestParam("is_literal") Boolean isLiteral) {
+	public FactType addFactType(@RequestParam("typeName") String name, @RequestParam("literal") Boolean isLiteral) {
 		FactType factType = new FactType(name, isLiteral);
 		factType.save();
 		return factType;
@@ -191,9 +190,10 @@ public class ApiController {
 
 
 	@RequestMapping(value="/rest/fact_type/{id}", method=RequestMethod.PUT)
-	public FactType editFactType(@PathVariable Integer id, @RequestParam("name") String name) {
+	public FactType editFactType(@PathVariable Integer id, @RequestParam("typeName") String name, @RequestParam("literal") Boolean isLiteral) {
 		FactType factType = FactType.fetchById(id);
 		factType.setTypeName(name);
+		factType.setLiteral(isLiteral);
 		factType.update();
 		return factType;
 	}
@@ -210,8 +210,9 @@ public class ApiController {
 	// user
 
 	@RequestMapping(value="/rest/user", method=RequestMethod.GET)
-	public List<User> getUser() {
-		List<User> users = User.fetchAll();
+	public List<User> getUser(@RequestParam("_start") int start, @RequestParam("_end") int end, HttpServletResponse response) {
+		List<User> users = User.fetchAll(start, end);
+	    response.setHeader("X-Total-Count", User.getCount().toString());
 		return users;
 	}
 
@@ -256,16 +257,17 @@ public class ApiController {
 
 
 	// user fact history
-
+	
 	@RequestMapping(value="/rest/user_fact_history", method=RequestMethod.GET)
-	public List<UserFactHistory> getUserFactHistory() {
-		List<UserFactHistory> userFactHistoryist = UserFactHistory.fetchAll();
+	public List<UserFactHistory> getUserFactHistories(@RequestParam("_start") int start, @RequestParam("_end") int end, HttpServletResponse response) {
+		List<UserFactHistory> userFactHistoryist = UserFactHistory.fetchAll(start, end);
+	    response.setHeader("X-Total-Count", UserFactHistory.getCount().toString());
 		return userFactHistoryist;
 	}
 
 	@RequestMapping(value="/rest/user_fact_history", method=RequestMethod.POST)
-	public UserFactHistory addUserFactHistory(@RequestParam("user_id") int userId,
-			@RequestParam("fact_id") int factId) {
+	public UserFactHistory addUserFactHistory(@RequestParam("userId") int userId,
+			@RequestParam("factId") int factId) {
 		UserFactHistory userFactHistory = new UserFactHistory(userId, factId);
 		userFactHistory.save();
 		return userFactHistory;
@@ -280,8 +282,8 @@ public class ApiController {
 
 	@RequestMapping(value="/rest/user_fact_history/{id}", method=RequestMethod.PUT)
 	public UserFactHistory editUserFactHistory(@PathVariable Integer id,
-			@RequestParam("user_id") int userId,
-			@RequestParam("fact_id") int factId) {
+			@RequestParam("userId") int userId,
+			@RequestParam("factId") int factId) {
 		UserFactHistory userFactHistory = UserFactHistory.fetchById(id);
 		userFactHistory.setUserId(userId);
 		userFactHistory.setFactId(factId);
@@ -299,14 +301,18 @@ public class ApiController {
 	// country route
 
 	@RequestMapping(value="/rest/country_order", method=RequestMethod.GET)
-	public List<CountryOrder> getCountryOrders() {
-		List<CountryOrder> countryOrders = CountryOrder.fetchAll();
+	public List<CountryOrder> getCountryOrders(@RequestParam("_start") int start, @RequestParam("_end") int end, HttpServletResponse response) {
+		List<CountryOrder> countryOrders = CountryOrder.fetchAll(start, end);
+	    response.setHeader("X-Total-Count", CountryOrder.getCount().toString());
 		return countryOrders;
 	}
 
 	@RequestMapping(value="/rest/country_order", method=RequestMethod.POST)
-	public CountryOrder addCountryOrder(@RequestParam("country_id") int countryId,
-			@RequestParam("route_order") int routeOrder, @RequestParam("poster_image") String posterImage, String name) {
+	public CountryOrder addCountryOrder(
+			@RequestParam("countryId") int countryId,
+			@RequestParam("routeOrder") int routeOrder,
+			@RequestParam("posterImage") String posterImage, 
+			@RequestParam("name") String name) {
 		CountryOrder countryOrder = new CountryOrder(countryId, routeOrder, posterImage, name);
 		countryOrder.save();
 		return countryOrder;
@@ -321,11 +327,15 @@ public class ApiController {
 
 	@RequestMapping(value="/rest/country_order/{id}", method=RequestMethod.PUT)
 	public CountryOrder editCountryOrder(@PathVariable Integer id,
-			@RequestParam("country_id") int countryId,
-			@RequestParam("route_order") int routeOrder) {
+			@RequestParam("countryId") int countryId,
+			@RequestParam("routeOrder") int routeOrder,
+			@RequestParam("posterImage") String posterImage, 
+			@RequestParam("name") String name) {
 		CountryOrder countryOrder = CountryOrder.fetchById(id);
 		countryOrder.setCountryId(countryId);
 		countryOrder.setRouteOrder(routeOrder);
+		countryOrder.setPosterImage(posterImage);
+		countryOrder.setName(name);
 		countryOrder.update();
 		return countryOrder;
 	}
@@ -341,15 +351,16 @@ public class ApiController {
 	// fact_type_question_wording
 
 	@RequestMapping(value="/rest/fact_type_question_wording", method=RequestMethod.GET)
-	public List<FactTypeQuestionWording> getFactTypeQuestionWordings() {
-		return FactTypeQuestionWording.fetchAll();
+	public List<FactTypeQuestionWording> getFactTypeQuestionWordings(@RequestParam("_start") int start, @RequestParam("_end") int end, HttpServletResponse response) {
+	    response.setHeader("X-Total-Count", FactTypeQuestionWording.getCount().toString());
+		return FactTypeQuestionWording.fetchAll(start, end);
 	}
 
 	@RequestMapping(value="/rest/fact_type_question_wording", method=RequestMethod.POST)
 	public FactTypeQuestionWording addFactTypeQuestionWording(
-			@RequestParam("question_id") Integer questionId,
-			@RequestParam("question_wording") String questionWording) {
-		FactTypeQuestionWording factTypeQuestionWording = new FactTypeQuestionWording(questionId, questionWording);
+			@RequestParam("factId") Integer factId,
+			@RequestParam("questionWording") String questionWording) {
+		FactTypeQuestionWording factTypeQuestionWording = new FactTypeQuestionWording(factId, questionWording);
 		factTypeQuestionWording.save();
 		return factTypeQuestionWording;
 	}
@@ -360,7 +371,8 @@ public class ApiController {
 	}
 
 	@RequestMapping(value="/rest/fact_type_question_wording/{id}", method=RequestMethod.PUT)
-	public FactTypeQuestionWording editFactTypeQuestionWording(@PathVariable Integer id, @RequestParam("factId") Integer factId, @RequestParam("question_wording") String questionWording) {
+	public FactTypeQuestionWording editFactTypeQuestionWording(@PathVariable Integer id, 
+			@RequestParam("factId") Integer factId, @RequestParam("questionWording") String questionWording) {
 		FactTypeQuestionWording factTypeQuestionWording = FactTypeQuestionWording.fetchById(id);
 		factTypeQuestionWording.setFactId(factId);
 		factTypeQuestionWording.setQuestionWording(questionWording);
@@ -379,13 +391,16 @@ public class ApiController {
 	// fact
 
 	@RequestMapping(value="/rest/fact", method=RequestMethod.GET)
-	public List<Fact> getFacts(@RequestParam("_start") int start, @RequestParam("_end") int end) {
+	public List<Fact> getFacts(@RequestParam("_start") int start, @RequestParam("_end") int end, HttpServletResponse response) {
 		List<Fact> facts = Fact.fetchAll(start, end);
+	    response.setHeader("X-Total-Count", Fact.getCount().toString());
 		return facts;
+		
 	}
 
 	@RequestMapping(value="/rest/fact", method=RequestMethod.POST)
-	public Fact addFact(@RequestParam("yago_id") String yagoId, @RequestParam("country_id") int countryId, @RequestParam("data") String data, @RequestParam("type_id") int factTypeId, 
+	public Fact addFact(@RequestParam("yagoId") String yagoId,
+			@RequestParam("countryId") int countryId, @RequestParam("data") String data, @RequestParam("typeId") int factTypeId, 
 			@RequestParam("label") String label, @RequestParam("rank") int rank) {
 		Fact fact = new Fact(-1, "",countryId, data, factTypeId, label, rank, false);
 		fact.save();
@@ -399,7 +414,8 @@ public class ApiController {
 
 
 	@RequestMapping(value="/rest/fact/{id}", method=RequestMethod.PUT)
-	public Fact editFact(@PathVariable Integer id, @RequestParam("country_id") int countryId, @RequestParam("data") String data, @RequestParam("type_id") int factTypeId, @RequestParam("rank") int rank) {
+	public Fact editFact(@PathVariable Integer id, @RequestParam("countryId") int countryId, @RequestParam("data") String data, 
+			@RequestParam("typeId") int factTypeId, @RequestParam("rank") int rank) {
 		Fact fact = Fact.fetchById(id);
 		fact.setCountryId(countryId);
 		fact.setData(data);

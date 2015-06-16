@@ -17,8 +17,9 @@ public class UserFactHistory {
 	private static final String INSERT = "INSERT INTO user_fact_history (user_id, fact_id) VALUES (?, ?)";
 	private static final String DELETE_BY_ID = "UPDATE user_fact_history SET deleted = 1, updated = 1 WHERE id = ?";
 	private static final String UPDATE_BY_ID = "UPDATE user_fact_history SET user_id = ?, fact_id = ?, updated = 1 WHERE id = ?";
-	private static final String SELECT_ALL = "SELECT user_fact_history.id, user_id, fact_id FROM user_fact_history WHERE deleted = 0";
+	private static final String SELECT_ALL = "SELECT user_fact_history.id, user_id, fact_id FROM user_fact_history WHERE deleted = 0 LIMIT ?, ?";
 	private static final String SELECT_BY_ID = "SELECT user_fact_history.id, user_id, fact_id FROM user_fact_history WHERE deleted = 0 AND id = ?";
+	private static final String SELECT_COUNT = "SELECT count(1) as row_count FROM user_fact_history";
 
 	private int id;
 	private int userId;
@@ -74,7 +75,7 @@ public class UserFactHistory {
 				statement.setInt(1, id);
 				try (ResultSet rs = statement.executeQuery()) {
 					while (rs.next() == true) {
-						return new UserFactHistory(rs.getInt("id"), rs.getInt("user_id"), rs.getInt("factid"));
+						return new UserFactHistory(rs.getInt("id"), rs.getInt("user_id"), rs.getInt("fact_id"));
 					}
 				}
 			} catch (SQLException e) {
@@ -87,12 +88,15 @@ public class UserFactHistory {
 		return null;
 	}
 
-	public static List<UserFactHistory> fetchAll() {
+	
+	public static List<UserFactHistory> fetchAll(int start, int end) {
 		List<UserFactHistory> result = new ArrayList<UserFactHistory>();
 		Connection conn;
 		try {
 			conn = JDBCConnection.getConnection();
 			try (PreparedStatement statement = conn.prepareStatement(SELECT_ALL)){
+				statement.setInt(1, start);
+				statement.setInt(2, end - start);
 				try (ResultSet rs = statement.executeQuery()) {
 					while (rs.next() == true) {
 						result.add(new UserFactHistory(rs.getInt("id"),
@@ -109,7 +113,6 @@ public class UserFactHistory {
 		}
 		return result;
 	}
-
 
 	public void update() {
 		Connection conn;
@@ -144,6 +147,27 @@ public class UserFactHistory {
 		} catch (IOException | ParseException e1) {
 			e1.printStackTrace();
 		}
+	}
+	
+	public static Integer getCount() {
+		Connection conn;
+		try {
+			conn = JDBCConnection.getConnection();
+			try (PreparedStatement statement = conn
+					.prepareStatement(SELECT_COUNT)) {
+				try (ResultSet rs = statement.executeQuery()) {
+					while (rs.next() == true) {
+						return rs.getInt("row_count");
+					}
+				}
+			} catch (SQLException e) {
+				System.out.println("ERROR executeQuery - " + e.getMessage());
+			}
+
+		} catch (IOException | ParseException e1) {
+			e1.printStackTrace();
+		}
+		return 0;	
 	}
 
 	public int getUserId() {

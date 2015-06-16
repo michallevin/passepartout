@@ -15,10 +15,11 @@ import db.JDBCConnection;
 public class Highscore {
 	private static final String DELETE_BY_ID = "UPDATE highscore SET deleted = 1, updated = 1 WHERE id = ?";
 	private static final String UPDATE_BY_ID = "UPDATE highscore SET user_id = ?, score = ?, updated = 1 WHERE id = ?";
-	private static final String SELECT_ALL = "SELECT user_id, score FROM highscore WHERE deleted = 0";
-	private static final String SELECT_TOP = "SELECT user_id, score FROM highscore WHERE deleted = 0 ORDER BY score DESC LIMIT ?";
-	private static final String SELECT_BY_ID = "SELECT user_id, score FROM highscore WHERE deleted = 0 and id = ?";
+	private static final String SELECT_ALL = "SELECT id, user_id, score FROM highscore WHERE deleted = 0 LIMIT ?, ?";
+	private static final String SELECT_TOP = "SELECT id, user_id, score FROM highscore WHERE deleted = 0 ORDER BY score DESC LIMIT ?";
+	private static final String SELECT_BY_ID = "SELECT id, user_id, score FROM highscore WHERE deleted = 0 and id = ?";
 	private static final String INSERT = "INSERT INTO highscore (user_id, score) VALUES (?, ?)";
+	private static final String SELECT_COUNT = "SELECT count(1) as row_count FROM highscore";
 
 	private Integer id;
 	private Integer userId;
@@ -69,7 +70,7 @@ public class Highscore {
 				statement.setInt(1, id);
 				try (ResultSet rs = statement.executeQuery()) {
 					while (rs.next() == true) {
-						Highscore highscore = new Highscore(rs.getInt("user_id"), rs.getInt("score"));
+						Highscore highscore = new Highscore(rs.getInt("id"), rs.getInt("user_id"), rs.getInt("score"));
 						return highscore;
 					}
 				}
@@ -92,7 +93,7 @@ public class Highscore {
 				statement.setInt(1, scoresCount);
 				try (ResultSet rs = statement.executeQuery()) {
 					while (rs.next() == true) {
-						result.add(new Highscore(rs.getInt("user_id"), rs.getInt("score")));
+						result.add(new Highscore(rs.getInt("id"), rs.getInt("user_id"), rs.getInt("score")));
 					}
 				}
 			} catch (SQLException e) {
@@ -105,15 +106,17 @@ public class Highscore {
 		return result;
 	}
 
-	public static List<Highscore> fetchAll() {
+	public static List<Highscore> fetchAll(int start, int end) {
 		List<Highscore> result = new ArrayList<Highscore>();
 		Connection conn;
 		try {
 			conn = JDBCConnection.getConnection();
 			try (PreparedStatement statement = conn.prepareStatement(SELECT_ALL)){
+				statement.setInt(1, start);
+				statement.setInt(2, end - start);
 				try (ResultSet rs = statement.executeQuery()) {
 					while (rs.next() == true) {
-						result.add(new Highscore(rs.getInt("user_id"), rs.getInt("score")));
+						result.add(new Highscore(rs.getInt("id"), rs.getInt("user_id"), rs.getInt("score")));
 					}
 				}
 			} catch (SQLException e) {
@@ -124,6 +127,27 @@ public class Highscore {
 			e1.printStackTrace();
 		}
 		return result;
+	}
+	
+	public static Integer getCount() {
+		Connection conn;
+		try {
+			conn = JDBCConnection.getConnection();
+			try (PreparedStatement statement = conn
+					.prepareStatement(SELECT_COUNT)) {
+				try (ResultSet rs = statement.executeQuery()) {
+					while (rs.next() == true) {
+						return rs.getInt("row_count");
+					}
+				}
+			} catch (SQLException e) {
+				System.out.println("ERROR executeQuery - " + e.getMessage());
+			}
+
+		} catch (IOException | ParseException e1) {
+			e1.printStackTrace();
+		}
+		return 0;	
 	}
 
 	public void update() {

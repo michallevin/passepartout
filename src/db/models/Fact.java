@@ -26,6 +26,7 @@ public class Fact {
 	private static final String SELECT_ALL = "SELECT fact.id, fact.yago_id, fact.country_id, "
 			+ "fact.data, fact.type_id, fact.label, fact.rank, fact.updated "
 			+ "FROM fact WHERE deleted = 0";
+	private static final String SELECT_COUNT = "SELECT count(1) as row_count FROM fact";
 	private static final String SELECT_ALL_PAGED = "SELECT fact.id, fact.yago_id, fact.country_id, "
 			+ "fact.data, fact.type_id, fact.label, fact.rank, fact.updated "
 			+ "FROM fact WHERE deleted = 0 LIMIT ?, ?";
@@ -286,6 +287,28 @@ public class Fact {
 		}
 		return null;
 	}
+	
+
+	public static Integer getCount() {
+		Connection conn;
+		try {
+			conn = JDBCConnection.getConnection();
+			try (PreparedStatement statement = conn
+					.prepareStatement(SELECT_COUNT)) {
+				try (ResultSet rs = statement.executeQuery()) {
+					while (rs.next() == true) {
+						return rs.getInt("row_count");
+					}
+				}
+			} catch (SQLException e) {
+				System.out.println("ERROR executeQuery - " + e.getMessage());
+			}
+
+		} catch (IOException | ParseException e1) {
+			e1.printStackTrace();
+		}
+		return 0;	
+	}
 
 	public void update() {
 		if (!dirty)
@@ -514,5 +537,6 @@ public class Fact {
 		// TODO Auto-generated method stub
 		return shouldDelete;
 	}
+
 
 }

@@ -19,12 +19,15 @@ public class CountryOrder {
 	private static final String SELECT_ALL = "SELECT country_order.id, country_order.country_id, "
 			+ "country_order.route_order, country_order.poster_image, "
 			+ "country_order.route_name "
-			+ "FROM country_order WHERE deleted = 0";
+			+ "FROM country_order WHERE deleted = 0 LIMIT ?, ?";
 	private static final String SELECT_BY_ID = "SELECT country_order.id, country_order.country_id, "
 			+ "country_order.route_order, country_order.poster_image, "
 			+ "country_order.route_name "
 			+ "FROM country_order WHERE deleted = 0 AND id = ?";
 	private static final String INSERT = "INSERT INTO country_order(country_id, route_order, poster_image, route_name) VALUES(?, ?, ?, ?)";
+	
+	private static final String SELECT_COUNT = "SELECT count(1) as row_count FROM country_order";
+
 	private int id;
 	private int countryId;
 	private int routeOrder;
@@ -106,13 +109,15 @@ public class CountryOrder {
 		return null;
 	}
 
-	public static List<CountryOrder> fetchAll() {
+	public static List<CountryOrder> fetchAll(int start, int end) {
 		List<CountryOrder> result = new ArrayList<CountryOrder>();
 		Connection conn;
 		try {
 			conn = JDBCConnection.getConnection();
 			try (PreparedStatement statement = conn
 					.prepareStatement(SELECT_ALL)) {
+				statement.setInt(1, start);
+				statement.setInt(2, end - start);
 				try (ResultSet rs = statement.executeQuery()) {
 					while (rs.next() == true) {
 						result.add(new CountryOrder(rs.getInt("id"), rs
@@ -130,6 +135,27 @@ public class CountryOrder {
 			e1.printStackTrace();
 		}
 		return result;
+	}
+	
+	public static Integer getCount() {
+		Connection conn;
+		try {
+			conn = JDBCConnection.getConnection();
+			try (PreparedStatement statement = conn
+					.prepareStatement(SELECT_COUNT)) {
+				try (ResultSet rs = statement.executeQuery()) {
+					while (rs.next() == true) {
+						return rs.getInt("row_count");
+					}
+				}
+			} catch (SQLException e) {
+				System.out.println("ERROR executeQuery - " + e.getMessage());
+			}
+
+		} catch (IOException | ParseException e1) {
+			e1.printStackTrace();
+		}
+		return 0;	
 	}
 
 	public int getCountryId() {

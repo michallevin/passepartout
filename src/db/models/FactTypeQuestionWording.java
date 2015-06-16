@@ -18,11 +18,14 @@ public class FactTypeQuestionWording {
 	private static final String UPDATE_BY_ID = "UPDATE fact_type_question_wording SET question_wording = ?, fact_id = ?, updated = 1 WHERE id = ?";
 	private static final String SELECT_ALL = "SELECT id, "
 			+ "fact_id, question_wording "
-			+ "FROM fact_type_question_wording WHERE deleted = 0";
+			+ "FROM fact_type_question_wording WHERE deleted = 0 LIMIT ?, ?";
 	private static final String SELECT_BY_ID = "SELECT id, "
 			+ "fact_id, question_wording "
 			+ "FROM fact_type_question_wording WHERE deleted = 0 AND id = ?";
 	private static final String INSERT = "INSERT INTO fact_type_question_wording (fact_id, question_wording) VALUES(?, ?)";
+	private static final String SELECT_COUNT = "SELECT count(1) as row_count FROM fact_type_question_wording";
+
+	
 	private int id;
 	private int factId;
 	private String questionWording;
@@ -45,7 +48,7 @@ public class FactTypeQuestionWording {
 			try (PreparedStatement statement = conn.prepareStatement(INSERT,
 					Statement.RETURN_GENERATED_KEYS)) {
 				statement.setInt(1, factId);
-				statement.setString(2, getQuestion_wording());
+				statement.setString(2, getQuestionWording());
 				statement.executeUpdate();
 
 				try (ResultSet genKeys = statement.getGeneratedKeys()) {
@@ -88,13 +91,15 @@ public class FactTypeQuestionWording {
 		return null;
 	}
 
-	public static List<FactTypeQuestionWording> fetchAll() {
+	public static List<FactTypeQuestionWording> fetchAll(int start, int end) {
 		List<FactTypeQuestionWording> result = new ArrayList<FactTypeQuestionWording>();
 		Connection conn;
 		try {
 			conn = JDBCConnection.getConnection();
 			try (PreparedStatement statement = conn
 					.prepareStatement(SELECT_ALL)) {
+				statement.setInt(1, start);
+				statement.setInt(2, end - start);
 				try (ResultSet rs = statement.executeQuery()) {
 					while (rs.next() == true) {
 						result.add(new FactTypeQuestionWording(rs.getInt("id"),
@@ -147,7 +152,28 @@ public class FactTypeQuestionWording {
 
 	}
 
-	public String getQuestion_wording() {
+	public static Integer getCount() {
+		Connection conn;
+		try {
+			conn = JDBCConnection.getConnection();
+			try (PreparedStatement statement = conn
+					.prepareStatement(SELECT_COUNT)) {
+				try (ResultSet rs = statement.executeQuery()) {
+					while (rs.next() == true) {
+						return rs.getInt("row_count");
+					}
+				}
+			} catch (SQLException e) {
+				System.out.println("ERROR executeQuery - " + e.getMessage());
+			}
+
+		} catch (IOException | ParseException e1) {
+			e1.printStackTrace();
+		}
+		return 0;	
+	}
+	
+	public String getQuestionWording() {
 		return questionWording;
 	}
 

@@ -16,10 +16,11 @@ public class User {
 
 	private static final String DELETE_BY_ID = "UPDATE user SET deleted = 1, updated = 1 WHERE id = ?";
 	private static final String UPDATE_BY_ID = "UPDATE user SET name = ?, updated = 1 WHERE id = ?";
-	private static final String SELECT_ALL = "SELECT id, name FROM user WHERE deleted = 0";
+	private static final String SELECT_ALL = "SELECT id, name FROM user WHERE deleted = 0 LIMIT ?, ?";
 	private static final String SELECT_BY_NAME = "SELECT id, name FROM user WHERE deleted = 0 AND name = ?";
 	private static final String SELECT_BY_ID = "SELECT id, name FROM user WHERE deleted = 0 AND id = ?";
 	private static final String INSERT = "INSERT INTO user (name) VALUES (?)";
+	private static final String SELECT_COUNT = "SELECT count(1) as row_count FROM user";
 
 	private String name;
 	private int id;
@@ -104,12 +105,14 @@ public class User {
 		return null;
 	}
 
-	public static List<User> fetchAll() {
+	public static List<User> fetchAll(int start, int end) {
 		List<User> result = new ArrayList<User>();
 		Connection conn;
 		try {
 			conn = JDBCConnection.getConnection();
 			try (PreparedStatement statement = conn.prepareStatement(SELECT_ALL)){
+				statement.setInt(1, start);
+				statement.setInt(2, end - start);
 				try (ResultSet rs = statement.executeQuery()) {
 					while (rs.next() == true) {
 						result.add(new User(rs.getInt("id"), rs.getString("name")));
@@ -157,6 +160,27 @@ public class User {
 		} catch (IOException | ParseException e1) {
 			e1.printStackTrace();
 		}
+	}
+	
+	public static Integer getCount() {
+		Connection conn;
+		try {
+			conn = JDBCConnection.getConnection();
+			try (PreparedStatement statement = conn
+					.prepareStatement(SELECT_COUNT)) {
+				try (ResultSet rs = statement.executeQuery()) {
+					while (rs.next() == true) {
+						return rs.getInt("row_count");
+					}
+				}
+			} catch (SQLException e) {
+				System.out.println("ERROR executeQuery - " + e.getMessage());
+			}
+
+		} catch (IOException | ParseException e1) {
+			e1.printStackTrace();
+		}
+		return 0;	
 	}
 
 	public String getName() {

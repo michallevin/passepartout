@@ -17,12 +17,17 @@ public class Country {
 	private static final String DELETE_BY_ID = "UPDATE country SET deleted = 1, updated = 1 WHERE id = ?";
 	private static final String UPDATE_AFTER_IMPORT = "UPDATE country SET name = ?, label = ? WHERE id = ? and updated = 0";
 	private static final String UPDATE = "UPDATE country SET name = ?, label = ?, updated = 1 WHERE id = ?";
-	private static final String SELECT_BY_ORDER = "SELECT country.id, country.yago_id, country.name, country.label, country.updated, country_order.poster_image, country_order.route_name " + 
-						"FROM country JOIN country_order ON country_order.country_id = country.id WHERE route_order IS NOT NULL AND country.deleted = 0 AND country_order.deleted = 0 ORDER BY route_order";
-	private static final String SELECT_ALL = "SELECT country.id, country.yago_id, country.name, country.label, country.updated " + 
-						"FROM country WHERE deleted = 0";
-	private static final String SELECT_BY_ID = "SELECT country.id, country.yago_id, country.name, country.label, country.updated " + 
-						"FROM country WHERE deleted = 0 AND id = ?";
+	private static final String SELECT_BY_ORDER = "SELECT country.id, country.yago_id, country.name, country.label, country.updated, country_order.poster_image, country_order.route_name "
+			+ "FROM country JOIN country_order ON country_order.country_id = country.id WHERE route_order IS NOT NULL AND country.deleted = 0 AND country_order.deleted = 0 ORDER BY route_order";
+	private static final String SELECT_ALL = "SELECT country.id, country.yago_id, country.name, country.label, country.updated "
+			+ "FROM country WHERE deleted = 0";
+	private static final String SELECT_ALL_PAGED = "SELECT country.id, country.yago_id, country.name, country.label, country.updated "
+			+ "FROM country WHERE deleted = 0 LIMIT ?, ?";
+	private static final String SELECT_COUNT = "SELECT count(1) as row_count FROM country";
+
+	
+	private static final String SELECT_BY_ID = "SELECT country.id, country.yago_id, country.name, country.label, country.updated "
+			+ "FROM country WHERE deleted = 0 AND id = ?";
 	private static final String INSERT = "INSERT INTO country(yago_id, name) VALUES(?, ?)";
 	private String name;
 	private int id;
@@ -33,7 +38,8 @@ public class Country {
 	private boolean updated;
 	private String routeLabel;
 
-	public Country(int id, String yagoId, String name, String label, boolean updated) {
+	public Country(int id, String yagoId, String name, String label,
+			boolean updated) {
 
 		this.id = id;
 		this.name = name;
@@ -48,12 +54,13 @@ public class Country {
 
 	public void save() {
 		Connection conn;
-		try{
+		try {
 			conn = JDBCConnection.getConnection();
-			try (PreparedStatement statement = conn.prepareStatement(INSERT, Statement.RETURN_GENERATED_KEYS)){
+			try (PreparedStatement statement = conn.prepareStatement(INSERT,
+					Statement.RETURN_GENERATED_KEYS)) {
 
 				statement.setString(1, yagoId);
-				statement.setString(2, getName().replace("'", "''"));
+				statement.setString(2, getName());
 				statement.executeUpdate();
 				try (ResultSet genKeys = statement.getGeneratedKeys()) {
 					if (genKeys.next()) {
@@ -61,7 +68,6 @@ public class Country {
 						this.setId(id);
 					}
 				}
-
 
 			} catch (SQLException e) {
 				System.out.println("ERROR executeQuery - " + e.getMessage());
@@ -76,11 +82,14 @@ public class Country {
 		Connection conn;
 		try {
 			conn = JDBCConnection.getConnection();
-			try (PreparedStatement statement = conn.prepareStatement(SELECT_BY_ID)){
+			try (PreparedStatement statement = conn
+					.prepareStatement(SELECT_BY_ID)) {
 				statement.setInt(1, id);
 				try (ResultSet rs = statement.executeQuery()) {
 					while (rs.next() == true) {
-						return new Country(rs.getInt("id"), rs.getString("yago_id"), rs.getString("name"), rs.getString("label"), rs.getBoolean("updated"));
+						return new Country(rs.getInt("id"),
+								rs.getString("yago_id"), rs.getString("name"),
+								rs.getString("label"), rs.getBoolean("updated"));
 					}
 				}
 			} catch (SQLException e) {
@@ -98,10 +107,13 @@ public class Country {
 		Connection conn;
 		try {
 			conn = JDBCConnection.getConnection();
-			try (PreparedStatement statement = conn.prepareStatement(SELECT_ALL)) {
+			try (PreparedStatement statement = conn
+					.prepareStatement(SELECT_ALL)) {
 				try (ResultSet rs = statement.executeQuery()) {
 					while (rs.next() == true) {
-						result.add(new Country(rs.getInt("id"), rs.getString("yago_id"), rs.getString("name"), rs.getString("label"), rs.getBoolean("updated")));
+						result.add(new Country(rs.getInt("id"), rs
+								.getString("yago_id"), rs.getString("name"), rs
+								.getString("label"), rs.getBoolean("updated")));
 					}
 				}
 			} catch (SQLException e) {
@@ -114,15 +126,67 @@ public class Country {
 		return result;
 	}
 
+	public static List<Country> fetchAll(int start, int end) {
+		List<Country> result = new ArrayList<Country>();
+		Connection conn;
+		try {
+			conn = JDBCConnection.getConnection();
+			try (PreparedStatement statement = conn
+					.prepareStatement(SELECT_ALL_PAGED)) {
+				statement.setInt(1, start);
+				statement.setInt(2, end - start);
+				try (ResultSet rs = statement.executeQuery()) {
+					while (rs.next() == true) {
+						result.add(new Country(rs.getInt("id"), rs
+								.getString("yago_id"), rs.getString("name"), rs
+								.getString("label"), rs.getBoolean("updated")));
+					}
+				}
+			} catch (SQLException e) {
+				System.out.println("ERROR executeQuery - " + e.getMessage());
+			}
+
+		} catch (IOException | ParseException e1) {
+			e1.printStackTrace();
+		}
+		return result;
+	}
+	
+
+	public static Integer getCount() {
+		// TODO Auto-generated method stub
+		Connection conn;
+		try {
+			conn = JDBCConnection.getConnection();
+			try (PreparedStatement statement = conn
+					.prepareStatement(SELECT_COUNT)) {
+				try (ResultSet rs = statement.executeQuery()) {
+					while (rs.next() == true) {
+						return rs.getInt("row_count");
+					}
+				}
+			} catch (SQLException e) {
+				System.out.println("ERROR executeQuery - " + e.getMessage());
+			}
+
+		} catch (IOException | ParseException e1) {
+			e1.printStackTrace();
+		}
+		return 0;	
+	}
+	
 	public static List<Country> fetchByOrder() {
 		List<Country> result = new ArrayList<Country>();
 		Connection conn;
 		try {
 			conn = JDBCConnection.getConnection();
-			try (PreparedStatement statement = conn.prepareStatement(SELECT_BY_ORDER)) {
+			try (PreparedStatement statement = conn
+					.prepareStatement(SELECT_BY_ORDER)) {
 				try (ResultSet rs = statement.executeQuery()) {
 					while (rs.next() == true) {
-						Country country = new Country(rs.getInt("id"), rs.getString("yago_id"), rs.getString("name"), rs.getString("label"), rs.getBoolean("updated"));
+						Country country = new Country(rs.getInt("id"),
+								rs.getString("yago_id"), rs.getString("name"),
+								rs.getString("label"), rs.getBoolean("updated"));
 						country.posterImage = rs.getString("poster_image");
 						country.setRouteLabel(rs.getString("route_name"));
 						result.add(country);
@@ -138,14 +202,14 @@ public class Country {
 		return result;
 	}
 
-
 	public void update() {
-		if (!dirty) return;
+		if (!dirty)
+			return;
 
 		Connection conn;
 		try {
 			conn = JDBCConnection.getConnection();
-			try (PreparedStatement statement = conn.prepareStatement(UPDATE)){
+			try (PreparedStatement statement = conn.prepareStatement(UPDATE)) {
 				statement.setString(1, name);
 				statement.setString(2, label);
 				statement.setInt(3, id);
@@ -156,17 +220,19 @@ public class Country {
 			}
 		} catch (IOException | ParseException e1) {
 			e1.printStackTrace();
-		}		
+		}
 		dirty = false;
 
 	}
 
 	public void updateFromImport() {
-		if (!dirty) return;
+		if (!dirty)
+			return;
 		Connection conn;
 		try {
 			conn = JDBCConnection.getConnection();
-			try (PreparedStatement statement = conn.prepareStatement(UPDATE_AFTER_IMPORT)){
+			try (PreparedStatement statement = conn
+					.prepareStatement(UPDATE_AFTER_IMPORT)) {
 				statement.setString(1, name);
 				statement.setString(2, label);
 				statement.setInt(3, id);
@@ -186,7 +252,8 @@ public class Country {
 		Connection conn;
 		try {
 			conn = JDBCConnection.getConnection();
-			try (PreparedStatement statement = conn.prepareStatement(DELETE_BY_ID)){
+			try (PreparedStatement statement = conn
+					.prepareStatement(DELETE_BY_ID)) {
 				statement.setInt(1, id);
 				statement.executeUpdate();
 			} catch (SQLException e) {
@@ -194,9 +261,8 @@ public class Country {
 			}
 		} catch (IOException | ParseException e1) {
 			e1.printStackTrace();
-		}				
+		}
 	}
-
 
 	public void updateFields(Country other) {
 		setName(other.getName());
@@ -207,7 +273,8 @@ public class Country {
 	}
 
 	public void setName(String name) {
-		if (name != null && this.name != null && name.equals(this.name)) return;
+		if (name != null && this.name != null && name.equals(this.name))
+			return;
 		dirty = true;
 		this.name = name;
 	}
@@ -217,7 +284,8 @@ public class Country {
 	}
 
 	public void setId(int id) {
-		if (id == this.id) return;
+		if (id == this.id)
+			return;
 		dirty = true;
 		this.id = id;
 	}
@@ -227,7 +295,8 @@ public class Country {
 	}
 
 	public void setLabel(String label) {
-		if (label != null && this.label != null && label.equals(this.label)) return;
+		if (label != null && this.label != null && label.equals(this.label))
+			return;
 		dirty = true;
 		this.label = label;
 	}
@@ -251,6 +320,5 @@ public class Country {
 	public void setRouteLabel(String routeLabel) {
 		this.routeLabel = routeLabel;
 	}
-
 
 }

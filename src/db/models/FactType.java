@@ -14,11 +14,16 @@ import db.JDBCConnection;
 
 public class FactType {
 
-	private static final String SELECT_BY_ID = "SELECT fact_type.id, fact_type.name, fact_type.is_literal, "
-			+ "question_wording FROM fact WHERE deleted = 0 AND id = ?";
+	private static final String SELECT_BY_ID = "SELECT fact_type.id, fact_type.name, fact_type.is_literal "
+			+ "FROM fact_type WHERE deleted = 0 AND id = ?";
 	private static final String SELECT_ALL = "SELECT fact_type.id, fact_type.name, fact_type.is_literal, "
 			+ "question_wording FROM fact_type LEFT JOIN fact_type_question_wording ON fact_type_question_wording.fact_id = fact_type.id "
 			+ "WHERE fact_type.deleted = 0 and fact_type_question_wording.deleted = 0";
+	
+	private static final String SELECT_ALL_PAGED = "SELECT fact_type.id, fact_type.name, fact_type.is_literal, "
+			+ "question_wording FROM fact_type LEFT JOIN fact_type_question_wording ON fact_type_question_wording.fact_id = fact_type.id "
+			+ "WHERE fact_type.deleted = 0 and fact_type_question_wording.deleted = 0 LIMIT ?, ?";
+	
 	
 	private static final String SELECT_RANDOM = "SELECT fact_type.id, fact_type.name, fact_type.is_literal,"
 			+ " fact_type_question_wording.question_wording FROM fact_type "
@@ -29,6 +34,7 @@ public class FactType {
 	private static final String DELETE_BY_ID = "UPDATE fact_type SET deleted = 1, updated = 1 WHERE id = ?";
 	private static final String UPDATE_BY_ID = "UPDATE fact_type SET name = ?, updated = 1 WHERE id = ?";
 	private static final String INSERT = "INSERT INTO fact_type (name, is_literal) VALUES(?, ?)";
+	private static final String SELECT_COUNT = "SELECT count(1) as row_count FROM fact_type";
 
 	private String typeName;
 	private String questionWording;
@@ -170,6 +176,57 @@ public class FactType {
 		return result;
 	}
 
+
+	public static List<FactType> fetchAll(int start, int end) {
+		List<FactType> result = new ArrayList<FactType>();
+		Connection conn;
+		try {
+			conn = JDBCConnection.getConnection();
+			try (PreparedStatement statement = conn
+					.prepareStatement(SELECT_ALL_PAGED)) {
+				statement.setInt(1, start);
+				statement.setInt(2, end - start);
+				try (ResultSet rs = statement.executeQuery()) {
+					while (rs.next() == true) {
+						result.add(new FactType(rs.getInt("id"), rs
+								.getString("name"),
+								rs.getBoolean("is_literal"), rs
+										.getString("question_wording")));
+					}
+				}
+			} catch (SQLException e) {
+				System.out.println("ERROR executeQuery - " + e.getMessage());
+			}
+
+		} catch (IOException | ParseException e1) {
+			e1.printStackTrace();
+		}
+		return result;
+	}
+
+
+	
+	public static Integer getCount() {
+		Connection conn;
+		try {
+			conn = JDBCConnection.getConnection();
+			try (PreparedStatement statement = conn
+					.prepareStatement(SELECT_COUNT)) {
+				try (ResultSet rs = statement.executeQuery()) {
+					while (rs.next() == true) {
+						return rs.getInt("row_count");
+					}
+				}
+			} catch (SQLException e) {
+				System.out.println("ERROR executeQuery - " + e.getMessage());
+			}
+
+		} catch (IOException | ParseException e1) {
+			e1.printStackTrace();
+		}
+		return 0;	
+	}
+	
 	public String getTypeName() {
 		return typeName;
 	}
@@ -195,7 +252,6 @@ public class FactType {
 	}
 
 	public static FactType fetchById(Integer id) {
-		// TODO Auto-generated method stub
 		Connection conn;
 		try {
 			conn = JDBCConnection.getConnection();
@@ -206,8 +262,8 @@ public class FactType {
 					while (rs.next() == true) {
 						return new FactType(rs.getInt("id"),
 								rs.getString("name"),
-								rs.getBoolean("is_literal"),
-								rs.getString("question_wording"));
+								rs.getBoolean("is_literal")
+								);
 					}
 				}
 			} catch (SQLException e) {

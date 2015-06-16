@@ -18,7 +18,7 @@ passepartoutApp.questions = angular.module('passepartoutApp.questions',['passepa
 				userId : id
 			}
 		}).success((function(questions_data) {
-			this.questions= questions_data;
+			this.questions = questions_data;
 			callback();	
 		}).bind(this));
 	}
@@ -56,7 +56,7 @@ passepartoutApp.user = angular.module('passepartoutApp.user',[])
 		$http({
 		    method: 'POST',
 		    url: baseApiLocation + "highscore",
-		    data: "user_id=" + this.id + "&score=" + user_score,
+		    data: "userId=" + this.id + "&score=" + user_score,
 		    headers: {'Content-Type': 'application/x-www-form-urlencoded'}
 		})
 		.success((function(data) {
