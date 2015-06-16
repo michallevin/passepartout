@@ -18,11 +18,8 @@ passepartoutApp.questions = angular.module('passepartoutApp.questions',['passepa
 				userId : id
 			}
 		}).success((function(questions_data) {
-		
 			this.questions= questions_data;
-		
-			callback();
-//		
+			callback();	
 		}).bind(this));
 	}
 	return new $Questions()
@@ -42,12 +39,9 @@ passepartoutApp.user = angular.module('passepartoutApp.user',[])
 
 		$http({
 			url : baseApiLocation + "user/login",
-			method : "POST",
-			data : {
+			method : "GET",
+			params : {
 				name : this.name
-			},
-			headers : {
-				'Content-Type' : 'application/x-www-form-urlencoded',
 			}
 		}).success((function(user) {
 			console.log(user);
@@ -62,11 +56,8 @@ passepartoutApp.user = angular.module('passepartoutApp.user',[])
 
 		$http({
 			url : baseApiLocation + "highscore",
-			method : "POST",
-			headers : {
-				'Content-Type' : 'application/x-www-form-urlencoded',
-			},
-			data : {
+			method : "GET",
+			params : {
 				user_id : this.id,
 				score : user_score
 			}
@@ -74,8 +65,6 @@ passepartoutApp.user = angular.module('passepartoutApp.user',[])
 			callback();
 		}).bind(this));
 	}
-
-	
 	return new $User();
 });
 
@@ -105,7 +94,7 @@ passepartoutApp.highscores = angular.module('passepartoutApp.highscores',['passe
 });
 
 
-passepartoutApp.admin = angular.module('passepartoutApp.admin')
+passepartoutApp.manage = angular.module('passepartoutApp.manage', [])
 
 .factory('$Admin', function($http) {
 

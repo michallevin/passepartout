@@ -133,6 +133,13 @@ public class ApiController {
 		return Highscore.fetchTop(10);
 	}
 
+	@RequestMapping(value="/rest/highscore/add", method=RequestMethod.GET)
+	public Highscore addHighScore2(@RequestParam("user_id") Integer userId, @RequestParam("score") Integer score) {
+		Highscore highscore = new Highscore(userId, score);
+		highscore.save();
+		return highscore;
+	}
+	
 	@RequestMapping(value="/rest/highscore", method=RequestMethod.POST)
 	public Highscore addHighScore(@RequestParam("user_id") Integer userId, @RequestParam("score") Integer score) {
 		Highscore highscore = new Highscore(userId, score);
@@ -237,7 +244,7 @@ public class ApiController {
 		return user;
 	}
 
-	@RequestMapping(value="/rest/user/login", method=RequestMethod.POST)
+	@RequestMapping(value="/rest/user/login", method=RequestMethod.GET)
 	public User login(@RequestParam("name") String name) {
 		// Fetch user by name, or create user if it doesn't exist
 		User user = User.fetchByName(name);

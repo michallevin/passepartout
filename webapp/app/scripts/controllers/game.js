@@ -8,7 +8,7 @@
  * Controller of the passepartoutApp
  */
 angular.module('passepartoutApp')
-.controller('GameCtrl', function ($scope, $http, $Questions, $User, $location,$timeout) {
+.controller('GameCtrl', function ($scope, $http, $Questions, $User, $location, $timeout) {
 
 	$scope.currentQuestion = 0;
 	$scope.lives = 3;

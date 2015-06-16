@@ -9,16 +9,11 @@
  */
 angular
   .module('passepartoutApp', [
+    'passepartoutApp.manage',
     'passepartoutApp.questions',
     'passepartoutApp.user',
     'passepartoutApp.highscores',
-    'passepartoutApp.admin',
-    'ngAnimate',
-    'ngCookies',
-    'ngResource',
     'ngRoute',
-    'ngSanitize',
-    'ngTouch'
   ])
   .config(function ($routeProvider) {
     $routeProvider

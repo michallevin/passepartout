@@ -8,25 +8,25 @@
  * Controller of the passepartoutApp
  */
 angular.module('passepartoutApp')
-.controller('AdminCrl', function ($scope, $http) {
+.controller('AdminCrl', function ($scope, $http, $Admin) {
 
 	$scope.isImporting = false;
 
 		
 	$scope.startImport = function() {
-		$AdminService.startImport(function() {
+		$Admin.startImport(function() {
 			$scope.isImporting = true;	
 		});
 	};
 
 	$scope.cancelImport = function() {
-		$AdminService.cancelImport(function() {
+		$Admin.cancelImport(function() {
 			$scope.isImporting = false;
 		});
 	};
 
 	$scope.getImportUpdate = function() {
-		$AdminService.getImportUpdate(function(isImporting) {
+		$Admin.getImportUpdate(function(isImporting) {
 			$scope.isImporting = isImporting;
 		});
 	};
