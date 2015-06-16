@@ -96,8 +96,8 @@ public class UserFactHistory {
 				try (ResultSet rs = statement.executeQuery()) {
 					while (rs.next() == true) {
 						result.add(new UserFactHistory(rs.getInt("id"),
-									       rs.getInt("userId"),
-									       rs.getInt("factId")));
+									       rs.getInt("user_id"),
+									       rs.getInt("fact_id")));
 					}
 				}
 			} catch (SQLException e) {

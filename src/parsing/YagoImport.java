@@ -87,7 +87,8 @@ public class YagoImport {
 			System.out.println("updating all countries");
 			DictionaryUpdater.updateCountryDictionary();
 			
-			FactDictionary.getInstance().clear();
+			if (FactDictionary.hasInstance())
+				FactDictionary.getInstance().clear();
 			
 			System.out.println("import process finished");
 			

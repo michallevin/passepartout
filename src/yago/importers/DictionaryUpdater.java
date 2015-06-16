@@ -30,6 +30,8 @@ public class DictionaryUpdater {
 			//update labels and ranks (if we calculated them) for all facts
 			int i = 0;
 			for (String factData : FactDictionary.getInstance().getFactByDataMap().keySet()) {
+				if (YagoImport.shouldCancel()) break;
+
 				Collection<Fact> factList = FactDictionary.getInstance().getFactByDataMap().get(factData);
 				for (Fact fact : factList) {
 					if (YagoImport.shouldCancel()) break;

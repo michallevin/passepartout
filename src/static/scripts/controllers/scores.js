@@ -9,6 +9,6 @@
  */
 angular.module('passepartoutApp')
 .controller('ScoresCtrl', function ($scope, $location, $User, $Highscores) {
-//	$scope.scores = $Highscores.highscores;
-	$scope.scores = [{'name': 'Yotam', 'score': 230},{'name': 'Eden', 'score':450}]; 
+	$scope.scores = $Highscores.highscores;
+	//$scope.scores = [{'name': 'Yotam', 'score': 230},{'name': 'Eden', 'score':450}]; 
 });

@@ -53,15 +53,13 @@ passepartoutApp.user = angular.module('passepartoutApp.user',[])
 		}).bind(this))}
 
 	$User.prototype.setHighscore = function(user_score, callback){
-
 		$http({
-			url : baseApiLocation + "highscore",
-			method : "GET",
-			params : {
-				user_id : this.id,
-				score : user_score
-			}
-		}).success((function(data) {
+		    method: 'POST',
+		    url: baseApiLocation + "highscore",
+		    data: "user_id=" + this.id + "&score=" + user_score,
+		    headers: {'Content-Type': 'application/x-www-form-urlencoded'}
+		})
+		.success((function(data) {
 			callback();
 		}).bind(this));
 	}

@@ -10,12 +10,27 @@
 	<h1 style="font-family: 'Fredericka the Great', cursive;">
 		<b>Admin</b>
 	</h1>
-			<div style="text-align: center; background: url(http://www.texturepalace.com/wp-content/uploads/vintage-paper-texture-for-photoshop-3.jpg) top center; border-style: solid; border-width: 1px; font-family: 'Fredericka the Great', cursive;">
-			<div class="col btn" ng-click="startImport()"  style="border-style: solid; border-width: 1px; width: 30%" ><b>Start Import</b></div> <div class="col btn" style="border-style: solid; border-width: 1px; width: 30%"
-				ng-click="cancelImport()"><b>Cancel Import</b>
-			</div> <div class="col btn" style="border-style: solid; border-width: 1px; width: 30%" ng-click="getImportUpdate()"> 
-				<b><a href="/admin">Manage db</a></b>
-			</div>
+		<div style="text-align: center; background: url(images/paper.jpg) top center; border-style: solid; border-width: 1px; font-family: 'Fredericka the Great', cursive;">
+			
+			<div class="col btn" style="border-style: solid; border-width: 1px; width: 30%" >
+				<b ng-click="startImport()" >Start Import</b>
+			</div> 
+			
+			<div class="col btn" style="border-style: solid; border-width: 1px; width: 30%">
+				<b ng-click="cancelImport()">Cancel Import</b>
+			</div> 
+					
+			<div class="col btn" style="border-style: solid; border-width: 1px; width: 30%">
+				<b>Status: {{ getStatus() }}</b>
+			</div> 
+		
 		</div>
+		
+				<div style="text-align: center; background: url(images/paper.jpg) top center; border-style: solid; border-width: 1px; font-family: 'Fredericka the Great', cursive;">
+		
+			<div class="col btn" style="border-style: solid; border-width: 1px; width: 100%"> 
+				<b><a href="/admin/index.html">Manage db</a></b>
+			</div>
+			</div>
 	
 </div>

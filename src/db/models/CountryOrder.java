@@ -16,11 +16,11 @@ public class CountryOrder {
 
 	private static final String DELETE = "UPDATE country_order SET deleted = 1, updated = 1 WHERE id = ?";
 	private static final String UPDATE_BY_ID = "UPDATE country_order SET route_name = ?, country_id = ?, route_order = ?, updated = 1 WHERE id = ?";
-	private static final String SELECT_ALL = "SELECT country_order.id, country_order.country_id "
+	private static final String SELECT_ALL = "SELECT country_order.id, country_order.country_id, "
 			+ "country_order.route_order, country_order.poster_image, "
 			+ "country_order.route_name "
 			+ "FROM country_order WHERE deleted = 0";
-	private static final String SELECT_BY_ID = "SELECT country_order.id, country_order.country_id "
+	private static final String SELECT_BY_ID = "SELECT country_order.id, country_order.country_id, "
 			+ "country_order.route_order, country_order.poster_image, "
 			+ "country_order.route_name "
 			+ "FROM country_order WHERE deleted = 0 AND id = ?";

@@ -2,16 +2,20 @@
 
 /**
  * @ngdoc function
- * @name passepartoutApp.controller:AboutCtrl
+ * @name passepartoutApp.AdminCrl
  * @description
- * # AboutCtrl
+ * # AdminCrl
  * Controller of the passepartoutApp
  */
 angular.module('passepartoutApp')
-.controller('AdminCrl', function ($scope, $http, $Admin) {
+.controller('AdminCtrl', function ($scope, $Admin, $interval) {
 
 	$scope.isImporting = false;
 
+	$scope.getStatus = function() {
+		if ($scope.isImporting) return "Active!";
+		return "Inactive";
+	}
 		
 	$scope.startImport = function() {
 		$Admin.startImport(function() {
@@ -31,5 +35,8 @@ angular.module('passepartoutApp')
 		});
 	};
 
+
+    $interval(function(){ $scope.getImportUpdate(); }, 3000);
+	$scope.getImportUpdate();
 
 });

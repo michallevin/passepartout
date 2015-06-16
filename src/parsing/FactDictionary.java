@@ -67,7 +67,6 @@ public class FactDictionary {
 	}
 
 	public int getCount() {
-		// TODO Auto-generated method stub
 		return factsByYagoId.size();
 	}
 
@@ -75,6 +74,10 @@ public class FactDictionary {
 		factsByYagoId.clear();
 		factByDataMap.clear();
 		instance = null;
+	}
+
+	public static boolean hasInstance() {
+		return instance != null;
 	}
 
 
