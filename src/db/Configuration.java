@@ -1,5 +1,6 @@
 package db;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Properties;
@@ -19,9 +20,11 @@ public class Configuration {
 
 
 	public static void load(String fileName) {
+		if (!new File(fileName).exists())
+			return;
+		
 		try (FileInputStream input = new FileInputStream(fileName)) {
 
-			// load a properties file
 			Properties prop = new Properties();
 			prop.load(input);
 
