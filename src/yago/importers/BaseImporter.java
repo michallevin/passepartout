@@ -54,9 +54,9 @@ public abstract class BaseImporter {
 					++i;
 				}
 				if (i > 0 && i % 50000 == 0) {
+					System.out.print(".");
 					if (i % 5000000 == 0)
 						System.out.println("");
-					System.out.print(".");
 					JDBCConnection.getConnection().commit();
 				}
 			}

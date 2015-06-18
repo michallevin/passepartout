@@ -35,8 +35,8 @@ public class Fact {
 
 	private static final String SELECT_WRONG_ANSWERS = "SELECT fact.id, fact.yago_id, fact.country_id, "
 			+ "fact.data, fact.type_id, fact.label, fact.rank, fact.updated "
-			+ "FROM fact WHERE type_id = ? AND country_id <> ? "
-			+ "ORDER BY RAND() " + "LIMIT 3";
+			+ "FROM fact WHERE type_id = ? AND country_id <> ? and deleted = 0"
+			+ "ORDER BY RAND() LIMIT 3";
 
 	private static final String SElECT_RANDOM_LITERAL_FACT = "SELECT fact.id, fact.yago_id, fact.country_id, "
 			+ "fact.data, fact.type_id, fact.label, fact.rank, fact.updated, "
@@ -53,7 +53,7 @@ public class Fact {
 			+ "LEFT JOIN user_fact_history "
 			+ "ON fact.id = user_fact_history.fact_id AND user_fact_history.user_id = ? AND user_fact_history.deleted = 0 "
 			+ "WHERE country_id = ? AND type_id = ? AND fact.deleted = 0 "
-			+ "GROUP BY fact.id " + "ORDER BY appearance_count ASC, rank DESC";
+			+ "GROUP BY fact.id ORDER BY appearance_count ASC, rank DESC";
 
 	private String yagoId;
 	private int countryId;
@@ -63,6 +63,11 @@ public class Fact {
 	private int id;
 	private int rank;
 	private boolean updated;
+	
+	private int tempRank = 0;
+	private String tempData;
+	private int tempFactTypeId;
+	private String tempLabel;
 
 	private boolean dirty = false;
 	private boolean shouldDelete = true;
@@ -423,9 +428,12 @@ public class Fact {
 	}
 
 	public void updateFields(Fact fact) {
-		setData(fact.getData());
-		setFactTypeId(fact.getFactTypeId());
-		setYagoId(fact.getYagoId());
+		
+		//update temp fields since we might update a fact multiple times and we only want to check for changes for the final info
+		
+		this.tempData = fact.getData();
+		this.tempFactTypeId = fact.getFactTypeId();
+	
 		shouldDelete = false;
 	}
 	
@@ -433,7 +441,7 @@ public class Fact {
 
 		if (label != null && label.length() > 0)
 			return StringEscapeUtils.unescapeJava(label
-					.replace(countryName, "").replaceAll("\\(.*?\\)", ""));
+					.replace(countryName, "").replaceAll("\\(.*?\\)", "")).replaceFirst("[a-zA-Z][a-zA-Z]/", "");
 		else
 			return StringEscapeUtils.unescapeJava(data.replace("<", "")
 					.replace(">", "").replace("_", " ").replace("[", "")
@@ -534,9 +542,33 @@ public class Fact {
 	}
 
 	public boolean shouldDelete() {
-		// TODO Auto-generated method stub
 		return shouldDelete;
 	}
+	
+	public void incRank() {
+		tempRank += 1;
+	}
+
+	public void setRank() {
+		setRank(tempRank);
+	}
+	
+	public void setFactTypeId() {
+		setFactTypeId(tempFactTypeId);
+	}
+	
+	public void setData() {
+		setData(tempData);
+	}
+
+	public void setTempLabel(String label) {
+		this.tempLabel = label;		
+	}
+	
+	public void setLabel() {
+		setLabel(tempLabel);
+	}
+	
 
 
 }

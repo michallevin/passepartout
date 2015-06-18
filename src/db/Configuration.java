@@ -1,53 +1,51 @@
 package db;
 
-public class Configuration {
-	private static final String location = "local";
-	
-	public String hostName;
-	public String port;
-	public String dbName;
-	public String protocol = "jdbc:mysql";
-	private String userName;
-	private String password;
-	
-	public static Configuration get() {
-		Configuration config = new Configuration();
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.Properties;
 
-		if (location.equals("remote")) {
-			config.hostName = "127.0.0.1";
-			config.port = "3305";
-			config.dbName = "DbMysql08";
-			config.setUserName("DbMysql08");
-			config.setPassword("DbMysql08");
-		}
-		else if (location.equals("local")) {
-			config.hostName = "127.0.0.1";
-			config.port = "3306";
-			config.dbName = "passepartout";
-			config.setUserName("root");
-			config.setPassword("");
-		}
-		
-		return config;
-	}
-	
-	public String getConnectionURL(){
+public class Configuration {
+
+	public static String hostName = "localhost";
+	public static String port = "3306";
+	public static String dbName = "passepartout";
+	public static String protocol = "jdbc:mysql";
+	private static String userName = "root";
+	private static String password = "";
+
+	public static String getConnectionURL(){
 		return String.format("%s://%s:%s/%s", protocol, hostName, port, dbName);
 	}
 
-	public String getUserName() {
+
+	public static void load(String fileName) {
+		try (FileInputStream input = new FileInputStream(fileName)) {
+
+			// load a properties file
+			Properties prop = new Properties();
+			prop.load(input);
+
+			// get the property value and print it out
+			Configuration.protocol = prop.getProperty("protocol", "jdbc:mysql");
+			Configuration.hostName = prop.getProperty("hostname", "localhost");
+			Configuration.port = prop.getProperty("port", "3306");
+			Configuration.dbName = prop.getProperty("database", "passepartout");
+			Configuration.userName = prop.getProperty("user", "root");
+			Configuration.password = prop.getProperty("password", "");
+
+
+		} catch (IOException ex) {
+			ex.printStackTrace();
+		}
+	}
+
+
+	public static String getUserName() {
 		return userName;
 	}
 
-	public void setUserName(String userName) {
-		this.userName = userName;
-	}
-
-	public String getPassword() {
+	public static String getPassword() {
 		return password;
 	}
 
-	public void setPassword(String password) {
-		this.password = password;
-	}
 }

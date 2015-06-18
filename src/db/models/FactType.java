@@ -16,13 +16,16 @@ public class FactType {
 
 	private static final String SELECT_BY_ID = "SELECT fact_type.id, fact_type.name, fact_type.is_literal "
 			+ "FROM fact_type WHERE deleted = 0 AND id = ?";
+	
 	private static final String SELECT_ALL = "SELECT fact_type.id, fact_type.name, fact_type.is_literal, "
-			+ "question_wording FROM fact_type LEFT JOIN fact_type_question_wording ON fact_type_question_wording.fact_id = fact_type.id "
-			+ "WHERE fact_type.deleted = 0 and fact_type_question_wording.deleted = 0";
+			+ "question_wording FROM fact_type LEFT JOIN fact_type_question_wording ON "
+			+ "fact_type_question_wording.fact_id = fact_type.id and fact_type_question_wording.deleted = 0 "
+			+ "WHERE fact_type.deleted = 0 ";
 	
 	private static final String SELECT_ALL_PAGED = "SELECT fact_type.id, fact_type.name, fact_type.is_literal, "
-			+ "question_wording FROM fact_type LEFT JOIN fact_type_question_wording ON fact_type_question_wording.fact_id = fact_type.id "
-			+ "WHERE fact_type.deleted = 0 and fact_type_question_wording.deleted = 0 LIMIT ?, ?";
+			+ "question_wording FROM fact_type LEFT JOIN fact_type_question_wording ON "
+			+ "fact_type_question_wording.fact_id = fact_type.id and fact_type_question_wording.deleted = 0 "
+			+ "WHERE fact_type.deleted = 0 LIMIT ?, ?";
 	
 	
 	private static final String SELECT_RANDOM = "SELECT fact_type.id, fact_type.name, fact_type.is_literal,"
@@ -160,10 +163,8 @@ public class FactType {
 					.prepareStatement(SELECT_ALL)) {
 				try (ResultSet rs = statement.executeQuery()) {
 					while (rs.next() == true) {
-						result.add(new FactType(rs.getInt("id"), rs
-								.getString("name"),
-								rs.getBoolean("is_literal"), rs
-										.getString("question_wording")));
+						result.add(new FactType(rs.getInt("id"), rs.getString("name"),
+								rs.getBoolean("is_literal"), rs.getString("question_wording")));
 					}
 				}
 			} catch (SQLException e) {

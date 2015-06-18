@@ -8,14 +8,14 @@
  * Controller of the passepartoutApp
  */
 angular.module('passepartoutApp')
-.controller('GameCtrl', function ($scope, $http, $Questions, $User, $location, $timeout) {
+.controller('GameCtrl', function ($scope, $Questions, $User, $location, $timeout) {
 
 	$scope.currentQuestion = 0;
 	$scope.lives = 3;
 	$scope.score = 0;
-	$scope.guessed=-1;
-	$scope.gameOver=0;
-	$scope.loading=false;
+	$scope.guessed = -1;
+	$scope.gameOver = 0;
+	$scope.loading = false;
 
 	$scope.questions=$Questions.questions;
 	
@@ -25,47 +25,49 @@ angular.module('passepartoutApp')
 	}
 	
 	$scope.getAnswerClass = function(index) {
-		if ($scope.guessed != -1 && index==$scope.questions[$scope.currentQuestion].answerIndex) {
+		if ($scope.guessed != -1 && index == $scope.questions[$scope.currentQuestion].answerIndex) {
 			return "green"
 		}
-		else if ($scope.guessed==index) {
+		else if ($scope.guessed == index) {
 			return "red";
 		}
 		return "";
 	}
+	
 	$scope.guessAnswer = function(index) {
-		$scope.guessed=index;
+		$scope.guessed = index;
 
 		if (index == $scope.questions[$scope.currentQuestion].answerIndex) { //yes!
-			setTimeout(function(){$scope.currentQuestion += 1; $scope.guessed=-1;if ($scope.currentQuestion==$scope.questions.length) {
-				console.log("insideeee");
-				$scope.gameOver=1;
-			}$scope.$apply();}, 1000);
-			$scope.score+=$scope.questions[$scope.currentQuestion].score;
+			$timeout(function() {
+				$scope.currentQuestion += 1; 
+				$scope.guessed =- 1;
+				if ($scope.currentQuestion == $scope.questions.length) {
+					$scope.gameOver = 1;
+				}
+			}, 500);
+			$scope.score += $scope.questions[$scope.currentQuestion].score;
 		}
 		else { //no!
 			
-			setTimeout(function(){
+			$timeout(function(){
 				$scope.lives -= 1;
-				if ($scope.lives>0) {
+				if ($scope.lives > 0) {
 					$scope.currentQuestion += 1;
-					}
-				$scope.guessed=-1;
-				if ($scope.currentQuestion==$scope.questions.length) {
-					console.log("insideeee")
-					$scope.gameOver=1;
 				}
-				$scope.$apply()
-
-				}, 1000);
+				$scope.guessed =- 1;
+				if ($scope.currentQuestion == $scope.questions.length) {
+					$scope.gameOver = 1;
+				}
+			}, 500);
 		}
-		console.log($scope.currentQuestion)
-		console.log($scope.questions.length)
-	
-			
-	
+		console.log($scope.currentQuestion);
+		console.log($scope.questions.length);	
 	}
 	
+	// for debugging
+	$scope.advance = function() {
+		$scope.currentQuestion += 1;
+	}
 	
 	$scope.submitScore = function() {
 		$User.setHighscore($scope.score, function() {
@@ -91,8 +93,8 @@ angular.module('passepartoutApp')
 	$scope.endGame = function() {
 		$scope.currentQuestion = 0;
 		$scope.lives = 3;
-		$scope.score=0;
-		$scope.gameOver=0;
+		$scope.score = 0;
+		$scope.gameOver = 0;
 		$location.path('/');
 	}
 

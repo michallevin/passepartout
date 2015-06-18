@@ -41,7 +41,7 @@ public class GameConfigInit {
 	
 	public static void setQuestionWordings() {
 		String[][] questionWordings = {
-				{"<happenedIn>", "Which of these happend in $countryName?"}, 
+				{"<happenedIn>", "Which of these happened in $countryName?"}, 
 				{"<isCitizenOf>", "Who is/was a citizen of $countryName?"}, 
 				{"<isPoliticianOf>", "Who is/was a politician of $countryName?"}, 
 				{"<infobox/en/basincountries>", "Which of these is located in $countryName?"}, 
@@ -57,10 +57,8 @@ public class GameConfigInit {
 				{"<hasOfficialLanguage>", "Which of these is an official language of $countryName?"}, 
 				{"<hasNumberOfPeople>", "How many people live in $countryName?"}, 
 				{"<infobox/en/headquarters>", "Which of these has its headquarters in $countryName?"}, 
-				//{"<infobox/en/imagemap>", "Which of these is $countryName?"}, 
 				{"<hasMotto>", "Which of these is the motto of $countryName?"}, 
-				//{"<infobox/en/imageflag>", "Which of these is the flag of $countryName?"}, 
-				{"<infobox/en/areakm>", "What is the area of $countryName?"}, 
+				{"<infobox/en/areakm>", "What is the area in km of $countryName?"}, 
 				//{"<infobox/en/cctld>", "What is the TLD of $countryName?"}, 
 				{"<infobox/en/capital>", "What is the capital of $countryName?"}, 
 				{"<infobox/en/currencycode>", "What is the currency code of $countryName?"}, 

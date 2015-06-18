@@ -4,8 +4,6 @@ import java.io.IOException;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.text.ParseException;
-import java.util.Collection;
-
 import parsing.CountryDictionary;
 import parsing.FactDictionary;
 import parsing.YagoImport;
@@ -17,7 +15,7 @@ public class DictionaryUpdater {
 
 	public static void updateFactDictionary() {
 		if (YagoImport.shouldCancel()) return;
-		
+
 		try {
 			JDBCConnection.getConnection().setAutoCommit(false);
 
@@ -26,57 +24,59 @@ public class DictionaryUpdater {
 			int updated = 0;
 			int inserted = 0;
 			int deleted = 0;
-			
-			//update labels and ranks (if we calculated them) for all facts
+
+			//insert/update/delete facts from dictionary
 			int i = 0;
-			for (String factData : FactDictionary.getInstance().getFactByDataMap().keySet()) {
+			for (Fact fact : FactDictionary.getInstance().getFactsByYagoIdMap().values()) {
+
 				if (YagoImport.shouldCancel()) break;
 
-				Collection<Fact> factList = FactDictionary.getInstance().getFactByDataMap().get(factData);
-				for (Fact fact : factList) {
-					if (YagoImport.shouldCancel()) break;
+				//rank and label were calculated in a temp vars, move final result to real vars (for dirty checking)
+				fact.setRank(); 
+				fact.setLabel();
 
-					
-					if (fact.isNew()) {
-						fact.saveFromImport(insertStatment);
-						inserted += 1;
-					}
-					else if (!fact.isUpdated()) {
-						if (fact.shouldDelete()) {
-							fact.delete();
-							deleted += 1;
-						}
-						else {
-							fact.updateFromImport(updateStatment);
-							updated += 1;
-						}
-					}
-				
-					if (i > 0 && i % 10000 == 0) {
-						if (i % 1000000 == 0)
-							System.out.println("");
-						System.out.print(".");
-						
-						insertStatment.executeBatch();
-						updateStatment.executeBatch();
-						
-						JDBCConnection.getConnection().commit();
-					}
-					++i;
+				if (fact.isNew()) {
+					fact.saveFromImport(insertStatment);
+					inserted += 1;
 				}
+				else if (!fact.isUpdated()) { // make sure user hasn't updated this fact
+					if (fact.shouldDelete()) {
+						fact.delete();
+						deleted += 1;
+					}
+					else {
+						fact.setData(); //copy final data from temp
+						fact.setFactTypeId(); //copy final type from temp
+
+						fact.updateFromImport(updateStatment);
+						updated += 1;
+					}
+				}
+
+				if (i > 0 && i % 100 == 0) {
+					if (i % 10000 == 0)
+						System.out.println("");
+					System.out.print(".");
+
+					insertStatment.executeBatch();
+					updateStatment.executeBatch();
+
+					JDBCConnection.getConnection().commit();
+				}
+				++i;
 			}
 
 
-			
+
 			insertStatment.executeBatch();
 			updateStatment.executeBatch();
-			
+
 			JDBCConnection.getConnection().commit();
 			JDBCConnection.getConnection().setAutoCommit(true);
-			
+
 			System.out.println(String.format("inserted %d, updated %d, delted %d", inserted, updated, deleted));
 			System.out.println("finished");
-			
+
 		} catch (SQLException | IOException | ParseException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -86,10 +86,10 @@ public class DictionaryUpdater {
 	public static void updateCountryDictionary() {
 		if (YagoImport.shouldCancel()) return;
 
-		
+
 		try {
 			JDBCConnection.getConnection().setAutoCommit(false);
-			
+
 
 			for (String countryName : CountryDictionary.getInstance().getCountryMap().keySet()) {
 				if (YagoImport.shouldCancel()) break;
@@ -109,6 +109,6 @@ public class DictionaryUpdater {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
 	}
 }

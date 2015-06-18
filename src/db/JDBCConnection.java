@@ -40,9 +40,8 @@ public class JDBCConnection {
 		
 		try {
 			
-			Configuration dbConfig = Configuration.get();
 			conn = DriverManager.getConnection(
-					dbConfig.getConnectionURL(), dbConfig.getUserName(), dbConfig.getPassword()
+					Configuration.getConnectionURL(), Configuration.getUserName(), Configuration.getPassword()
 					);
 			
 		} catch (SQLException e) {

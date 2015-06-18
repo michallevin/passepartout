@@ -22,7 +22,7 @@ public class Question {
 	
 	public static Question generateQuestion(Country country, int userId, boolean isLiteral, int difficulty) {
 
-		System.out.println("generating question " + country.getLabel());
+		System.out.print("generating question " + country.getLabel());
 		List<Fact> otherOptions = new ArrayList<Fact>();
 		FactType factType = null;
 		Fact answer = null;
@@ -34,6 +34,8 @@ public class Question {
 			if (answer == null) continue;
 			otherOptions = Fact.getWrongAnswers(factType.getId(), country.getId());
 		}
+		System.out.println();
+
 		
 		Question question = new Question();
 		question.setQuestionText(factType.getQuestionWording().replace("$countryName", country.getLabel()));
