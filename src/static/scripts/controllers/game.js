@@ -16,8 +16,9 @@ angular.module('passepartoutApp')
 	$scope.guessed = -1;
 	$scope.gameOver = 0;
 	$scope.loading = false;
+	
 
-	$scope.questions=$Questions.questions;
+	$scope.questions = $Questions.questions;
 	
 	if ($scope.questions.length == 0) {
 		$location.path('/');

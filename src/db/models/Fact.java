@@ -35,7 +35,7 @@ public class Fact {
 
 	private static final String SELECT_WRONG_ANSWERS = "SELECT fact.id, fact.yago_id, fact.country_id, "
 			+ "fact.data, fact.type_id, fact.label, fact.rank, fact.updated "
-			+ "FROM fact WHERE type_id = ? AND country_id <> ? and deleted = 0"
+			+ "FROM fact WHERE type_id = ? AND country_id <> ? and deleted = 0 "
 			+ "ORDER BY RAND() LIMIT 3";
 
 	private static final String SElECT_RANDOM_LITERAL_FACT = "SELECT fact.id, fact.yago_id, fact.country_id, "
