@@ -8,7 +8,7 @@
  * Controller of the passepartoutApp
  */
 angular.module('passepartoutApp')
-.controller('GameCtrl', function ($scope, $Questions, $User, $location, $timeout) {
+.controller('GameCtrl', function ($scope, $Questions, $User, $location, $timeout, $Highscores) {
 
 	$scope.currentQuestion = 0;
 	$scope.lives = 3;
@@ -71,7 +71,9 @@ angular.module('passepartoutApp')
 	}
 	
 	$scope.submitScore = function() {
-		$User.setHighscore($scope.score, function() {
+		console.log($User.id)
+		$User.setHighscore($scope.score)
+		$Highscores.getHighscores(function() {
 			$location.path('/highscores');
 		})
 		

@@ -8,7 +8,7 @@
  * Controller of the passepartoutApp
  */
 angular.module('passepartoutApp')
-.controller('MainCtrl', function ($scope, $location, $User) {
+.controller('MainCtrl', function ($scope, $location, $User, $Highscores) {
 
 	$scope.username = {
 		name: 'guest',
@@ -31,8 +31,9 @@ angular.module('passepartoutApp')
 
 	};
 	$scope.gotoHighScores = function() {
-		console.log($scope.username.name);
-		$location.path('/highscores');
+		$Highscores.getHighscores(function() {
+			$location.path('/highscores');
+		})
 	};
 	$scope.gotoAdmin = function() {
 		console.log($scope.username.name);
