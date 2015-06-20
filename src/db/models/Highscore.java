@@ -16,7 +16,9 @@ public class Highscore {
 	private static final String DELETE_BY_ID = "UPDATE highscore SET deleted = 1, updated = 1 WHERE id = ?";
 	private static final String UPDATE_BY_ID = "UPDATE highscore SET user_id = ?, score = ?, updated = 1 WHERE id = ?";
 	private static final String SELECT_ALL = "SELECT id, user_id, score FROM highscore WHERE deleted = 0 LIMIT ?, ?";
-	private static final String SELECT_TOP = "SELECT id, user_id, score FROM highscore WHERE deleted = 0 ORDER BY score DESC LIMIT ?";
+	private static final String SELECT_TOP = "SELECT highscore.id, highscore.user_id, highscore.score, user.name FROM highscore"
+			+ " JOIN user on highscore.user_id = user.id"
+			+ " WHERE user.deleted = 0 AND highscore.deleted = 0 ORDER BY score	DESC LIMIT ?";
 	private static final String SELECT_BY_ID = "SELECT id, user_id, score FROM highscore WHERE deleted = 0 and id = ?";
 	private static final String INSERT = "INSERT INTO highscore (user_id, score) VALUES (?, ?)";
 	private static final String SELECT_COUNT = "SELECT count(1) as row_count FROM highscore";
@@ -93,7 +95,9 @@ public class Highscore {
 				statement.setInt(1, scoresCount);
 				try (ResultSet rs = statement.executeQuery()) {
 					while (rs.next() == true) {
-						result.add(new Highscore(rs.getInt("id"), rs.getInt("user_id"), rs.getInt("score")));
+						Highscore highscore = new Highscore(rs.getInt("id"), rs.getInt("user_id"), rs.getInt("score"));
+						highscore.setName(rs.getString("name"));
+						result.add(highscore);
 					}
 				}
 			} catch (SQLException e) {
