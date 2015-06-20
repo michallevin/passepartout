@@ -153,7 +153,7 @@ public class ApiController {
 	@RequestMapping(value="/rest/highscore/{id}", method=RequestMethod.PUT)
 	public Highscore editHighscore(@PathVariable Integer id,@RequestParam("userId") Integer userId, @RequestParam("score") Integer score) {
 		Highscore highscore = Highscore.fetchById(id);
-		highscore.setScore(score);
+		highscore.setScore(score);	
 		highscore.setUserId(userId);
 		highscore.update();
 		return highscore;

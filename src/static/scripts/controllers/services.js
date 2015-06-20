@@ -52,15 +52,15 @@ passepartoutApp.user = angular.module('passepartoutApp.user',[])
 			
 		}).bind(this))}
 
-	$User.prototype.setHighscore = function(user_score, callback){
+	$User.prototype.setHighscore = function(user_score){
 		$http({
 		    method: 'POST',
-		    url: baseApiLocation + "highscore",
+		    url: baseApiLocation + "highscore/",
 		    data: "userId=" + this.id + "&score=" + user_score,
 		    headers: {'Content-Type': 'application/x-www-form-urlencoded'}
 		})
 		.success((function(data) {
-			callback();
+			
 		}).bind(this));
 	}
 	return new $User();
@@ -74,7 +74,7 @@ passepartoutApp.highscores = angular.module('passepartoutApp.highscores',['passe
 		this.highscores=[];
 	}
 
-	$Highscores.prototype.getHighscores = function(){
+	$Highscores.prototype.getHighscores = function(callback){
 
 		$http({
 			url : baseApiLocation + "highscore/top",
@@ -84,7 +84,7 @@ passepartoutApp.highscores = angular.module('passepartoutApp.highscores',['passe
 		}).success((function(data) {
 
 			this.highscores= data;
-			
+			callback();
 	
 		}).bind(this))}
 
