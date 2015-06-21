@@ -76,8 +76,11 @@ angular.module('passepartoutApp')
 		$Highscores.getHighscores(function() {
 			$location.path('/highscores');
 		})
-		
-		$scope.gameOver=0;
+		$scope.currentQuestion = 0;
+		$scope.lives = 3;
+		$scope.score = 0;
+		$scope.gameOver = 0;
+
 	}
 	
 	$scope.startOver= function() {

@@ -17,12 +17,7 @@ angular.module('passepartoutApp')
 
 	$scope.startGame = function() {
 		
-		if (!$scope.username.name) {
-			alert("You must choose a username!")
-			return;
-		}
-		console.log($scope.username.name);
-		$User.name=$scope.username.name;
+	
 		$scope.loading = true;
 		$User.getUserId(function() {
 			console.log("loaded questions");
@@ -42,6 +37,12 @@ angular.module('passepartoutApp')
 	};
 	$scope.gotoIntro = function() {
 		console.log($scope.username.name);
+		if (!$scope.username.name) {
+			alert("You must choose a username!")
+			return;
+		}
+		console.log($scope.username.name);
+		$User.name=$scope.username.name;
 		$location.path('/intro');
 	};
 
